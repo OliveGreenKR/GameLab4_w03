@@ -24,7 +24,6 @@ public class obstacleJump : MonoBehaviour
                     // 충돌 지점이 내 중심보다 위쪽인지 확인
                     if (contact.point.y > transform.position.y + 0.1f)
                     {
-                        Debug.Log("a");
                         Rigidbody rb = collision.gameObject.GetComponent<Rigidbody>();
                         if (rb != null)
                         {
