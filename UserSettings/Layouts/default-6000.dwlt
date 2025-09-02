@@ -15,7 +15,7 @@ MonoBehaviour:
   m_PixelRect:
     serializedVersion: 2
     x: 1920
-    y: 42
+    y: 43
     width: 1920
     height: 1109
   m_ShowMode: 4
