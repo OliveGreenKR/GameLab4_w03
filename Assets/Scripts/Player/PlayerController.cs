@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     [Header("Player State")]
     [SerializeField] public bool IsGrounded = true;
     [SerializeField] private bool _isMoving = false;
+    [SerializeField] private Vector3 _currentVelocity;
 
     [Header("Rigid Settings")]
     [SerializeField] public float GravityMultiplier = 3.0f;
@@ -21,7 +22,8 @@ public class PlayerController : MonoBehaviour, IReSpawnable
 
     [Header("Movement Settings")]
     [SerializeField] public float MovementSpeed = 5.0f;
-    [SerializeField] public float JumpSpeed = 10.0f;
+    [SerializeField] public float MovementAccelInAir = 10.0f;
+    [SerializeField] public float JumpImpulseAccel = 10.0f;
     [SerializeField] public float FallingMovementSpeedMultiplier = 0.5f;
     [SerializeField] public float MaxSpeed = 10.0f;
     [SerializeField] public float MaxFallSpeed = 30.0f;
@@ -169,7 +171,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     {
         if(IsGrounded)
         {
-            _rigid.linearVelocity += Vector3.up * JumpSpeed;
+            _rigid.AddForce(Vector3.up * JumpImpulseAccel, ForceMode.VelocityChange);  
             IsGrounded = false;
         }
         
@@ -202,14 +204,15 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         if (IsGrounded)
         {
             targetVelocity = direction * MovementSpeed;
+            // Y축(수직) 속도는 유지하고 수평 속도만 직접 설정
+            _rigid.linearVelocity = new Vector3(targetVelocity.x, _rigid.linearVelocity.y, targetVelocity.z);
         }
         else
         {
-            targetVelocity = direction * MovementSpeed * FallingMovementSpeedMultiplier;
+            _rigid.AddForce(direction * MovementAccelInAir * FallingMovementSpeedMultiplier, ForceMode.Acceleration);
         }
 
-        // Y축(수직) 속도는 유지하고 수평 속도만 직접 설정
-        _rigid.linearVelocity = new Vector3(targetVelocity.x, _rigid.linearVelocity.y, targetVelocity.z);
+        
     }
 
     private void LimitMaxSpeed()
@@ -227,6 +230,8 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         {
             _rigid.linearVelocity = new Vector3(_rigid.linearVelocity.x, -MaxFallSpeed, _rigid.linearVelocity.z);
         }
+
+        _currentVelocity = _rigid.linearVelocity;
     }
 
     private void ApplyGravity()

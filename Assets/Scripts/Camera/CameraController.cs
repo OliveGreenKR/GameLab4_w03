@@ -229,10 +229,10 @@ public class CameraController : MonoBehaviour , IAngleController
         bool updatePosition = false;   
         
 
-        //위치변화량이 한계값 이상하고 충분한 경우에만 업데이트
+        //위치변화량이 한계값 이상
         Vector3 currentPosition = transform.position;
         float positionDistance = Vector3.Distance(currentPosition, _targetWorldPosition);
-        updatePosition = Mathf.Abs(positionDistance) > _positionDeadZoneUnits && Mathf.Abs(positionDistance) > 0.01f;
+        updatePosition = Mathf.Abs(positionDistance) > _positionDeadZoneUnits;
         Debug.Log($"Distance to Target : {positionDistance}");
 
         if (updatePosition)
@@ -250,7 +250,7 @@ public class CameraController : MonoBehaviour , IAngleController
 
             float rotationAngle = Quaternion.Angle(transform.rotation, targetRotation);
 
-            updateRotation = Mathf.Abs(rotationAngle) > _rotationDeadZoneDegrees && Mathf.Abs(rotationAngle) > 0.1f;
+            updateRotation = Mathf.Abs(rotationAngle) > _rotationDeadZoneDegrees;
             if (updateRotation)
             {
                 Quaternion NewRotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationDampingSpeed * Time.deltaTime);
