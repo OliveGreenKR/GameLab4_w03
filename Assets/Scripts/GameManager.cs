@@ -1,4 +1,4 @@
-using NUnit.Framework;
+Ôªøusing NUnit.Framework;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Serialized Fields
+    [SerializeField] private Vector3 _playerStartLocation = new Vector3(0, 5.0f, 0);
     [SerializeField] private PlayerController _player = null;
     [SerializeField] private PlayerColorController _playerColorController = null;
 
@@ -28,6 +29,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Vector3 _respawnPosition = new Vector3(0, 0, 10);
     [SerializeField] private ObjectColorChangeManager _objectColorChangeManager = null;
     [SerializeField] private ObjectColor _playerColor = ObjectColor.Red;
+    [SerializeField] private bool _canColorChange = true;
+
+
     #endregion
 
     #region Properties
@@ -37,7 +41,7 @@ public class GameManager : MonoBehaviour
     #region Unity Lifecycle
     private void Awake()
     {
-        // ΩÃ±€≈Ê ¿ŒΩ∫≈œΩ∫ ∞¸∏Æ
+        // Ïã±Í∏ÄÌÜ§ Ïù∏Ïä§ÌÑ¥Ïä§ Í¥ÄÎ¶¨
         if (Instance == null)
         {
             Instance = this;
@@ -62,6 +66,7 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         Debug.Log("Game Start");
+        SpawnPlayer(_playerStartLocation);
     }
 
     public void GameOver()
@@ -71,6 +76,10 @@ public class GameManager : MonoBehaviour
 
     public void OnPlayerClicked()
     {
+        if (!_canColorChange)
+        {
+            return;
+        }
         int nextValue = ((int)_playerColor + 1) % 2; //red,blue
         _playerColor = (ObjectColor)nextValue;
         _playerColorController?.ChangeColor(_playerColor);
@@ -81,6 +90,17 @@ public class GameManager : MonoBehaviour
     {
         (_player as IReSpawnable)?.ReSpawn(_respawnPosition, Quaternion.identity);  
     }
+
+    public void SpawnPlayer(Vector3 spawnPosition)
+    {
+        (_player as IReSpawnable)?.ReSpawn(spawnPosition, Quaternion.identity);
+    }
+
+    public void SetCanColorChange(bool value)
+    {
+        _canColorChange = value;
+    }
+
     #endregion
 
     #region Private Methods

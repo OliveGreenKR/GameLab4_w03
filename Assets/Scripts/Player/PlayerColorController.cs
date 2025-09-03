@@ -1,16 +1,15 @@
-using UnityEngine;
-
+ï»¿using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerColorController : MonoBehaviour
 {
-    [SerializeField] private Renderer _playerRenderer = null;     // ÇÃ·¹ÀÌ¾î ·»´õ·¯
+    [SerializeField] private Renderer _playerRenderer = null;     // í”Œë ˆì´ì–´ ë Œë”ëŸ¬
     [SerializeField] private ObjectColor _playerColor = ObjectColor.Gray;
-
     public ObjectColor PlayerColor => _playerColor;
 
     [Header("Materials")]
-    [SerializeField] private Material redSolidMaterial;      // »¡°£»ö ¿ø»ö ¸ŞÅ×¸®¾ó
-    [SerializeField] private Material blueSolidMaterial;     // ÆÄ¶õ»ö ¿ø»ö ¸ŞÅ×¸®¾ó
+    [SerializeField] private Material redSolidMaterial;      // ë¹¨ê°„ìƒ‰ ì›ìƒ‰ ë©”í…Œë¦¬ì–¼
+    [SerializeField] private Material blueSolidMaterial;     // íŒŒë€ìƒ‰ ì›ìƒ‰ ë©”í…Œë¦¬ì–¼
 
     private Collider[] _cachedColliders;
 
@@ -25,13 +24,32 @@ public class PlayerColorController : MonoBehaviour
             }
         }
 
-        // ¸ğµç Collider Ä³½Ì (ÀÚ½Ä Æ÷ÇÔ)
-        _cachedColliders = gameObject.GetComponentsInChildren<Collider>();
-        Debug.Log($"Cached {_cachedColliders.Length} colliders for player color changes");
-        if(_cachedColliders == null)
+        // ëª¨ë“  Collider ìºì‹± (ìì‹ í¬í•¨) - "GrayObject" íƒœê·¸ ì œì™¸
+        Collider[] allColliders = gameObject.GetComponentsInChildren<Collider>();
+
+        // 1ë‹¨ê³„: ìœ íš¨í•œ Collider ê°œìˆ˜ ì¹´ìš´íŠ¸
+        int validCount = 0;
+        for (int i = 0; i < allColliders.Length; i++)
         {
-            Debug.LogWarning("PlayerColorController: No colliders found on player or its children!");
+            if (allColliders[i] != null && allColliders[i].gameObject.tag != "GrayObject")
+            {
+                validCount++;
+            }
         }
+
+        // 2ë‹¨ê³„: ì •í™•í•œ í¬ê¸°ë¡œ ë°°ì—´ í• ë‹¹ í›„ ìœ íš¨í•œ Colliderë§Œ ì±„ì›€
+        _cachedColliders = new Collider[validCount];
+        int cacheIndex = 0;
+        for (int i = 0; i < allColliders.Length; i++)
+        {
+            if (allColliders[i] != null && allColliders[i].gameObject.tag != "GrayObject")
+            {
+                _cachedColliders[cacheIndex] = allColliders[i];
+                cacheIndex++;
+            }
+        }
+
+        Debug.Log($"Cached {_cachedColliders.Length} colliders for player color changes (excluded GrayObject tags)");
 
         var gameManager = GameManager.Instance;
         if (gameManager != null)
@@ -49,12 +67,12 @@ public class PlayerColorController : MonoBehaviour
         }
 
         _playerColor = NewColor;
-        Debug.Log($"Player color changed to: {_playerColor}");
+        //Debug.Log($"Player color changed to: {_playerColor}");
 
-        //¸ÅÅÍ¸®¾ó º¯°æ
+        //ë§¤í„°ë¦¬ì–¼ ë³€ê²½
         ChangeMaterial(NewColor);
 
-        // Å¸°Ù ·¹ÀÌ¾î °áÁ¤
+        // íƒ€ê²Ÿ ë ˆì´ì–´ ê²°ì •
         int targetLayer;
         switch (NewColor)
         {
@@ -69,10 +87,10 @@ public class PlayerColorController : MonoBehaviour
                 break;
         }
 
-        // GameObject ·¹ÀÌ¾î º¯°æ
+        // GameObject ë ˆì´ì–´ ë³€ê²½
         gameObject.layer = targetLayer;
 
-        // Ä³½ÌµÈ ¸ğµç ColliderÀÇ ·¹ÀÌ¾î º¯°æ
+        // ìºì‹±ëœ ëª¨ë“  Colliderì˜ ë ˆì´ì–´ ë³€ê²½
         for (int i = 0; i < _cachedColliders.Length; i++)
         {
             if (_cachedColliders[i] != null && _cachedColliders[i].gameObject != null)

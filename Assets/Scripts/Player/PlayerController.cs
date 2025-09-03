@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour, IReSpawnable
@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     [SerializeField] private Rigidbody _rigid;
     [SerializeField] Camera _camera = null;
     #endregion
-
     public bool IsMoving => _isMoving;
 
     [Header("Player State")]
@@ -44,7 +43,6 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     private void Start()
     {
         InitializeReferences();
-        
     }
     private void Update()
     {
@@ -67,8 +65,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     {
         HandleContinuousMovement();
         ApplyMoreGravity();
-        LimitMaxSpeed();
-        
+        LimitMaxSpeed();  
     }
 
     private void OnEnable()
@@ -85,23 +82,23 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     #region IReSpawnable Implementation
     public bool ReSpawn(Vector3 worldPosition, Quaternion worldRotation)
     {
-        // À§Ä¡¿Í È¸Àü ¼³Á¤
+        // ìœ„ì¹˜ì™€ íšŒì „ ì„¤ì •
         transform.position = worldPosition;
         transform.rotation = worldRotation;
 
-        // ¹°¸® »óÅÂ ÃÊ±âÈ­
+        // ë¬¼ë¦¬ ìƒíƒœ ì´ˆê¸°í™”
         if (_rigid != null)
         {
             _rigid.linearVelocity = Vector3.zero;
             _rigid.angularVelocity = Vector3.zero;
         }
 
-        // ÇÃ·¹ÀÌ¾î »óÅÂ ÃÊ±âÈ­
-        IsGrounded = true;
+        // í”Œë ˆì´ì–´ ìƒíƒœ ì´ˆê¸°í™”
+        IsGrounded = false;
         _isMoving = false;
         _currentMoveInput = Vector2.zero;
 
-        // ½ºÆù À§Ä¡ ±â·Ï
+        // ìŠ¤í° ìœ„ì¹˜ ê¸°ë¡
         LastSpawnPosition = worldPosition;
 
         Debug.Log($"[Player] Respawned at position: {worldPosition}");
@@ -180,6 +177,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
         _currentMoveInput = Vector2.zero;
+        _rigid.linearVelocity = new Vector3(0, _rigid.linearVelocity.y, 0);
         //_isMoving = false;
     }
 
@@ -214,14 +212,14 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         Vector3 direction = new Vector3(_currentMoveInput.x, 0.0f, _currentMoveInput.y);
         if(_camera)
         {
-            // 3. Ä«¸Ş¶óÀÇ Transform ÄÄÆ÷³ÍÆ®¿¡ Á¢±ÙÇÏ¿© eulerAngles.y °ªÀ» °¡Á®¿É´Ï´Ù.
+            // 3. ì¹´ë©”ë¼ì˜ Transform ì»´í¬ë„ŒíŠ¸ì— ì ‘ê·¼í•˜ì—¬ eulerAngles.y ê°’ì„ ê°€ì ¸ì˜µë‹ˆë‹¤.
             Quaternion cameraRotation = Quaternion.Euler(0, _camera.transform.eulerAngles.y, 0);
 
-            // 4. ¹æÇâ º¤ÅÍ¸¦ Ä«¸Ş¶óÀÇ YÃà È¸Àü¸¸Å­ È¸Àü½ÃÅµ´Ï´Ù.
+            // 4. ë°©í–¥ ë²¡í„°ë¥¼ ì¹´ë©”ë¼ì˜ Yì¶• íšŒì „ë§Œí¼ íšŒì „ì‹œí‚µë‹ˆë‹¤.
             direction = cameraRotation * direction;
         }
 
-        // ´ë°¢¼± ÀÌµ¿ ½Ã ¼Óµµ Á¤±ÔÈ­ (¹æÇâÀÌ ÀÖÀ» ¶§¸¸)
+        // ëŒ€ê°ì„  ì´ë™ ì‹œ ì†ë„ ì •ê·œí™” (ë°©í–¥ì´ ìˆì„ ë•Œë§Œ)
         if (direction.magnitude > 0.1f)
         {
             direction = direction.normalized;
@@ -232,8 +230,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         if (IsGrounded)
         {
             targetVelocity = direction * MovementSpeed;
-            // YÃà(¼öÁ÷) ¼Óµµ´Â À¯ÁöÇÏ°í ¼öÆò ¼Óµµ¸¸ Á÷Á¢ ¼³Á¤
-            _rigid.linearVelocity = new Vector3(targetVelocity.x, _rigid.linearVelocity.y, targetVelocity.z);
+            _rigid.AddForce(targetVelocity, ForceMode.VelocityChange);
         }
         else
         {
@@ -257,7 +254,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
             _rigid.linearVelocity = new Vector3(horizontalVelocity.x, _rigid.linearVelocity.y, horizontalVelocity.z);
         }
 
-        // ÃÖ´ë ³«ÇÏ ¼Óµµ Á¦ÇÑ
+        // ìµœëŒ€ ë‚™í•˜ ì†ë„ ì œí•œ
         if (_rigid.linearVelocity.y < -MaxFallSpeed)
         {
             _rigid.linearVelocity = new Vector3(_rigid.linearVelocity.x, -MaxFallSpeed, _rigid.linearVelocity.z);
@@ -270,7 +267,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     {
         float gravityMultiplier;
 
-        // ÇÏ°­ ÁßÀÏ ¶§ ´õ °­ÇÑ Áß·Â Àû¿ë
+        // í•˜ê°• ì¤‘ì¼ ë•Œ ë” ê°•í•œ ì¤‘ë ¥ ì ìš©
         if (_rigid.linearVelocity.y < 0)
         {
             gravityMultiplier = FallingGravityMultiplier;
