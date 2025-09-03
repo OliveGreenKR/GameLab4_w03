@@ -358,7 +358,6 @@ public class CameraController : MonoBehaviour , IAngleController
             float playerSpeed = _playerRigidbody.linearVelocity.magnitude;
             float speedRatio = Mathf.Clamp01(playerSpeed / _maxSpeedForDistanceUnitsPerSecond);
             float speedDistanceOffset = speedRatio * _speedDistanceMultiplier * _baseDistanceUnits;
-            Debug.Log($"Player Speed: {playerSpeed}, Speed Ratio: {speedRatio}, Distance Offset: {speedDistanceOffset}");
             baseDistance += speedDistanceOffset;
         }
 

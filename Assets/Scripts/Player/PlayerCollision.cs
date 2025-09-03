@@ -4,34 +4,42 @@ public class PlayerCollision : MonoBehaviour
 {
     [SerializeField] Collider _collider = null;
     [SerializeField] PlayerController _player;
+    [SerializeField] Collider _lastTriggered = null;
 
     private void Start()
     {
-        if(_collider == null )
+        if (_collider == null)
         {
             _collider = GetComponent<Collider>();
         }
 
-        if(_player == null )
+        if (_player == null)
         {
             _player = GetComponent<PlayerController>();
         }
+
+        // BoxCollider를 Trigger로 설정 확인
+        if (_collider != null && !_collider.isTrigger)
+        {
+            Debug.LogWarning("PlayerCollision: Collider should be set as Trigger!");
+        }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"player collision enter {collision.gameObject.name}");
+        Debug.Log($"player trigger enter {other.gameObject.name}");
         _player.IsGrounded = true;
     }
 
-    private void OnCollisionExit(Collision collision)
+    private void OnTriggerExit(Collider other)
     {
-        Debug.Log($"player collision exit {collision.gameObject.name}");
+        Debug.Log($"player trigger exit {other.gameObject.name}");
+        _player.IsGrounded = false;
     }
 
-    private void OnCollisionStay(Collision collision)
+    private void OnTriggerStay(Collider other)
     {
-        //sdfsdfsdfsdfsf
-        //sdfsdfsdfs
+        
+
     }
 }
