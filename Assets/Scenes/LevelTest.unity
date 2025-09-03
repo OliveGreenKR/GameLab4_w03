@@ -1054,9 +1054,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a2530dc894f9e748b895c0f5bd713eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 0
-  moveDir: {x: 0, y: 0, z: 1}
-  rotateDir: {x: 0, y: 1, z: 0}
+  comeBack: 0
+  moveNum: 0
+  movePos: []
 --- !u!1 &1653432831
 GameObject:
   m_ObjectHideFlags: 0
