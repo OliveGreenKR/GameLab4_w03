@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
     {
         int nextValue = ((int)_playerColor + 1) % 2; //red,blue
         _playerColor = (ObjectColor)nextValue;
-        //_playerColorController?.ChangeColor(_playerColor);
+        _playerColorController?.ChangeColor(_playerColor);
         _objectColorChangeManager?.ObjectColorChange(_playerColor);
     }
 
