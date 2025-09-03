@@ -25,7 +25,6 @@ public class obstacleMove : MonoBehaviour
         if (movePos.Count > 0)
         {
             moveMax = movePos.Count;
-            Debug.Log(moveMax);
             movingSec = movePos[movingNum].moveSec;//이동중시간을 입력한 첫번째 시간으로
         }
             
