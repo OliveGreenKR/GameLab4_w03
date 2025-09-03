@@ -101,6 +101,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Red Platform (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -184,6 +188,10 @@ PrefabInstance:
       value: Blue Platform (4)
       objectReference: {fileID: 0}
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_TagString
       value: BlueObject
       objectReference: {fileID: 0}
@@ -264,6 +272,10 @@ PrefabInstance:
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_Name
       value: Blue Platform (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -348,6 +360,10 @@ PrefabInstance:
       value: Blue Platform (1)
       objectReference: {fileID: 0}
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_TagString
       value: BlueObject
       objectReference: {fileID: 0}
@@ -428,6 +444,10 @@ PrefabInstance:
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_Name
       value: Red Platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -510,6 +530,10 @@ PrefabInstance:
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_Name
       value: Blue Platform (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_TagString
@@ -598,6 +622,10 @@ PrefabInstance:
       value: Blue Platform
       objectReference: {fileID: 0}
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_TagString
       value: BlueObject
       objectReference: {fileID: 0}
@@ -679,6 +707,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Red Platform
       objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -757,6 +789,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Red Platform (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -834,6 +870,10 @@ PrefabInstance:
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_Name
       value: Blue Platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -918,6 +958,10 @@ PrefabInstance:
       value: Blue Platform (6)
       objectReference: {fileID: 0}
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_TagString
       value: BlueObject
       objectReference: {fileID: 0}
@@ -998,6 +1042,10 @@ PrefabInstance:
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_Name
       value: Red Platform (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1082,6 +1130,10 @@ PrefabInstance:
       value: Blue Platform (3)
       objectReference: {fileID: 0}
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_TagString
       value: BlueObject
       objectReference: {fileID: 0}
@@ -1162,6 +1214,10 @@ PrefabInstance:
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_Name
       value: Red Platform (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1246,6 +1302,10 @@ PrefabInstance:
       value: Blue Platform (5)
       objectReference: {fileID: 0}
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_TagString
       value: BlueObject
       objectReference: {fileID: 0}
@@ -1327,6 +1387,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Red Platform (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1404,6 +1468,10 @@ PrefabInstance:
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_Name
       value: Red Platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_TagString
@@ -1490,6 +1558,10 @@ PrefabInstance:
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_Name
       value: Red Platform (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1789,6 +1861,10 @@ PrefabInstance:
       value: Red Platform
       objectReference: {fileID: 0}
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_TagString
       value: RedObject
       objectReference: {fileID: 0}
@@ -1873,6 +1949,10 @@ PrefabInstance:
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_Name
       value: Red Platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_TagString
@@ -1965,6 +2045,10 @@ PrefabInstance:
       value: Blue Platform (2)
       objectReference: {fileID: 0}
     - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
       propertyPath: m_TagString
       value: BlueObject
       objectReference: {fileID: 0}
@@ -2046,6 +2130,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Blue Platform (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2123,6 +2211,10 @@ PrefabInstance:
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_Name
       value: Red Platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_TagString
@@ -2210,6 +2302,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Red Platform (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7299199514883721381, guid: 444afd1efe71a764b93ac0a59af9efc2, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2287,6 +2383,10 @@ PrefabInstance:
     - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
       propertyPath: m_Name
       value: Blue Platform (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5266611078565098870, guid: d0d7917dd5ff9df45a608f44362b1bb1, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -10,6 +10,8 @@ public class PlayerCollision : MonoBehaviour
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+
         if (_collider == null)
         {
             _collider = GetComponent<Collider>();

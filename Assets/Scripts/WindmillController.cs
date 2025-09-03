@@ -98,11 +98,4 @@ public class WindmillController : MonoBehaviour
             UpdateBladePositions();
         }
     }
-
-    // 디버그용 UI 정보 표시
-    void OnGUI()
-    {
-        GUI.Label(new Rect(10, 10, 300, 20), $"날개 거리: {bladeDistance:F2}");
-        GUI.Label(new Rect(10, 30, 300, 20), $"회전 속도: {rotationSpeed:F1}");
-    }
 }
