@@ -6,11 +6,6 @@ public class NewMonoBehaviourScript : MonoBehaviour
     public float amplitude = 0.5f;  // 최대 변동 폭
     public float frequency = 1f;    // 변화 속도
     public float weightSpeed = 0.5f; // 가중치 증가 속도
-    public float power;//초창기 힘
-    public float powerWeight;//파워가중량
-    public float powerLose;//파워소실량
-    public float powerInside;
-    public float powerOutside;
 
     private float weight = 0f; // 현재 가중치
 
@@ -32,5 +27,4 @@ public class NewMonoBehaviourScript : MonoBehaviour
         // X, Y, Z축에 동시에 적용
         transform.localScale = baseScale * scaleFactor;
     }
-    
 }
