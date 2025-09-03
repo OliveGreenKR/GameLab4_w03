@@ -177,6 +177,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
         _currentMoveInput = Vector2.zero;
+        _rigid.linearVelocity = new Vector3(0, _rigid.linearVelocity.y, 0);
         //_isMoving = false;
     }
 
