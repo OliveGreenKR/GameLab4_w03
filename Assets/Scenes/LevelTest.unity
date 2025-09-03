@@ -334,120 +334,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &379779992
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -2.6910224
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 9.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -3.9081268
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7685368637248795134, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
-      propertyPath: m_Name
-      value: RazerBlue
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 125d0a1196c4e4c49963a695c5b92291, type: 3}
---- !u!1001 &585606197
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -4.5948153
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 9.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -3.5125313
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7685368637248795134, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
-      propertyPath: m_Name
-      value: RazerSmallRed
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: f77a2429c7d31a243be090ef4ad8634a, type: 3}
 --- !u!1 &1153742864
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,63 +564,6 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
---- !u!1001 &1278628592
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.72336483
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 9.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -3.635826
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7685368637248795134, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
-      propertyPath: m_Name
-      value: RazerSmallBlue
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 9ef6ac8aa359ef641b8b84bb243a4d49, type: 3}
 --- !u!1 &1582347901
 GameObject:
   m_ObjectHideFlags: 0
@@ -1162,7 +991,7 @@ Transform:
   m_GameObject: {fileID: 1653432831}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.5511032, w: 0.83443713}
-  m_LocalPosition: {x: 0.98, y: 4.03, z: -2.996}
+  m_LocalPosition: {x: 0.98, y: 4.03, z: 4.87}
   m_LocalScale: {x: 1, y: 2.4184, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1195,63 +1024,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!1001 &1990523428
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 5.2630277
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -3.518836
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1295301977574888254, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7685368637248795134, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
-      propertyPath: m_Name
-      value: RazerRed
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 194f058dcfceae84a839c1bf544c655f, type: 3}
 --- !u!1001 &2071418514142714703
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1379,7 +1151,3 @@ SceneRoots:
   - {fileID: 6138243198075092564}
   - {fileID: 2071418514142714703}
   - {fileID: 184742621}
-  - {fileID: 379779992}
-  - {fileID: 1990523428}
-  - {fileID: 585606197}
-  - {fileID: 1278628592}

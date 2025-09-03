@@ -481,9 +481,10 @@ MonoBehaviour:
   _speedDistanceMultiplier: 0.5
   _maxSpeedForDistanceUnitsPerSecond: 15
   _positionDampingSpeed: 15
-  _rotationDampingSpeed: 90
+  _rotationDampingSpeed: 180
   _positionDeadZoneUnits: 0.1
   _rotationDeadZoneDegrees: 0.1
+  _positionLerpthresholdVelocitypRatio: 0.05
   _obstacleLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
