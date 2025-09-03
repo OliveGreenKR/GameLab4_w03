@@ -69,7 +69,7 @@ public class PlayerColorController : MonoBehaviour
         }
 
         _playerColor = NewColor;
-        Debug.Log($"Player color changed to: {_playerColor}");
+        //Debug.Log($"Player color changed to: {_playerColor}");
 
         //매터리얼 변경
         ChangeMaterial(NewColor);
