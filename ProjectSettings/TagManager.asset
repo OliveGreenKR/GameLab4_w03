@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - BlueObject
+  - RedObject
+  - GrayObject
   layers:
   - Default
   - TransparentFX
