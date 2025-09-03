@@ -52,7 +52,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        CollectAllColoredObjects();
+        InitializeObjectColorManager();
+        
         GameStart();
     }
     #endregion
@@ -95,6 +96,12 @@ public class GameManager : MonoBehaviour
         {
             _objectColorChangeManager = FindFirstObjectByType<ObjectColorChangeManager>();
         }
+    }
+
+    private void InitializeObjectColorManager()
+    {
+        CollectAllColoredObjects();
+        _objectColorChangeManager.InitializeAllObjects();
     }
 
     private void CollectAllColoredObjects()

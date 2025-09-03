@@ -37,7 +37,7 @@ public class ObjectColorChangeManager : MonoBehaviour
     {
         // 초기 상태 설정
         InitializeAllObjects();
-        SetActiveObjectsByStage(currentStage); // 현재 스테이지에 맞는 오브젝트만 활성화
+        //SetActiveObjectsByStage(currentStage); // 현재 스테이지에 맞는 오브젝트만 활성화
         Debug.Log($"ColorChangeManager initialized. Current Stage: {currentStage}, Player ObjectColor: {playerObjectColor}");
     }
 
@@ -61,7 +61,7 @@ public class ObjectColorChangeManager : MonoBehaviour
     /// <summary>
     /// 모든 오브젝트를 초기 상태(투명)로 설정
     /// </summary>
-    private void InitializeAllObjects()
+    public void InitializeAllObjects()
     {
         playerObjectColor = GameManager.Instance.PlayerColor;
         // 플레이어 색상에 따라 현재 스테이지의 색상 오브젝트를 투명하게 설정
