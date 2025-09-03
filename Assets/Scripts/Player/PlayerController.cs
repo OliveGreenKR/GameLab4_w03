@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     public bool IsMoving => _isMoving;
 
     [Header("Player State")]
-    [SerializeField] public bool IsGrounded = true;
+    [SerializeField] public bool IsGrounded = false;
     [SerializeField] private bool _isMoving = false;
     [SerializeField] private Vector3 _currentVelocity;
 
@@ -140,6 +140,9 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         _inputs.Player.Move.performed += OnMovePerformed;
         _inputs.Player.Move.canceled += OnMoveCanceled;
         _inputs.Player.Jump.performed += OnJumpPerformed;
+        _inputs.Player.ColorChange.performed += OnMouseClicked;
+
+
     }
 
     public void DisableInput()
@@ -152,6 +155,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         _inputs.Player.Move.performed -= OnMovePerformed;
         _inputs.Player.Move.canceled -= OnMoveCanceled;
         _inputs.Player.Jump.performed -= OnJumpPerformed;
+        _inputs.Player.ColorChange.performed -= OnMouseClicked;
         _currentMoveInput = Vector2.zero;
     }
     #endregion
@@ -168,6 +172,11 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         _isMoving = false;
     }
 
+    private void OnMouseClicked(InputAction.CallbackContext context)
+    {
+        GameManager.Instance.OnPlayerClicked();
+    }
+
     private void OnJumpPerformed(InputAction.CallbackContext context)
     {
         if(IsGrounded)
@@ -182,7 +191,14 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     #region Private Methods
     private void HandleContinuousMovement()
     {
-        if (!_isMoving) return;
+        if (!_isMoving)
+        {
+            if(IsGrounded)
+            {
+                _rigid.linearVelocity = Vector3.zero;
+            }
+            return;
+        }
 
         Vector3 direction = new Vector3(_currentMoveInput.x, 0.0f, _currentMoveInput.y);
         if(_camera)
