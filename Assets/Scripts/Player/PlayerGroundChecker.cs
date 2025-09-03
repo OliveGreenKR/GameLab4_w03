@@ -20,7 +20,7 @@ public class PlayerGroundChecker : MonoBehaviour
         }
 
         // BoxCollider를 Trigger로 설정 확인
-        if (_collider != null && !_collider.isTrigger)d
+        if (_collider != null && !_collider.isTrigger)
         {
             Debug.LogWarning("PlayerCollision: Collider should be set as Trigger!");
         }

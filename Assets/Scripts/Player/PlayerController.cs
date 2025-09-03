@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     }
     private void LateUpdate()
     {
+
         if (_rigid.linearVelocity.magnitude < 0.1f)
         {
             _rigid.linearVelocity = Vector3.zero;
