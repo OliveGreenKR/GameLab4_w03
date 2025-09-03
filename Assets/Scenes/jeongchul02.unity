@@ -429,7 +429,7 @@ MonoBehaviour:
   MovementAccelInAir: 5
   JumpImpulseAccel: 10
   FallingMovementSpeedMultiplier: 0.5
-  MaxSpeed: 15
+  MaxSpeed: 5
   MaxFallSpeed: 40
   _currentMoveInput: {x: 0, y: 0}
 --- !u!114 &87799206
