@@ -229,10 +229,11 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         }
         else
         {
-            if(_rigid.linearVelocity.magnitude < MaxSpeed)
-            {
-                _rigid.AddForce(direction * MovementAccelInAir * FallingMovementSpeedMultiplier, ForceMode.Acceleration);
-            }
+            _rigid.AddForce(direction * MovementAccelInAir * FallingMovementSpeedMultiplier, ForceMode.VelocityChange);
+            //if (_rigid.linearVelocity.magnitude < MaxSpeed)
+            //{
+                
+            //}
         }
 
         

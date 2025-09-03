@@ -16,12 +16,6 @@ public class PlayerColorController : MonoBehaviour
 
     private void Start()
     {
-        var gameManager = GameManager.Instance;
-        if (gameManager != null)
-        {
-            ChangeColor(gameManager.PlayerColor);
-        }
-
         if(_playerRenderer == null)
         {
             _playerRenderer = gameObject.GetComponent<Renderer>();
@@ -34,6 +28,17 @@ public class PlayerColorController : MonoBehaviour
         // 모든 Collider 캐싱 (자식 포함)
         _cachedColliders = gameObject.GetComponentsInChildren<Collider>();
         Debug.Log($"Cached {_cachedColliders.Length} colliders for player color changes");
+        if(_cachedColliders == null)
+        {
+            Debug.LogWarning("PlayerColorController: No colliders found on player or its children!");
+        }
+
+        var gameManager = GameManager.Instance;
+        if (gameManager != null)
+        {
+            ChangeColor(gameManager.PlayerColor);
+        }
+
     }
 
     public void ChangeColor(ObjectColor NewColor)
@@ -67,14 +72,14 @@ public class PlayerColorController : MonoBehaviour
         // GameObject 레이어 변경
         gameObject.layer = targetLayer;
 
-        //// 캐싱된 모든 Collider의 레이어 변경
-        //for (int i = 0; i < _cachedColliders.Length; i++)
-        //{
-        //    if (_cachedColliders[i] != null)
-        //    {
-        //        _cachedColliders[i].gameObject.layer = targetLayer;
-        //    }
-        //}
+        // 캐싱된 모든 Collider의 레이어 변경
+        for (int i = 0; i < _cachedColliders.Length; i++)
+        {
+            if (_cachedColliders[i] != null && _cachedColliders[i].gameObject != null)
+            {
+                _cachedColliders[i].gameObject.layer = targetLayer;
+            }
+        }
     }
 
     private void ChangeMaterial(ObjectColor NewColor)
