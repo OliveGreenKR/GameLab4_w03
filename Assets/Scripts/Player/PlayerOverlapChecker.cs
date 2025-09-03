@@ -1,59 +1,175 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerOverlapChecker : MonoBehaviour
 {
+    #region Serialized Fields
+    [Header("References")]
     [SerializeField] private Collider _targetCollider = null;
     [SerializeField] private PlayerController _targetPlayer = null;
     [SerializeField] private bool _isOverlap = false;
 
+    [Header("Debug Settings")]
+    [SerializeField] private bool _enableDebugLogging = false;
+    #endregion
 
-    [SerializeField] public bool IsOverlap => _isOverlap;
+    #region Properties
+    public bool IsOverlap => _isOverlap;
+    public int OverlappingObjectCount => _overlappingColliders.Count;
+    #endregion
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    #region Private Fields
+    private HashSet<Collider> _overlappingColliders = new HashSet<Collider>();
+    private bool _hasDisabledColorControl = false;
+    #endregion
+
+    #region Unity Lifecycle
+    private void Start()
     {
-        if(_targetCollider == null)
-        {
-            _targetCollider = gameObject.GetComponent<Collider>();
-            Debug.LogWarning("PlayerOverlapChecker: Target Collider is not assigned. Attempting to get Collider from the same GameObject.");
-        }
-        if (_targetPlayer == null)
-        {
-            Debug.LogWarning("PlayerOverlapChecker : TargetPlayer is missing!");
-        }
+        InitializeReferences();
+        _isOverlap = false;
+        _hasDisabledColorControl = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        int otherLayer = other.gameObject.layer;
-        string layerName = LayerMask.LayerToName(otherLayer);
-        Debug.Log($"trigger Enter with {other.gameObject.name}:{otherLayer}");
+        if (_targetPlayer == null || other == null)
+            return;
 
-        if (LayerMask.LayerToName(_targetPlayer.gameObject.layer) == "Red" && layerName == "Blue")
+        string otherLayerName = LayerMask.LayerToName(other.gameObject.layer);
+        string playerLayerName = LayerMask.LayerToName(_targetPlayer.gameObject.layer);
+
+        //if (_enableDebugLogging)
+        //{
+        //    Debug.Log($"[PlayerOverlapChecker] TriggerEnter: {other.gameObject.name} ({otherLayerName}) vs Player ({playerLayerName})");
+        //}
+
+        // 반대 레이어인지 확인
+        if (IsOppositeLayer(playerLayerName, otherLayerName))
         {
-            _isOverlap = true;
-        }
-        else if (LayerMask.LayerToName(_targetPlayer.gameObject.layer) == "Blue" && layerName == "Red")
-        {
-            _isOverlap = true;
-        }
-        else
-        {
-            _isOverlap = false;
+            // HashSet에 추가 (중복 자동 제거)
+            if (_overlappingColliders.Add(other))
+            {
+                if (_enableDebugLogging)
+                {
+                    Debug.Log($"[PlayerOverlapChecker] Added overlapping object: {other.gameObject.name}. Total: {_overlappingColliders.Count}");
+                }
+
+                UpdateOverlapStatus();
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        int otherLayer = other.gameObject.layer;
-        string layerName = LayerMask.LayerToName(otherLayer);
-        Debug.Log($"trigger Exit with {other.gameObject.name}:{otherLayer}");
+        if (other == null)
+            return;
 
-        _isOverlap = false;
+        string otherLayerName = LayerMask.LayerToName(other.gameObject.layer);
+
+        //if (_enableDebugLogging)
+        //{
+        //    Debug.Log($"[PlayerOverlapChecker] TriggerExit: {other.gameObject.name} ({otherLayerName})");
+        //}
+
+        // HashSet에서 제거
+        if (_overlappingColliders.Remove(other))
+        {
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[PlayerOverlapChecker] Removed overlapping object: {other.gameObject.name}. Total: {_overlappingColliders.Count}");
+            }
+
+            UpdateOverlapStatus();
+        }
+    }
+    #endregion
+
+    #region Public Methods
+    public void ForceUpdateOverlapStatus()
+    {
+        UpdateOverlapStatus();
     }
 
-    //void OnTriggerStay(Collider other)
-    //{
-    //    // 겹치는 동안 매 프레임 호출 ⚠️
-    //}
+    public void ClearAllOverlaps()
+    {
+        _overlappingColliders.Clear();
+        UpdateOverlapStatus();
+    }
+    #endregion
+
+    #region Private Methods
+    private void InitializeReferences()
+    {
+        if (_targetCollider == null)
+        {
+            _targetCollider = gameObject.GetComponent<Collider>();
+            if (_targetCollider == null)
+            {
+                Debug.LogError("[PlayerOverlapChecker] No Collider found on GameObject!");
+            }
+            else
+            {
+                Debug.LogWarning("[PlayerOverlapChecker] Target Collider auto-assigned from GameObject.");
+            }
+        }
+
+        if (_targetPlayer == null)
+        {
+            Debug.LogError("[PlayerOverlapChecker] TargetPlayer is required!");
+        }
+
+        // Collider가 Trigger인지 확인
+        if (_targetCollider != null && !_targetCollider.isTrigger)
+        {
+            Debug.LogWarning("[PlayerOverlapChecker] Target Collider should be set as Trigger!");
+        }
+    }
+
+    private bool IsOppositeLayer(string playerLayerName, string otherLayerName)
+    {
+        return (playerLayerName == "Red" && otherLayerName == "Blue") ||
+               (playerLayerName == "Blue" && otherLayerName == "Red");
+    }
+
+    private void UpdateOverlapStatus()
+    {
+        bool newOverlapStatus = _overlappingColliders.Count > 0;
+
+        // 상태가 변경된 경우에만 처리
+        if (newOverlapStatus != IsOverlap)
+        {
+            _isOverlap = newOverlapStatus;
+
+            if (_targetPlayer != null)
+            {
+                if (IsOverlap && !_hasDisabledColorControl)
+                {
+                    GameManager.Instance.SetCanColorChange(false);
+                    _hasDisabledColorControl = true;
+
+                    if (_enableDebugLogging)
+                    {
+                        Debug.Log("[PlayerOverlapChecker] Player colorChange DISABLED due to overlap.");
+                    }
+                }
+                else if (!IsOverlap && _hasDisabledColorControl)
+                {
+                    GameManager.Instance.SetCanColorChange(true);
+                    _hasDisabledColorControl = false;
+
+                    if (_enableDebugLogging)
+                    {
+                        Debug.Log("[PlayerOverlapChecker] Player colorChange ENABLED - no more overlaps.");
+                    }
+                }
+            }
+
+            if (_enableDebugLogging)
+            {
+                Debug.Log($"[PlayerOverlapChecker] Overlap status changed to: {IsOverlap} (Objects: {_overlappingColliders.Count})");
+            }
+        }
+    }
+    #endregion
 }
