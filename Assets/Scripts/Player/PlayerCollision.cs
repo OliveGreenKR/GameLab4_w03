@@ -4,7 +4,6 @@ public class PlayerCollision : MonoBehaviour
 {
     [SerializeField] Collider _collider = null;
     [SerializeField] PlayerController _player;
-    [SerializeField] Collider _lastTriggered = null;
 
     private void Start()
     {
