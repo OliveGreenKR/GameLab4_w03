@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Serialized Fields
+    [SerializeField] private Vector3 _playerStartLocation = new Vector3(0, 5.0f, 0);
     [SerializeField] private PlayerController _player = null;
     [SerializeField] private PlayerColorController _playerColorController = null;
 
@@ -65,6 +66,7 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         Debug.Log("Game Start");
+        SpawnPlayer(_playerStartLocation);
     }
 
     public void GameOver()
@@ -87,6 +89,11 @@ public class GameManager : MonoBehaviour
     public void RespawnPlayer()
     {
         (_player as IReSpawnable)?.ReSpawn(_respawnPosition, Quaternion.identity);  
+    }
+
+    public void SpawnPlayer(Vector3 spawnPosition)
+    {
+        (_player as IReSpawnable)?.ReSpawn(spawnPosition, Quaternion.identity);
     }
 
     public void SetCanColorChange(bool value)

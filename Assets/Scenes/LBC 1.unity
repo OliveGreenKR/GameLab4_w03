@@ -1725,7 +1725,7 @@ Transform:
   m_GameObject: {fileID: 411691742}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.7, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1846,6 +1846,10 @@ PrefabInstance:
     - target: {fileID: 6594385467313129505, guid: a5749e83b51c7fe4b8d0ee610c4feae1, type: 3}
       propertyPath: m_Name
       value: Windmill 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6594385467313129505, guid: a5749e83b51c7fe4b8d0ee610c4feae1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2099,7 +2103,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &517185881
 Transform:
   m_ObjectHideFlags: 0
@@ -2109,7 +2113,7 @@ Transform:
   m_GameObject: {fileID: 517185880}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.9, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2206,6 +2210,10 @@ PrefabInstance:
     - target: {fileID: 6594385467313129505, guid: 0aa27e54baa2f5f4d9721be48567547c, type: 3}
       propertyPath: m_Name
       value: Windmill 2 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6594385467313129505, guid: 0aa27e54baa2f5f4d9721be48567547c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7139550053132301595, guid: 0aa27e54baa2f5f4d9721be48567547c, type: 3}
       propertyPath: m_LocalScale.x
@@ -2589,24 +2597,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c54ffc7b340f0a4799bf92db6fa4641, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectColorObjectsList1Red:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  ObjectColorObjectsList1Blue:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  ObjectColorObjectsList2Red:
-  - {fileID: 1440246579}
-  - {fileID: 73679072}
-  ObjectColorObjectsList2Blue:
-  - {fileID: 1673640914}
-  - {fileID: 436041503}
-  ObjectColorObjectsList3Red:
-  - {fileID: 353198372}
-  ObjectColorObjectsList3Blue:
-  - {fileID: 1777293829}
+  ColorObjectsListRed: []
+  ColorObjectsListBlue: []
   redSolidMaterial: {fileID: 2100000, guid: 6e25434a97cf18646997648af82ab2ed, type: 2}
   redTransparentMaterial: {fileID: 2100000, guid: fb2f916c7c631dc40a1be9c4c7265ef2, type: 2}
   blueSolidMaterial: {fileID: 2100000, guid: 7171f754d1dff184d8283efc34337f54, type: 2}
@@ -3642,6 +3634,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Windmill 2 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 6594385467313129505, guid: 0aa27e54baa2f5f4d9721be48567547c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7139550053132301595, guid: 0aa27e54baa2f5f4d9721be48567547c, type: 3}
       propertyPath: m_LocalScale.x
       value: 2
@@ -3762,6 +3758,10 @@ PrefabInstance:
     - target: {fileID: 6594385467313129505, guid: 0aa27e54baa2f5f4d9721be48567547c, type: 3}
       propertyPath: m_Name
       value: Windmill 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6594385467313129505, guid: 0aa27e54baa2f5f4d9721be48567547c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7139550053132301595, guid: 0aa27e54baa2f5f4d9721be48567547c, type: 3}
       propertyPath: m_LocalScale.x
@@ -4596,6 +4596,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Windmill (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 8247173482912393706, guid: 5be971799c7bc394ead4960edb32bb94, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5060,6 +5064,10 @@ PrefabInstance:
     - target: {fileID: 6594385467313129505, guid: a5749e83b51c7fe4b8d0ee610c4feae1, type: 3}
       propertyPath: m_Name
       value: Windmill 3 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6594385467313129505, guid: a5749e83b51c7fe4b8d0ee610c4feae1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6153,6 +6161,10 @@ PrefabInstance:
     - target: {fileID: 8247173482912393706, guid: 5be971799c7bc394ead4960edb32bb94, type: 3}
       propertyPath: m_Name
       value: Windmill (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8247173482912393706, guid: 5be971799c7bc394ead4960edb32bb94, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7485,7 +7497,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &2022479721
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7738,7 +7750,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2045733592
 Transform:
   m_ObjectHideFlags: 0
@@ -8054,6 +8066,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Windmill 4
       objectReference: {fileID: 0}
+    - target: {fileID: 3085936053009695244, guid: b19a92b755f8b3c4e9d023eb71b9f013, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3820357513837450748, guid: b19a92b755f8b3c4e9d023eb71b9f013, type: 3}
       propertyPath: m_LocalPosition.x
       value: -179
@@ -8151,6 +8167,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Windmill
       objectReference: {fileID: 0}
+    - target: {fileID: 8247173482912393706, guid: 5be971799c7bc394ead4960edb32bb94, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8233742939388067242, guid: 5be971799c7bc394ead4960edb32bb94, type: 3}
     m_RemovedGameObjects: []
@@ -8180,9 +8200,6 @@ MonoBehaviour:
   rotationSpeed: 50
   bladeDistance: 2
   blades: []
-  increaseKey: 61
-  decreaseKey: 45
-  adjustmentSpeed: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     [SerializeField] private Rigidbody _rigid;
     [SerializeField] Camera _camera = null;
     #endregion
-
     public bool IsMoving => _isMoving;
 
     [Header("Player State")]
@@ -44,7 +43,6 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     private void Start()
     {
         InitializeReferences();
-        
     }
     private void Update()
     {
@@ -67,8 +65,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     {
         HandleContinuousMovement();
         ApplyMoreGravity();
-        LimitMaxSpeed();
-        
+        LimitMaxSpeed();  
     }
 
     private void OnEnable()
@@ -97,7 +94,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         }
 
         // 플레이어 상태 초기화
-        IsGrounded = true;
+        IsGrounded = false;
         _isMoving = false;
         _currentMoveInput = Vector2.zero;
 

@@ -12,11 +12,10 @@ GameObject:
   - component: {fileID: 9166370361349530693}
   - component: {fileID: 3743009069826927481}
   - component: {fileID: 4184667280051301875}
-  - component: {fileID: 8634426099477269482}
   - component: {fileID: 9182305453493729219}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BalloonBlue
-  m_TagString: Untagged
+  m_TagString: BlueObject
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31,8 +30,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -110,21 +109,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8634426099477269482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4674397725384154979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a2530dc894f9e748b895c0f5bd713eb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 0
-  moveDir: {x: 0, y: 0, z: 0}
-  rotateDir: {x: 0, y: 0, z: 0}
 --- !u!114 &9182305453493729219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,4 +121,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 940e3a299d3972c4d80849a388c33aa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpForce: 0
+  jumpForce: 1000
