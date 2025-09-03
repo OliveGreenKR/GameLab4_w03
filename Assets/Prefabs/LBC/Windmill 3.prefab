@@ -836,7 +836,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 50
   bladeDistance: 4
-  autoArrangeBlade: 1
+  autoArrangeBlade: 0
   startAngle: 0
   blades: []
 --- !u!64 &2978519475802471374
