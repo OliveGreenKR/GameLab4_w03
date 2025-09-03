@@ -835,7 +835,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 50
-  bladeDistance: 2
+  bladeDistance: 4
+  autoArrangeBlade: 0
+  startAngle: 0
   blades: []
 --- !u!64 &2978519475802471374
 MeshCollider:
