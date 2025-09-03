@@ -1,11 +1,10 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 
 public class PlayerCollision : MonoBehaviour
 {
     [SerializeField] Collider _collider = null;
     [SerializeField] PlayerController _player;
     [SerializeField] bool IsLog = false;
-
 
 
     private void Start()
@@ -20,7 +19,7 @@ public class PlayerCollision : MonoBehaviour
             _player = GetComponent<PlayerController>();
         }
 
-        // BoxCollider∏¶ Trigger∑Œ º≥¡§ »Æ¿Œ
+        // BoxColliderÎ•º TriggerÎ°ú ÏÑ§Ï†ï ÌôïÏù∏
         if (_collider != null && !_collider.isTrigger)
         {
             Debug.LogWarning("PlayerCollision: Collider should be set as Trigger!");
