@@ -230,10 +230,6 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         else
         {
             _rigid.AddForce(direction * MovementAccelInAir * FallingMovementSpeedMultiplier, ForceMode.VelocityChange);
-            //if (_rigid.linearVelocity.magnitude < MaxSpeed)
-            //{
-                
-            //}
         }
 
         
