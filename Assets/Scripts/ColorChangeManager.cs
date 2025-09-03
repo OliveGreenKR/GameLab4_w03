@@ -3,7 +3,7 @@ using UnityEngine;
 
 public enum ObjectColor
 {
-    Red,
+    Red = 0,
     Blue,
 }
 
@@ -43,18 +43,18 @@ public class ObjectColorChangeManager : MonoBehaviour
     // 테스트용
     private void Update()
     {
-        // 좌클릭을 해서 플레이어 색상 변경 (테스트용)
-        if (Input.GetMouseButtonDown(0))
-        {
-            playerObjectColor = playerObjectColor == ObjectColor.Red ? ObjectColor.Blue : ObjectColor.Red;
-            Debug.Log($"Player ObjectColor changed to: {playerObjectColor}");
-            ObjectColorChange(playerObjectColor);
-        }
+        //// 좌클릭을 해서 플레이어 색상 변경 (테스트용)
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    playerObjectColor = playerObjectColor == ObjectColor.Red ? ObjectColor.Blue : ObjectColor.Red;
+        //    Debug.Log($"Player ObjectColor changed to: {playerObjectColor}");
+        //    ObjectColorChange(playerObjectColor);
+        //}
 
-        // 숫자키로 스테이지 변경 (테스트용)
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SetCurrentStage(1);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) SetCurrentStage(2);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SetCurrentStage(3);
+        //// 숫자키로 스테이지 변경 (테스트용)
+        //if (Input.GetKeyDown(KeyCode.Alpha1)) SetCurrentStage(1);
+        //if (Input.GetKeyDown(KeyCode.Alpha2)) SetCurrentStage(2);
+        //if (Input.GetKeyDown(KeyCode.Alpha3)) SetCurrentStage(3);
     }
 
     /// <summary>

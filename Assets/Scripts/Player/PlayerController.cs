@@ -140,6 +140,9 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         _inputs.Player.Move.performed += OnMovePerformed;
         _inputs.Player.Move.canceled += OnMoveCanceled;
         _inputs.Player.Jump.performed += OnJumpPerformed;
+        _inputs.Player.ColorChange.performed += OnMouseClicked;
+
+
     }
 
     public void DisableInput()
@@ -152,6 +155,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         _inputs.Player.Move.performed -= OnMovePerformed;
         _inputs.Player.Move.canceled -= OnMoveCanceled;
         _inputs.Player.Jump.performed -= OnJumpPerformed;
+        _inputs.Player.ColorChange.performed -= OnMouseClicked;
         _currentMoveInput = Vector2.zero;
     }
     #endregion
@@ -166,6 +170,11 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     {
         _currentMoveInput = Vector2.zero;
         _isMoving = false;
+    }
+
+    private void OnMouseClicked(InputAction.CallbackContext context)
+    {
+        GameManager.Instance.OnPlayerClicked();
     }
 
     private void OnJumpPerformed(InputAction.CallbackContext context)
