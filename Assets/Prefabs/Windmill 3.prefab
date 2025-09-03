@@ -738,7 +738,7 @@ GameObject:
   - component: {fileID: 7301984292038062861}
   - component: {fileID: 2461331986780070235}
   - component: {fileID: 8190763471445023640}
-  - component: {fileID: 8301236862748414517}
+  - component: {fileID: 309157884855358085}
   m_Layer: 0
   m_Name: Windmill 3
   m_TagString: Untagged
@@ -845,7 +845,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &8301236862748414517
+--- !u!114 &309157884855358085
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -854,10 +854,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6594385467313129505}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 589dd683a2b4e0f4f87650f1a0a6101f, type: 3}
+  m_Script: {fileID: 11500000, guid: b999024892dbb6746b4179a946ac1bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 50
+  bladeDistance: 2
+  blades: []
 --- !u!1 &7161024242392830924
 GameObject:
   m_ObjectHideFlags: 0
