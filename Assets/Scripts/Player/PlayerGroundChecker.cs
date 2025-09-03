@@ -253,6 +253,7 @@ public class PlayerGroundChecker : MonoBehaviour
         gameObject.transform.SetParent(groundObject.transform);
         IsAttachedToMovingPlatform = true;
 
+
         if (_enableDebugLogging)
         {
             Debug.Log($"[PlayerGroundChecker] Attached to moving platform: {groundObject.name}");
