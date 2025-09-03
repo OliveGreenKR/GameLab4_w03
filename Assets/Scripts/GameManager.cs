@@ -1,19 +1,37 @@
+using NUnit.Framework;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField] private const string _redObjectTag = "RedObject";
+    [SerializeField] private const string _blueObjectTag = "BlueObject";
+    [SerializeField] private const string _grayObjectTag = "GrayObject";
+
+    public string RedObjectTag => _redObjectTag;
+    public string BlueObjectTag => _blueObjectTag;
+    public string GrayObjectTag => _grayObjectTag;
+
+
     #region Singleton
     public static GameManager Instance { get; private set; }
     #endregion
 
     #region Serialized Fields
     [SerializeField] private PlayerController _player = null;
+    [SerializeField] private PlayerColorController _playerColorController = null;
+
+
     [SerializeField] private Vector3 _respawnPosition = new Vector3(0, 0, 10);
     [SerializeField] private ObjectColorChangeManager _objectColorChangeManager = null;
     [SerializeField] private ObjectColor _playerColor = ObjectColor.Red;
+    #endregion
+
+    #region Properties
+    public ObjectColor PlayerColor => _playerColor; 
     #endregion
 
     #region Unity Lifecycle
@@ -34,6 +52,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        InitializeObjectColorManager();
+        
         GameStart();
     }
     #endregion
@@ -51,8 +71,9 @@ public class GameManager : MonoBehaviour
 
     public void OnPlayerClicked()
     {
-        int nextValue = ((int)_playerColor + 1) % Enum.GetValues(typeof(ObjectColor)).Length;
+        int nextValue = ((int)_playerColor + 1) % 2; //red,blue
         _playerColor = (ObjectColor)nextValue;
+        _playerColorController?.ChangeColor(_playerColor);
         _objectColorChangeManager?.ObjectColorChange(_playerColor);
     }
 
@@ -68,6 +89,7 @@ public class GameManager : MonoBehaviour
         if (_player == null)
         {
             _player = FindFirstObjectByType<PlayerController>();
+            _playerColorController = _player?.GetComponent<PlayerColorController>();
         }
 
         if (_objectColorChangeManager == null)
@@ -75,5 +97,35 @@ public class GameManager : MonoBehaviour
             _objectColorChangeManager = FindFirstObjectByType<ObjectColorChangeManager>();
         }
     }
+
+    private void InitializeObjectColorManager()
+    {
+        CollectAllColoredObjects();
+        _objectColorChangeManager.InitializeAllObjects();
+    }
+
+    private void CollectAllColoredObjects()
+    {
+        //red
+        CollectColoredObjects(_redObjectTag, _objectColorChangeManager.ColorObjectsListRed);
+        //blue
+        CollectColoredObjects(_blueObjectTag, _objectColorChangeManager.ColorObjectsListBlue);
+
+    }
+
+    private void CollectColoredObjects(string tagName, List<GameObject> List)
+    {
+        if(List == null)
+        {
+            return;
+        }
+
+        List.Clear();
+        GameObject[] objects = GameObject.FindGameObjectsWithTag(tagName);
+        List.AddRange(objects);
+        Debug.Log($"Collected {List.Count} objects with tag {tagName}");
+    }
+
+  
     #endregion
 }

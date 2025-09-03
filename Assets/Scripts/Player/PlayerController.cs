@@ -28,9 +28,6 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     [SerializeField] public float MaxSpeed = 10.0f;
     [SerializeField] public float MaxFallSpeed = 30.0f;
 
-    [SerializeField] public float jumpForce = 5f;
-    [SerializeField] public float movementSpeedInAir = 2f;
-
     [Header("Input State")]
     [SerializeField] Vector2 _currentMoveInput = Vector2.zero;
     
@@ -55,12 +52,14 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     }
     private void LateUpdate()
     {
-        LimitMaxSpeed();
+        
     }
 
     private void FixedUpdate()
     {
         HandleContinuousMovement();
+        ApplyMoreGravity();
+        LimitMaxSpeed();
     }
 
     private void OnEnable()
@@ -185,8 +184,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         if(IsGrounded)
         {
             _rigid.linearVelocity = new Vector3(_rigid.linearVelocity.x, 0, _rigid.linearVelocity.z);
-            _rigid.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); 
-            
+            _rigid.AddForce(Vector3.up * JumpImpulseAccel, ForceMode.VelocityChange);  
             IsGrounded = false;
         }
         
@@ -231,9 +229,13 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         }
         else
         {
-            _rigid.AddForce(direction * MovementAccelInAir * FallingMovementSpeedMultiplier, ForceMode.Force);
+            targetVelocity = direction * MovementAccelInAir * FallingMovementSpeedMultiplier;
+            if (targetVelocity.magnitude < MaxSpeed)
+            {
+                _rigid.AddForce(targetVelocity, ForceMode.VelocityChange);
+            }
+            
         }
-
         
     }
 
@@ -256,7 +258,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         _currentVelocity = _rigid.linearVelocity;
     }
 
-    private void ApplyGravity()
+    private void ApplyMoreGravity()
     {
         float gravityMultiplier;
 
@@ -271,7 +273,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         }
 
         Vector3 extraGravity = Physics.gravity * (gravityMultiplier - 1.0f);
-        _rigid.AddForce(extraGravity);
+        _rigid.AddForce(extraGravity,ForceMode.Acceleration);
     }
     #endregion
 }
