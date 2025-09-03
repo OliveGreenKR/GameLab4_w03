@@ -5,8 +5,6 @@ public class PlayerColorController : MonoBehaviour
 {
     [SerializeField] private Renderer _playerRenderer = null;     // 플레이어 렌더러
     [SerializeField] private ObjectColor _playerColor = ObjectColor.Gray;
-    
-
     public ObjectColor PlayerColor => _playerColor;
 
     [Header("Materials")]
