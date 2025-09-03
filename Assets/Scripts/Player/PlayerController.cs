@@ -52,7 +52,6 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     }
     private void LateUpdate()
     {
-
         if (_rigid.linearVelocity.magnitude < 0.1f)
         {
             _rigid.linearVelocity = Vector3.zero;
@@ -233,8 +232,6 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         if (IsGrounded)
         {
             targetVelocity = direction * MovementSpeed;
-            // Y축(수직) 속도는 유지하고 수평 속도만 직접 설정
-            //_rigid.linearVelocity = new Vector3(targetVelocity.x, _rigid.linearVelocity.y, targetVelocity.z);
             _rigid.AddForce(targetVelocity, ForceMode.VelocityChange);
         }
         else
