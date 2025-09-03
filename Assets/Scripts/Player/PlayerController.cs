@@ -52,7 +52,15 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     }
     private void LateUpdate()
     {
-        
+        if (_rigid.linearVelocity.magnitude < 0.1f)
+        {
+            _rigid.linearVelocity = Vector3.zero;
+            _isMoving = false;
+        }
+        else
+        {
+            _isMoving = true;
+        }
     }
 
     private void FixedUpdate()
@@ -60,6 +68,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
         HandleContinuousMovement();
         ApplyMoreGravity();
         LimitMaxSpeed();
+        
     }
 
     private void OnEnable()
@@ -166,12 +175,12 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     private void OnMovePerformed(InputAction.CallbackContext context)
     {
         _currentMoveInput = context.ReadValue<Vector2>();
-        _isMoving = _currentMoveInput.magnitude > 0;
+        //_isMoving = _currentMoveInput.magnitude > 0;
     }
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
         _currentMoveInput = Vector2.zero;
-        _isMoving = false;
+        //_isMoving = false;
     }
 
     private void OnMouseClicked(InputAction.CallbackContext context)
@@ -194,14 +203,13 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     #region Private Methods
     private void HandleContinuousMovement()
     {
-        if (!_isMoving)
-        {
-            if(IsGrounded)
-            {
-                _rigid.linearVelocity = Vector3.zero;
-            }
-            return;
-        }
+
+        //if (IsGrounded && _currentMoveInput == Vector2.zero)
+        //{
+        //    _rigid.linearVelocity = Vector3.zero;
+        //    return;
+        //}
+
 
         Vector3 direction = new Vector3(_currentMoveInput.x, 0.0f, _currentMoveInput.y);
         if(_camera)

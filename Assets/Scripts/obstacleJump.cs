@@ -28,7 +28,7 @@ public class obstacleJump : MonoBehaviour
                         if (rb != null)
                         {
                             // 위쪽 방향으로 힘을 가해 점프시키기
-                            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                            rb.AddForce(Vector3.up * jumpForce, ForceMode.Force);
                         }
                     }
                 }
