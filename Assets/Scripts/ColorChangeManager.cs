@@ -5,21 +5,22 @@ public enum ObjectColor
 {
     Red = 0,
     Blue,
+    Gray,
 }
 
 public class ObjectColorChangeManager : MonoBehaviour
 {
-    [Header("Stage 1")]
-    [SerializeField] private List<GameObject> ObjectColorObjectsList1Red = new List<GameObject>();
-    [SerializeField] private List<GameObject> ObjectColorObjectsList1Blue = new List<GameObject>();
+    [Header("Stage Objects")]
+    [SerializeField] public List<GameObject> ColorObjectsListRed = new List<GameObject>();
+    [SerializeField] public List<GameObject> ColorObjectsListBlue = new List<GameObject>();
 
-    [Header("Stage 2")]
-    [SerializeField] private List<GameObject> ObjectColorObjectsList2Red = new List<GameObject>();
-    [SerializeField] private List<GameObject> ObjectColorObjectsList2Blue = new List<GameObject>();
+    //[Header("Stage 2")]
+    //[SerializeField] private List<GameObject> ObjectColorObjectsList2Red = new List<GameObject>();
+    //[SerializeField] private List<GameObject> ObjectColorObjectsList2Blue = new List<GameObject>();
 
-    [Header("Stage 3")]
-    [SerializeField] private List<GameObject> ObjectColorObjectsList3Red = new List<GameObject>();
-    [SerializeField] private List<GameObject> ObjectColorObjectsList3Blue = new List<GameObject>();
+    //[Header("Stage 3")]
+    //[SerializeField] private List<GameObject> ObjectColorObjectsList3Red = new List<GameObject>();
+    //[SerializeField] private List<GameObject> ObjectColorObjectsList3Blue = new List<GameObject>();
 
     [Header("Materials")]
     [SerializeField] private Material redSolidMaterial;      // 빨간색 원색 메테리얼
@@ -62,6 +63,7 @@ public class ObjectColorChangeManager : MonoBehaviour
     /// </summary>
     private void InitializeAllObjects()
     {
+        playerObjectColor = GameManager.Instance.PlayerColor;
         // 플레이어 색상에 따라 현재 스테이지의 색상 오브젝트를 투명하게 설정
         if (playerObjectColor == ObjectColor.Red)
         {  // 플레이어 색상이 빨간색이면 파란색 오브젝트들 투명하게
@@ -149,49 +151,51 @@ public class ObjectColorChangeManager : MonoBehaviour
     /// <returns>해당하는 오브젝트 리스트</returns>
     private List<GameObject> GetObjectColorObjectsList(ObjectColor ObjectColor, int stage)
     {
-        switch (stage)
-        {
-            case 1:
-                return GetStage1ObjectColorList(ObjectColor);
-            case 2:
-                return GetStage2ObjectColorList(ObjectColor);
-            case 3:
-                return GetStage3ObjectColorList(ObjectColor);
-            default:
-                Debug.LogWarning($"Invalid stage: {stage}");
-                return new List<GameObject>();
-        }
+        return GetStageObjectColorList(ObjectColor);
+
+        //switch (stage)
+        //{
+        //    case 1:
+                
+        //    case 2:
+        //        return GetStage2ObjectColorList(ObjectColor);
+        //    case 3:
+        //        return GetStage3ObjectColorList(ObjectColor);
+        //    default:
+        //        Debug.LogWarning($"Invalid stage: {stage}");
+        //        return new List<GameObject>();
+        //}
     }
 
-    private List<GameObject> GetStage1ObjectColorList(ObjectColor ObjectColor)
+    private List<GameObject> GetStageObjectColorList(ObjectColor ObjectColor)
     {
         switch (ObjectColor)
         {
-            case ObjectColor.Red: return ObjectColorObjectsList1Red;
-            case ObjectColor.Blue: return ObjectColorObjectsList1Blue;
+            case ObjectColor.Red: return ColorObjectsListRed;
+            case ObjectColor.Blue: return ColorObjectsListBlue;
             default: return new List<GameObject>();
         }
     }
 
-    private List<GameObject> GetStage2ObjectColorList(ObjectColor ObjectColor)
-    {
-        switch (ObjectColor)
-        {
-            case ObjectColor.Red: return ObjectColorObjectsList2Red;
-            case ObjectColor.Blue: return ObjectColorObjectsList2Blue;
-            default: return new List<GameObject>();
-        }
-    }
+    //private List<GameObject> GetStage2ObjectColorList(ObjectColor ObjectColor)
+    //{
+    //    switch (ObjectColor)
+    //    {
+    //        case ObjectColor.Red: return ObjectColorObjectsList2Red;
+    //        case ObjectColor.Blue: return ObjectColorObjectsList2Blue;
+    //        default: return new List<GameObject>();
+    //    }
+    //}
 
-    private List<GameObject> GetStage3ObjectColorList(ObjectColor ObjectColor)
-    {
-        switch (ObjectColor)
-        {
-            case ObjectColor.Red: return ObjectColorObjectsList3Red;
-            case ObjectColor.Blue: return ObjectColorObjectsList3Blue;
-            default: return new List<GameObject>();
-        }
-    }
+    //private List<GameObject> GetStage3ObjectColorList(ObjectColor ObjectColor)
+    //{
+    //    switch (ObjectColor)
+    //    {
+    //        case ObjectColor.Red: return ObjectColorObjectsList3Red;
+    //        case ObjectColor.Blue: return ObjectColorObjectsList3Blue;
+    //        default: return new List<GameObject>();
+    //    }
+    //}
 
     /// <summary>
     /// 오브젝트들을 원색(불투명) 상태로 변경

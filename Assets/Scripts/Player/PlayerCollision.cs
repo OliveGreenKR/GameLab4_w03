@@ -4,6 +4,9 @@ public class PlayerCollision : MonoBehaviour
 {
     [SerializeField] Collider _collider = null;
     [SerializeField] PlayerController _player;
+    [SerializeField] bool IsLog = false;
+
+
 
     private void Start()
     {
@@ -26,13 +29,19 @@ public class PlayerCollision : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"player trigger enter {other.gameObject.name}");
+        if(IsLog)
+        {
+            Debug.Log($"player trigger enter {other.gameObject.name}");
+        }
         _player.IsGrounded = true;
     }
 
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log($"player trigger exit {other.gameObject.name}");
+        if(IsLog)
+        {
+            Debug.Log($"player trigger exit {other.gameObject.name}");
+        }
         _player.IsGrounded = false;
     }
 
