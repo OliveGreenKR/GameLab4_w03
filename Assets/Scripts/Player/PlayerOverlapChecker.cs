@@ -3,11 +3,11 @@
 public class PlayerOverlapChecker : MonoBehaviour
 {
     [SerializeField] private Collider _targetCollider = null;
-    [SerializeField] private GameObject _targetPlayer = null;
-    [SerializeField] bool _isOverlap = false;
+    [SerializeField] private PlayerController _targetPlayer = null;
+    [SerializeField] private bool _isOverlap = false;
 
 
-    [SerializeField] bool IsOverlap => _isOverlap;
+    [SerializeField] public bool IsOverlap => _isOverlap;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,11 +29,11 @@ public class PlayerOverlapChecker : MonoBehaviour
         string layerName = LayerMask.LayerToName(otherLayer);
         Debug.Log($"trigger Enter with {other.gameObject.name}:{otherLayer}");
 
-        if (LayerMask.LayerToName(_targetPlayer.layer) == "Red" && layerName == "Blue")
+        if (LayerMask.LayerToName(_targetPlayer.gameObject.layer) == "Red" && layerName == "Blue")
         {
             _isOverlap = true;
         }
-        else if (LayerMask.LayerToName(_targetPlayer.layer) == "Blue" && layerName == "Red")
+        else if (LayerMask.LayerToName(_targetPlayer.gameObject.layer) == "Blue" && layerName == "Red")
         {
             _isOverlap = true;
         }
