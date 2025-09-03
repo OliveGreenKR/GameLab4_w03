@@ -444,7 +444,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01afcf3bf8f92664495c74ee5186a6b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerRenderer: {fileID: 87799200}
   _playerColor: 2
+  redSolidMaterial: {fileID: 2100000, guid: 6e25434a97cf18646997648af82ab2ed, type: 2}
+  blueSolidMaterial: {fileID: 2100000, guid: 7171f754d1dff184d8283efc34337f54, type: 2}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
