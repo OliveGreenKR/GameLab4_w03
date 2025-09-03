@@ -60,7 +60,7 @@ public class MovingObstacle : MonoBehaviour
 
     private void Update()
     {
-        if (waypoints == null || waypoints.Length < 2 || hasReachedEnd)
+        if (waypoints == null || waypoints.Length < 2 || hasReachedEnd || hasPlayerEnter)
             return;
 
         if (isWaiting)

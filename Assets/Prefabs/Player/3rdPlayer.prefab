@@ -470,7 +470,7 @@ MonoBehaviour:
   FallingGravityMultiplier: 2
   MovementSpeed: 5
   MovementAccelInAir: 5
-  JumpImpulseAccel: 10
+  JumpImpulseAccel: 12
   FallingMovementSpeedMultiplier: 0.5
   MaxSpeed: 5
   MaxFallSpeed: 40
