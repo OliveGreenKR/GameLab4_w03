@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerCollision : MonoBehaviour
+public class PlayerGroundChecker : MonoBehaviour
 {
     [SerializeField] Collider _collider = null;
     [SerializeField] PlayerController _player;
@@ -20,7 +20,7 @@ public class PlayerCollision : MonoBehaviour
         }
 
         // BoxCollider를 Trigger로 설정 확인
-        if (_collider != null && !_collider.isTrigger)
+        if (_collider != null && !_collider.isTrigger)d
         {
             Debug.LogWarning("PlayerCollision: Collider should be set as Trigger!");
         }

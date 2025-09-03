@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using System.Collections.Generic;
 
 public class PlayerColorController : MonoBehaviour
 {
@@ -26,13 +26,32 @@ public class PlayerColorController : MonoBehaviour
             }
         }
 
-        // 모든 Collider 캐싱 (자식 포함)
-        _cachedColliders = gameObject.GetComponentsInChildren<Collider>();
-        Debug.Log($"Cached {_cachedColliders.Length} colliders for player color changes");
-        if(_cachedColliders == null)
+        // 모든 Collider 캐싱 (자식 포함) - "GrayObject" 태그 제외
+        Collider[] allColliders = gameObject.GetComponentsInChildren<Collider>();
+
+        // 1단계: 유효한 Collider 개수 카운트
+        int validCount = 0;
+        for (int i = 0; i < allColliders.Length; i++)
         {
-            Debug.LogWarning("PlayerColorController: No colliders found on player or its children!");
+            if (allColliders[i] != null && allColliders[i].gameObject.tag != "GrayObject")
+            {
+                validCount++;
+            }
         }
+
+        // 2단계: 정확한 크기로 배열 할당 후 유효한 Collider만 채움
+        _cachedColliders = new Collider[validCount];
+        int cacheIndex = 0;
+        for (int i = 0; i < allColliders.Length; i++)
+        {
+            if (allColliders[i] != null && allColliders[i].gameObject.tag != "GrayObject")
+            {
+                _cachedColliders[cacheIndex] = allColliders[i];
+                cacheIndex++;
+            }
+        }
+
+        Debug.Log($"Cached {_cachedColliders.Length} colliders for player color changes (excluded GrayObject tags)");
 
         var gameManager = GameManager.Instance;
         if (gameManager != null)
