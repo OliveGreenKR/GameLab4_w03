@@ -245,7 +245,7 @@ GameObject:
   - component: {fileID: 87799204}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -417,7 +417,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rigid: {fileID: 87799202}
   _camera: {fileID: 330585545}
-  IsGrounded: 1
+  IsGrounded: 0
   _isMoving: 0
   _currentVelocity: {x: 0, y: 0, z: 0}
   GravityMultiplier: 3
@@ -1944,6 +1944,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player: {fileID: 87799205}
   _respawnPosition: {x: 0, y: 0, z: 10}
+  _objectColorChangeManager: {fileID: 0}
+  _playerColor: 0
 --- !u!4 &1442786459
 Transform:
   m_ObjectHideFlags: 0
