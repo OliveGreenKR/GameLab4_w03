@@ -5,6 +5,7 @@ public class MovingObstacle : MonoBehaviour
 {
     [Header("이동 설정")]
     [SerializeField] private bool isRepeating = true; // 반복 이동 여부
+    [SerializeField] private bool canAutoMove = true; // 자동 이동 여부
     [SerializeField] private float moveSpeed = 5f; // 이동 속도
     [SerializeField] private float waitTime = 0f; // 각 포인트에서 대기 시간
 
@@ -22,6 +23,7 @@ public class MovingObstacle : MonoBehaviour
     private float waitTimer = 0f;
     private Vector3 startPosition;
     private bool hasReachedEnd = false; // 한 번만 이동하는 경우 종료 체크
+    private bool hasPlayerEnter = false; // 플레이어 탑승 시 활성화
 
     // 이동 완료 이벤트
     public System.Action OnMovementComplete;
@@ -49,6 +51,11 @@ public class MovingObstacle : MonoBehaviour
                 transform.position = firstPoint;
             }
         }
+
+        if (!canAutoMove)
+        {
+            hasPlayerEnter = true; // 자동 이동이 아니면 플레이어 감지할 때까지 대기
+        }
     }
 
     private void Update()
@@ -65,6 +72,16 @@ public class MovingObstacle : MonoBehaviour
             MoveTowardsTarget();
         }
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (canAutoMove) return; // 자동 이동이 아닐 경우에만 플레이어 감지
+
+        if (other.CompareTag("Player"))
+        {
+            hasPlayerEnter = false;
+        }
+    }
+
 
     private void MoveTowardsTarget()
     {

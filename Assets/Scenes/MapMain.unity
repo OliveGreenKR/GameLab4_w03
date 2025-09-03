@@ -335,17 +335,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6105577202910514306, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
+      propertyPath: canAutoMove
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105577202910514306, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
       propertyPath: waypoints.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6105577202910514306, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
       propertyPath: 'waypoints.Array.data[0]'
       value: 
-      objectReference: {fileID: 70821131}
+      objectReference: {fileID: 70821130}
     - target: {fileID: 6105577202910514306, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
       propertyPath: 'waypoints.Array.data[1]'
       value: 
-      objectReference: {fileID: 70821130}
+      objectReference: {fileID: 70821131}
     - target: {fileID: 6105577202910514306, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
       propertyPath: 'waypoints.Array.data[2]'
       value: 
@@ -360,11 +364,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 7227673931094008185, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1749963555}
-    m_AddedComponents: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7405046939600362019, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 158631455}
   m_SourcePrefab: {fileID: 100100000, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
 --- !u!4 &70821129 stripped
 Transform:
@@ -379,11 +383,6 @@ Transform:
 --- !u!4 &70821131 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5785498810808548948, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
-  m_PrefabInstance: {fileID: 70821128}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &70821132 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7227673931094008185, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
   m_PrefabInstance: {fileID: 70821128}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &109412864
@@ -525,6 +524,32 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2896171440755964616, guid: e37d7ac4a1ef70c479408c1fa31507df, type: 3}
   m_PrefabInstance: {fileID: 152943515}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &158631450 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7405046939600362019, guid: 39db6a2be5fe66642b7c284547342763, type: 3}
+  m_PrefabInstance: {fileID: 70821128}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &158631455
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158631450}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 0.1, z: 1}
+  m_Center: {x: 0, y: 0.6, z: 0}
 --- !u!1 &171846216
 GameObject:
   m_ObjectHideFlags: 0
@@ -573,6 +598,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -1348,6 +1374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -1478,6 +1505,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -1956,6 +1984,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3772447667585588627, guid: 41201d2cba5127645aca231df6496250, type: 3}
       insertIndex: -1
       addedObject: {fileID: 563526721}
+    - targetCorrespondingSourceObject: {fileID: 3772447667585588627, guid: 41201d2cba5127645aca231df6496250, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 563526723}
   m_SourcePrefab: {fileID: 100100000, guid: 41201d2cba5127645aca231df6496250, type: 3}
 --- !u!4 &563526717 stripped
 Transform:
@@ -1990,14 +2021,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 0
   moveSpeed: 2
-  waitTime: 4
+  waitTime: 2
   waypoints:
   - {fileID: 563526719}
   - {fileID: 563526718}
   useLocalPositions: 0
   showGizmos: 1
   gizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+--- !u!65 &563526723
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563526720}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.8024926, y: 0.100000024, z: 4.9036293}
+  m_Center: {x: -1.2546546, y: 0.4, z: 0.21807373}
 --- !u!1 &570662410
 GameObject:
   m_ObjectHideFlags: 0
@@ -2443,6 +2496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -3105,6 +3159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -3614,6 +3669,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 280467237968369617, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: c5ba7f75642b4da4090dabf658c23e33, type: 2}
     - target: {fileID: 853550567885672121, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
       propertyPath: m_Name
       value: 3rdPlayer
@@ -3657,6 +3716,14 @@ PrefabInstance:
     - target: {fileID: 4350614350347929174, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6167935740320920733, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
+      propertyPath: _baseDistanceUnits
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7603247532075904571, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4193,6 +4260,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -4885,6 +4953,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -5015,6 +5084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -5679,6 +5749,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -6342,6 +6413,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -6808,6 +6880,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
@@ -7562,37 +7635,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 723524555}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1749963554
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1749963555}
-  m_Layer: 0
-  m_Name: SpawnPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1749963555
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1749963554}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.11399994, y: 2.7399998, z: 0.027999878}
-  m_LocalScale: {x: 0.2, y: 2, z: 0.2}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 70821132}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1754641532
 PrefabInstance:
@@ -8988,6 +9030,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isRepeating: 1
+  canAutoMove: 1
   moveSpeed: 5
   waitTime: 0
   waypoints:
