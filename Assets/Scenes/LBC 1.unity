@@ -2597,24 +2597,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c54ffc7b340f0a4799bf92db6fa4641, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ObjectColorObjectsList1Red:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  ObjectColorObjectsList1Blue:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  ObjectColorObjectsList2Red:
-  - {fileID: 1440246579}
-  - {fileID: 73679072}
-  ObjectColorObjectsList2Blue:
-  - {fileID: 1673640914}
-  - {fileID: 436041503}
-  ObjectColorObjectsList3Red:
-  - {fileID: 353198372}
-  ObjectColorObjectsList3Blue:
-  - {fileID: 1777293829}
+  ColorObjectsListRed: []
+  ColorObjectsListBlue: []
   redSolidMaterial: {fileID: 2100000, guid: 6e25434a97cf18646997648af82ab2ed, type: 2}
   redTransparentMaterial: {fileID: 2100000, guid: fb2f916c7c631dc40a1be9c4c7265ef2, type: 2}
   blueSolidMaterial: {fileID: 2100000, guid: 7171f754d1dff184d8283efc34337f54, type: 2}

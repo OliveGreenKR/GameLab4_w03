@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 982086216273691703}
   - component: {fileID: 7389100964487845331}
   - component: {fileID: 1224642532720349041}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Red Wing 4
   m_TagString: RedObject
   m_Icon: {fileID: 0}
@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -3.7200036, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 589988186158479424}
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 7348489316774573705}
   - component: {fileID: 4008000869409847756}
   - component: {fileID: 993035047372581522}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Blue Wing 4
   m_TagString: BlueObject
   m_Icon: {fileID: 0}
@@ -151,7 +151,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -2.6300013, y: 0, z: -2.6299992}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 589988186158479424}
@@ -255,7 +255,7 @@ GameObject:
   - component: {fileID: 7986286500620275959}
   - component: {fileID: 7120799235037409994}
   - component: {fileID: 8084214553406619412}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Blue Wing 3
   m_TagString: BlueObject
   m_Icon: {fileID: 0}
@@ -272,7 +272,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -2.6300013, y: 0, z: 2.6299992}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 589988186158479424}
@@ -376,7 +376,7 @@ GameObject:
   - component: {fileID: 3043688898796414796}
   - component: {fileID: 6096990979195088637}
   - component: {fileID: 5297912218336648300}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Red Wing 2
   m_TagString: RedObject
   m_Icon: {fileID: 0}
@@ -393,7 +393,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 3.7200017, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 589988186158479424}
@@ -497,7 +497,7 @@ GameObject:
   - component: {fileID: 6009023681612868674}
   - component: {fileID: 5222842965172395448}
   - component: {fileID: 4112778576616124111}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Red Wing 3
   m_TagString: RedObject
   m_Icon: {fileID: 0}
@@ -514,7 +514,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 3.7199993}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 589988186158479424}
@@ -618,7 +618,7 @@ GameObject:
   - component: {fileID: 1147074835642728940}
   - component: {fileID: 257170520577860551}
   - component: {fileID: 238721388274676593}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Red Wing
   m_TagString: RedObject
   m_Icon: {fileID: 0}
@@ -635,7 +635,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -3.7199993}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 589988186158479424}
@@ -738,9 +738,9 @@ GameObject:
   - component: {fileID: 7301984292038062861}
   - component: {fileID: 2461331986780070235}
   - component: {fileID: 8190763471445023640}
-  - component: {fileID: 8083854517629054871}
+  - component: {fileID: 309157884855358085}
   m_Layer: 0
-  m_Name: Windmill 2
+  m_Name: Windmill 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -754,7 +754,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6594385467313129505}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -92.23, y: 35, z: -47.386303}
   m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
@@ -768,7 +768,7 @@ Transform:
   - {fileID: 7139550053132301595}
   - {fileID: 3938979479705082708}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7301984292038062861
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -845,7 +845,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &8083854517629054871
+--- !u!114 &309157884855358085
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -873,7 +873,7 @@ GameObject:
   - component: {fileID: 3506927231287129540}
   - component: {fileID: 7688541293904742737}
   - component: {fileID: 5765666446301933956}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Blue Wing 2
   m_TagString: BlueObject
   m_Icon: {fileID: 0}
@@ -890,7 +890,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.6300013, y: 0, z: 2.6299992}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 589988186158479424}
@@ -994,7 +994,7 @@ GameObject:
   - component: {fileID: 75410633976105727}
   - component: {fileID: 2391330573671367802}
   - component: {fileID: 8516218487517133471}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Blue Wing
   m_TagString: BlueObject
   m_Icon: {fileID: 0}
@@ -1011,7 +1011,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 2.6300013, y: 0, z: -2.6299992}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 589988186158479424}
