@@ -5,7 +5,7 @@ public class CameraController : MonoBehaviour , IAngleController
     #region Serialized Fields
     [Header("Target")]
     [SerializeField] private GameObject _playerGameObject;
-
+  
     [Header("Camera Angles")]
     [SerializeField][Range(-180f, 180f)] private float _initialYawDegrees = 0f;
     [SerializeField][Range(-80f, 80f)] private float _initialPitchDegrees = 15f;
@@ -29,6 +29,8 @@ public class CameraController : MonoBehaviour , IAngleController
     [Header("Dead Zone")]
     [SerializeField] private float _positionDeadZoneUnits = 0.01f;
     [SerializeField] private float _rotationDeadZoneDegrees = 0.1f;
+    [SerializeField] private float _positionLerpthresholdVelocitypRatio = 0.05f;
+    //[SerializeField] private float _rotationLerpthreshold = 0.01f;
 
     [Header("Visibility")]
     [SerializeField] private LayerMask _obstacleLayerMask = -1;
@@ -232,17 +234,29 @@ public class CameraController : MonoBehaviour , IAngleController
         //위치변화량이 한계값 이상
         Vector3 currentPosition = transform.position;
         float positionDistance = Vector3.Distance(currentPosition, _targetWorldPosition);
-        updatePosition = Mathf.Abs(positionDistance) > _positionDeadZoneUnits;
-        Debug.Log($"Distance to Target : {positionDistance}");
+        float positionDistMag = Mathf.Abs(positionDistance);
+        updatePosition = positionDistMag > _positionDeadZoneUnits;
+        //Debug.Log($"Distance to Target : {positionDistance}");
+
+        float playerSpeed = _playerRigidbody.linearVelocity.magnitude;
 
         if (updatePosition)
         {
-            transform.position = Vector3.Lerp(currentPosition, _targetWorldPosition, _positionDampingSpeed * Time.deltaTime);
+            // 객체 속도에 근거한 Lerp 적용
+            if (positionDistMag < _positionLerpthresholdVelocitypRatio * playerSpeed)
+            {
+                transform.position = _targetWorldPosition;
+            }
+            else
+            {
+                transform.position = Vector3.Lerp(currentPosition, _targetWorldPosition, _positionDampingSpeed * Time.deltaTime);
+            }
+            
         }
 
 
         bool updateRotation = false;
-        // 회전 변화량이 한계값 이상이고 충분한 경우에 업데이트
+        // 회전 변화량이 한계값 이상
         if (_playerTransform != null)
         {
             Vector3 lookDirection = (_playerTargetPosition - transform.position).normalized;
@@ -339,11 +353,12 @@ public class CameraController : MonoBehaviour , IAngleController
         float baseDistance = _baseDistanceUnits;
 
         // 플레이어 속도에 따른 거리 조절 (캐싱된 컴포넌트 사용)
-        if (_playerController != null && _playerRigidbody != null && _playerController.IsMoving)
+        if (_playerController != null && _playerRigidbody != null)
         {
             float playerSpeed = _playerRigidbody.linearVelocity.magnitude;
             float speedRatio = Mathf.Clamp01(playerSpeed / _maxSpeedForDistanceUnitsPerSecond);
             float speedDistanceOffset = speedRatio * _speedDistanceMultiplier * _baseDistanceUnits;
+            Debug.Log($"Player Speed: {playerSpeed}, Speed Ratio: {speedRatio}, Distance Offset: {speedDistanceOffset}");
             baseDistance += speedDistanceOffset;
         }
 

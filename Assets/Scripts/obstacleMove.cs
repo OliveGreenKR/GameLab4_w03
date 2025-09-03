@@ -7,7 +7,7 @@ public class posData//이동할 방향과 시간 저장
     public float moveSec;
     public float moveSpeed;
     public Vector3 moveDir;
-    public Vector3 rotateDir;    
+    public Vector3 rotateDir;
 }
 public class obstacleMove : MonoBehaviour
 {

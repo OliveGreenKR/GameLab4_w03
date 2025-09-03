@@ -23,21 +23,14 @@ public class NewMonoBehaviourScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // 시간이 지나면서 가중치 증가 → 점점 강해졌다 완화되는 느낌
+        weight = Mathf.Sin(Time.time * weightSpeed);
 
-        if (powerLose > 0f)
-        {
-            
-        }
+        // sin 곡선에 가중치 곱하기
+        float scaleFactor = 1f + Mathf.Sin(Time.time * frequency) * amplitude * weight;
 
-        transform.localScale = new Vector3(1 + powerWeight * 0.05f, 1 - powerWeight * 0.1f, 1 + powerWeight * 0.05f);
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        powerWeight=power;//파워 가중량 = 파워
-        powerLose = 5;
-
-
+        // X, Y, Z축에 동시에 적용
+        transform.localScale = baseScale * scaleFactor;
     }
     
 }
