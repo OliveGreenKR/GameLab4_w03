@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private const string _blueObjectTag = "BlueObject";
     [SerializeField] private const string _grayObjectTag = "GrayObject";
 
+    [SerializeField] private Canvas _gameMainUI = null;
+    [SerializeField] private Canvas _gameClearUI = null;
+    [SerializeField] private ClearPoint _clearPoint = null;
+
     public string RedObjectTag => _redObjectTag;
     public string BlueObjectTag => _blueObjectTag;
     public string GrayObjectTag => _grayObjectTag;
@@ -57,21 +61,34 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         InitializeObjectColorManager();
-        
-        GameStart();
+        GameMain();
+
     }
     #endregion
 
     #region Public Methods
+
+    public void GameMain()
+    {
+        _player.gameObject.SetActive(false);
+        _gameMainUI.gameObject.SetActive(true);
+        _gameClearUI.gameObject.SetActive(false);
+        _clearPoint.gameObject.SetActive(true);
+    }
     public void GameStart()
     {
         Debug.Log("Game Start");
+        _player.gameObject.SetActive(true);
         SpawnPlayer(_playerStartLocation);
     }
 
-    public void GameOver()
+    public void GameClear()
     {
-        Debug.Log("Game Over");
+        Debug.Log("Game Clear");
+        _player.gameObject.SetActive(false);
+        _gameMainUI.gameObject.SetActive(false);
+        _gameClearUI.gameObject.SetActive(true);
+        _clearPoint.gameObject.SetActive(false);
     }
 
     public void OnPlayerClicked()
@@ -145,7 +162,6 @@ public class GameManager : MonoBehaviour
         List.AddRange(objects);
         Debug.Log($"Collected {List.Count} objects with tag {tagName}");
     }
-
   
     #endregion
 }

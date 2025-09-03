@@ -2280,6 +2280,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 280467237968369617, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: c5ba7f75642b4da4090dabf658c23e33, type: 2}
     - target: {fileID: 853550567885672121, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
       propertyPath: m_Name
       value: 3rdPlayer
