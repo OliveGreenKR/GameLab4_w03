@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
     }
     private void Update()
     {
-        HandleContinuousMovement();
+        
     }
     private void LateUpdate()
     {
@@ -57,6 +57,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
 
     private void FixedUpdate()
     {
+        HandleContinuousMovement();
     }
 
     private void OnEnable()

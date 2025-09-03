@@ -31,5 +31,7 @@ public class PlayerCollision : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
+        //sdfsdfsdfsdfsf
+        //sdfsdfsdfs
     }
 }
