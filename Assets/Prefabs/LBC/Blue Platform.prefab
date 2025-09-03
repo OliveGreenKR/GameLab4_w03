@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 409592716194654662}
   - component: {fileID: 4621120689868894335}
   - component: {fileID: 7194234254888110293}
-  - component: {fileID: 7297607007848238647}
+  - component: {fileID: 9054552630930132282}
   m_Layer: 7
   m_Name: Blue Platform
   m_TagString: BlueObject
@@ -87,8 +87,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &7297607007848238647
-CapsuleCollider:
+--- !u!64 &9054552630930132282
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -105,8 +105,7 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
