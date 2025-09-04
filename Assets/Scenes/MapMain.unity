@@ -5425,6 +5425,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3rdPlayer
       objectReference: {fileID: 0}
+    - target: {fileID: 2061212976262942855, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 00cf01b854a5c554fb2177b468bc5fb8, type: 2}
     - target: {fileID: 3855576807630991324, guid: 9e55ae7270a81224dbb31162adea6e3d, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.70710784
