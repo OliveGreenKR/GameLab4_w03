@@ -78,6 +78,7 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         Debug.Log("Game Start");
+        _gameMainUI.gameObject.SetActive(false);
         _player.gameObject.SetActive(true);
         SpawnPlayer(_playerStartLocation);
     }

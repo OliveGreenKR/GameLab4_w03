@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class WindmillBlade : MonoBehaviour
 {
@@ -6,6 +6,7 @@ public class WindmillBlade : MonoBehaviour
     [SerializeField] private float knockbackForce = 25f;  // 플레이어를 날려버릴 힘의 크기
     [SerializeField] private float upwardForce = 10f;     // 위쪽으로 추가로 가해지는 힘
     [SerializeField] private bool useBladeVelocity = true; // 날개 회전 속도 반영 여부
+    [SerializeField] private float diableInputDuration = 0.5f;
 
     [Header("Player Detection")]
     [SerializeField] private string playerTag = "Player";  // 플레이어 태그
@@ -111,7 +112,7 @@ public class WindmillBlade : MonoBehaviour
         force.y += upwardForce;
 
         // 힘 적용 (임펄스로 즉시 적용)
-        playerRb.AddForce(force, ForceMode.Impulse);
+        playerRb.AddForce(force, ForceMode.VelocityChange);
 
         if (showDebugInfo)
         {
@@ -121,30 +122,19 @@ public class WindmillBlade : MonoBehaviour
 
     void DisablePlayerControl(GameObject player)
     {
-        // 플레이어 컨트롤러 일시 정지 (선택사항)
-        // 플레이어 스크립트 이름에 맞게 수정 필요
-
-        // PlayerController playerController = player.GetComponent<PlayerController>();
-        // if (playerController != null)
-        // {
-        //     StartCoroutine(DisablePlayerControlTemporary(playerController, 0.5f));
-        // }
+         PlayerController playerController = player.GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            StartCoroutine(DisableControllerTemporary(playerController, diableInputDuration));
+        }
     }
 
-    System.Collections.IEnumerator DisableControllerTemporary(CharacterController controller, float duration)
+    System.Collections.IEnumerator DisableControllerTemporary(PlayerController controller, float duration)
     {
-        controller.enabled = false;
+        controller.DisableInput();
         yield return new WaitForSeconds(duration);
-        controller.enabled = true;
+        controller.EnableInput();
     }
-
-    // 커스텀 플레이어 컨트롤러용 예시
-    // System.Collections.IEnumerator DisablePlayerControlTemporary(PlayerController controller, float duration)
-    // {
-    //     controller.enabled = false;
-    //     yield return new WaitForSeconds(duration);
-    //     controller.enabled = true;
-    // }
 
     // Gizmos로 충돌 영역 시각화
     void OnDrawGizmos()

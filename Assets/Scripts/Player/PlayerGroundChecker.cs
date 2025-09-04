@@ -251,7 +251,9 @@ public class PlayerGroundChecker : MonoBehaviour
 
         // 플레이어를 지면 객체의 자식으로 설정
         gameObject.transform.SetParent(groundObject.transform);
+        //gameObject.transform.SetParent(groundObject.transform.parent); // 원래 부모 유지
         IsAttachedToMovingPlatform = true;
+
 
         if (_enableDebugLogging)
         {

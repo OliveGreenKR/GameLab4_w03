@@ -406,7 +406,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7978645452344848732}
-  m_Material: {fileID: 13400000, guid: 051e1c5bb1297314fa275bda11e7afbc, type: 2}
+  m_Material: {fileID: 13400000, guid: c5ba7f75642b4da4090dabf658c23e33, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -470,7 +470,7 @@ MonoBehaviour:
   FallingGravityMultiplier: 2
   MovementSpeed: 5
   MovementAccelInAir: 5
-  JumpImpulseAccel: 10
+  JumpImpulseAccel: 12
   FallingMovementSpeedMultiplier: 0.5
   MaxSpeed: 5
   MaxFallSpeed: 40
@@ -482,7 +482,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7978645452344848732}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14582467188e1e241ae8ca91aaa562ec, type: 3}
   m_Name: 
