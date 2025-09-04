@@ -78,6 +78,7 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         Debug.Log("Game Start");
+        InvisibleCursor();
         _gameMainUI.gameObject.SetActive(false);
         _player.gameObject.SetActive(true);
         SpawnPlayer(_playerStartLocation);
@@ -86,6 +87,7 @@ public class GameManager : MonoBehaviour
     public void GameClear()
     {
         Debug.Log("Game Clear");
+        VisibleCursor();
         _player.gameObject.SetActive(false);
         _gameMainUI.gameObject.SetActive(false);
         _gameClearUI.gameObject.SetActive(true);
@@ -164,5 +166,15 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Collected {List.Count} objects with tag {tagName}");
     }
   
+    private void InvisibleCursor()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+    private void VisibleCursor()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
     #endregion
 }
