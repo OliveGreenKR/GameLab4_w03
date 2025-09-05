@@ -1381,37 +1381,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 9115138239978418433}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1695585178518881226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8207426039290695156}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdced96c0420b77438c40785b19ca3b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playerGameObject: {fileID: 3217490534960875019}
-  _initialYawDegrees: 0
-  _initialPitchDegrees: 15
-  _baseDistanceUnits: 13
-  _minDistanceUnits: 5
-  _maxDistanceUnits: 17
-  _playerHeightOffsetUnits: 1.5
-  _speedDistanceMultiplier: 0.5
-  _maxSpeedForDistanceUnitsPerSecond: 15
-  _positionDampingSpeed: 15
-  _rotationDampingSpeed: 180
-  _positionDeadZoneUnits: 0.1
-  _rotationDeadZoneDegrees: 0.00001
-  _positionLerpthresholdVelocitypRatio: 0.05
-  _obstacleLayerMask:
-    serializedVersion: 2
-    m_Bits: 247
-  _visibilityCheckInterval: 0.2
-  _playerTargetPosition: {x: 0.0000011692161, y: 5.04, z: -1.49}
 --- !u!136 &1958285455659500507
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1476,27 +1445,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &3142153564268616044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3217490534960875019}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14582467188e1e241ae8ca91aaa562ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _angleControllerGameObject: {fileID: 8207426039290695156}
-  _deltaMultiplier: 0.05
-  _mouseSensitivityX: 2
-  _mouseSensitivityY: 2
-  _invertYAxis: 0
-  _invertXAxis: 0
-  _defaultYawDegrees: 180
-  _defaultPitchDegrees: 0
-  _enableMouseInput: 1
 --- !u!1 &3217490534960875019
 GameObject:
   m_ObjectHideFlags: 0
@@ -1511,7 +1459,6 @@ GameObject:
   - component: {fileID: 4754514965157109894}
   - component: {fileID: 270556085547214796}
   - component: {fileID: 8619546578297739404}
-  - component: {fileID: 3142153564268616044}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1552,7 +1499,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1735,7 +1682,7 @@ GameObject:
   - component: {fileID: 6559881057788807214}
   - component: {fileID: 6218820691736420367}
   - component: {fileID: 8207426039290695157}
-  - component: {fileID: 1695585178518881226}
+  - component: {fileID: 8207426039290695158}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1756,14 +1703,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetGameObject: {fileID: 3217490534960875019}
-  _targetScreenPositionX: 0.605
-  _targetScreenPositionY: 0.56
+  _targetScreenPositionX: 0.578
+  _targetScreenPositionY: 0.588
   _initialYawDegrees: 0
-  _initialPitchDegrees: 15
+  _initialPitchDegrees: 10
   _baseDistanceUnits: 5
   _minDistanceUnits: 3
-  _maxDistanceUnits: 12
-  _targetHeightOffsetUnits: 1.7
+  _maxDistanceUnits: 8
+  _targetHeightOffsetUnits: 1.73
   _speedDistanceMultiplier: 0.5
   _maxSpeedForDistanceUnitsPerSecond: 10
   _positionDampingSpeed: 15
@@ -1775,8 +1722,29 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 247
   _visibilityCheckInterval: 0.2
-  _currentYawDegrees: -78.69977
-  _currentPitchDegrees: -1.099994
+  _currentYawDegrees: 50.300064
+  _currentPitchDegrees: 22.600042
+--- !u!114 &8207426039290695158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8207426039290695156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14582467188e1e241ae8ca91aaa562ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _angleControllerGameObject: {fileID: 8207426039290695156}
+  _deltaMultiplier: 0.05
+  _mouseSensitivityX: 2
+  _mouseSensitivityY: 2
+  _invertYAxis: 0
+  _invertXAxis: 0
+  _defaultYawDegrees: 180
+  _defaultPitchDegrees: 0
+  _enableMouseInput: 1
 --- !u!4 &8619546578297739403
 Transform:
   m_ObjectHideFlags: 0

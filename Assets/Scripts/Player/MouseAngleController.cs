@@ -2,7 +2,7 @@
 
 public class MouseAngleController : MonoBehaviour
 {
-    #region Serialized Fieldswea
+    #region Serialized Fields
     [Header("References")]
     [SerializeField] private InputSystem_Actions _inputs;
     [SerializeField] private GameObject _angleControllerGameObject;

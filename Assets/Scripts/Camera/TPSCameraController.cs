@@ -1,43 +1,104 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 public class TPSCameraController : MonoBehaviour, IAngleController
 {
     #region Serialized Fields
+    [TabGroup("Basic", "Target")]
     [Header("Target")]
+    [Required]
     [SerializeField] private GameObject _targetGameObject;
 
+    [TabGroup("Basic", "Target")]
     [Header("Target Screen Position")]
-    [SerializeField][Range(0f, 1f)] private float _targetScreenPositionX = 0.5f;
-    [SerializeField][Range(0f, 1f)] private float _targetScreenPositionY = 0.5f;
+    [PropertyRange(0f, 1f)]
+    [SuffixLabel("screen ratio")]
+    [SerializeField] private float _targetScreenPositionX = 0.5f;
 
-    [Header("Camera Angles")]
-    [SerializeField][Range(-180f, 180f)] private float _initialYawDegrees = 0f;
-    [SerializeField][Range(-80f, 80f)] private float _initialPitchDegrees = 15f;
+    [TabGroup("Basic", "Target")]
+    [PropertyRange(0f, 1f)]
+    [SuffixLabel("screen ratio")]
+    [SerializeField] private float _targetScreenPositionY = 0.5f;
 
+    [TabGroup("Basic", "Angles")]
+    [Header("Initial Camera Angles")]
+    [PropertyRange(-180f, 180f)]
+    [SuffixLabel("degrees")]
+    [SerializeField] private float _initialYawDegrees = 0f;
+
+    [TabGroup("Basic", "Angles")]
+    [PropertyRange(-80f, 80f)]
+    [SuffixLabel("degrees")]
+    [SerializeField] private float _initialPitchDegrees = 15f;
+
+    [TabGroup("Distance", "Base")]
     [Header("Distance Settings")]
-    [SerializeField][Range(2f, 50f)] private float _baseDistanceUnits = 8f;
-    [SerializeField][Range(1f, 50f)] private float _minDistanceUnits = 3f;
-    [SerializeField][Range(5f, 60f)] private float _maxDistanceUnits = 15f;
+    [PropertyRange(2f, 50f)]
+    [SuffixLabel("units")]
+    [SerializeField] private float _baseDistanceUnits = 8f;
 
+    [TabGroup("Distance", "Base")]
+    [PropertyRange(1f, 50f)]
+    [SuffixLabel("units")]
+    [SerializeField] private float _minDistanceUnits = 3f;
+
+    [TabGroup("Distance", "Base")]
+    [PropertyRange(5f, 60f)]
+    [SuffixLabel("units")]
+    [SerializeField] private float _maxDistanceUnits = 15f;
+
+    [TabGroup("Distance", "Base")]
     [Header("Height Offset")]
-    [SerializeField][Range(0f, 5f)] private float _targetHeightOffsetUnits = 1.5f;
+    [PropertyRange(0f, 5f)]
+    [SuffixLabel("units")]
+    [SerializeField] private float _targetHeightOffsetUnits = 1.5f;
 
+    [TabGroup("Distance", "Speed")]
     [Header("Speed Based Distance")]
-    [SerializeField][Range(0f, 2f)] private float _speedDistanceMultiplier = 0.5f;
-    [SerializeField][Range(0f, 100f)] private float _maxSpeedForDistanceUnitsPerSecond = 10f;
+    [PropertyRange(0f, 2f)]
+    [SuffixLabel("multiplier")]
+    [SerializeField] private float _speedDistanceMultiplier = 0.5f;
 
+    [TabGroup("Distance", "Speed")]
+    [PropertyRange(0f, 100f)]
+    [SuffixLabel("units/sec")]
+    [SerializeField] private float _maxSpeedForDistanceUnitsPerSecond = 10f;
+
+    [TabGroup("Movement", "Damping")]
     [Header("Damping")]
+    [PropertyRange(0.1f, 20f)]
+    [SuffixLabel("speed")]
     [SerializeField] private float _positionDampingSpeed = 2f;
+
+    [TabGroup("Movement", "Damping")]
+    [PropertyRange(0.1f, 360f)]
+    [SuffixLabel("speed")]
     [SerializeField] private float _rotationDampingSpeed = 3f;
 
+    [TabGroup("Movement", "DeadZone")]
     [Header("Dead Zone")]
+    [PropertyRange(0.001f, 1f)]
+    [SuffixLabel("units")]
     [SerializeField] private float _positionDeadZoneUnits = 0.01f;
+
+    [TabGroup("Movement", "DeadZone")]
+    [PropertyRange(0.001f, 5f)]
+    [SuffixLabel("degrees")]
     [SerializeField] private float _rotationDeadZoneDegrees = 0.1f;
+
+    [TabGroup("Movement", "DeadZone")]
+    [PropertyRange(0.01f, 1f)]
+    [SuffixLabel("ratio")]
     [SerializeField] private float _positionLerpthresholdVelocitypRatio = 0.05f;
 
+    [TabGroup("Advanced", "Visibility")]
     [Header("Visibility")]
     [SerializeField] private LayerMask _obstacleLayerMask = -1;
-    [SerializeField][Range(0.1f, 1f)] private float _visibilityCheckInterval = 0.2f;
+
+    [TabGroup("Advanced", "Visibility")]
+    [PropertyRange(0.1f, 2f)]
+    [SuffixLabel("seconds")]
+    [SerializeField] private float _visibilityCheckInterval = 0.2f;
     #endregion
 
     #region Properties
