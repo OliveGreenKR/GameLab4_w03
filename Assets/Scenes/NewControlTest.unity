@@ -567,9 +567,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1173287276}
-  - component: {fileID: 1173287275}
+  - component: {fileID: 1173287279}
   - component: {fileID: 1173287277}
   - component: {fileID: 1173287278}
+  - component: {fileID: 1173287275}
   m_Layer: 0
   m_Name: CameraTarget
   m_TagString: Untagged
@@ -584,7 +585,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1173287274}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6992e359526b2cd42997f1d2b42f73b5, type: 3}
   m_Name: 
@@ -653,6 +654,18 @@ MonoBehaviour:
   showGizmo: 1
   gizmoColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   gizmoRadius: 0.14
+--- !u!114 &1173287279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173287274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7427550be0e01b4a9b915c2bc4ff8aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1276899764
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,9 +954,9 @@ MonoBehaviour:
   _enableRotationTracking: 1
   _offsetRotationDegrees: {x: -8, y: 0, z: 0}
   _offsetDistance: {x: 1, y: 0.5, z: -3.5}
-  _positionDampingSpeed: {x: 20, y: 20, z: 20}
-  _rotationDampingSpeed: {x: 90, y: 90, z: 90}
-  _dampingThresholdRatio: 0.05
+  _positionDampingSpeed: {x: 10, y: 5, z: 10}
+  _rotationDampingSpeed: {x: 180, y: 180, z: 180}
+  _dampingThresholdRatio: 0.0005
   _positionThreshold: 0.0001
   _rotationThreshold: 0.0001
 --- !u!1 &1660262971
@@ -1462,7 +1475,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterController: {fileID: 1802387329}
   _camera: {fileID: 1605510719}
-  _moveSpeedUnitsPerSecond: 5
+  _moveSpeedUnitsPerSecond: 10
   _maxSpeedUnitsPerSecond: 10
   _characterRotateSpeed: 180
   _usePhysicsScale: 1
