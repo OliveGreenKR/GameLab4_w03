@@ -4,8 +4,12 @@ using UnityEngine;
 public class AimCamera : MonoBehaviour
 {
 
-    [SerializeField] public CinemachineCamera _aimingCamera;
-    [SerializeField] public Vector3 _aimedWorldPosition;
+    [SerializeField] private CinemachineCamera _aimingCamera;
+    [SerializeField] private Transform _aimTransform;
+    [SerializeField] private Vector3 _aimedWorldPosition;
+
+    public Vector3 AimedWorldPosition => _aimedWorldPosition;
+    public Transform AimTransform => _aimTransform;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -17,6 +21,7 @@ public class AimCamera : MonoBehaviour
     void Update()
     {
         _aimedWorldPosition = _aimingCamera.State.ReferenceLookAt;
+        _aimTransform.position = _aimedWorldPosition;
     }
 
     // Scene View에 디버깅용 구체 그리기
