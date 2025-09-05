@@ -51,12 +51,6 @@ public class PlayerColorController : MonoBehaviour
 
         Debug.Log($"Cached {_cachedColliders.Length} colliders for player color changes (excluded GrayObject tags)");
 
-        var gameManager = GameManager.Instance;
-        if (gameManager != null)
-        {
-            ChangeColor(gameManager.PlayerColor);
-        }
-
     }
 
     public void ChangeColor(ObjectColor NewColor)

@@ -16,7 +16,8 @@ public class ClearPoint : MonoBehaviour
     {
         if (other.CompareTag(_playerTag))
         {
-            GameManager.Instance.GameClear();
+            //GameManager.Instance.GameClear();
+            Debug.Log("ClearPoint Triggered!");
         }
     }
 }

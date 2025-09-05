@@ -145,7 +145,7 @@ public class PlayerOverlapChecker : MonoBehaviour
             {
                 if (IsOverlap && !_hasDisabledColorControl)
                 {
-                    GameManager.Instance.SetCanColorChange(false);
+                    //GameManager.Instance.SetCanColorChange(false);
                     _hasDisabledColorControl = true;
 
                     if (_enableDebugLogging)
@@ -155,7 +155,7 @@ public class PlayerOverlapChecker : MonoBehaviour
                 }
                 else if (!IsOverlap && _hasDisabledColorControl)
                 {
-                    GameManager.Instance.SetCanColorChange(true);
+                    //GameManager.Instance.SetCanColorChange(true);
                     _hasDisabledColorControl = false;
 
                     if (_enableDebugLogging)

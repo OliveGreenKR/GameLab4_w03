@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public enum ObjectColor
@@ -14,37 +14,28 @@ public class ObjectColorChangeManager : MonoBehaviour
     [SerializeField] public List<GameObject> ColorObjectsListRed = new List<GameObject>();
     [SerializeField] public List<GameObject> ColorObjectsListBlue = new List<GameObject>();
 
-    //[Header("Stage 2")]
-    //[SerializeField] private List<GameObject> ObjectColorObjectsList2Red = new List<GameObject>();
-    //[SerializeField] private List<GameObject> ObjectColorObjectsList2Blue = new List<GameObject>();
-
-    //[Header("Stage 3")]
-    //[SerializeField] private List<GameObject> ObjectColorObjectsList3Red = new List<GameObject>();
-    //[SerializeField] private List<GameObject> ObjectColorObjectsList3Blue = new List<GameObject>();
-
     [Header("Materials")]
-    [SerializeField] private Material redSolidMaterial;      // »¡°£»ö ¿ø»ö ¸ŞÅ×¸®¾ó
-    [SerializeField] private Material redTransparentMaterial; // »¡°£»ö ºÒÅõ¸í ¸ŞÅ×¸®¾ó
-    [SerializeField] private Material blueSolidMaterial;     // ÆÄ¶õ»ö ¿ø»ö ¸ŞÅ×¸®¾ó
-    [SerializeField] private Material blueTransparentMaterial; // ÆÄ¶õ»ö ºÒÅõ¸í ¸ŞÅ×¸®¾ó
+    [SerializeField] private Material redSolidMaterial;      // ë¹¨ê°„ìƒ‰ ì›ìƒ‰ ë©”í…Œë¦¬ì–¼
+    [SerializeField] private Material redTransparentMaterial; // ë¹¨ê°„ìƒ‰ ë¶ˆíˆ¬ëª… ë©”í…Œë¦¬ì–¼
+    [SerializeField] private Material blueSolidMaterial;     // íŒŒë€ìƒ‰ ì›ìƒ‰ ë©”í…Œë¦¬ì–¼
+    [SerializeField] private Material blueTransparentMaterial; // íŒŒë€ìƒ‰ ë¶ˆíˆ¬ëª… ë©”í…Œë¦¬ì–¼
 
     [Header("Current Options")]
-    [SerializeField] private int currentStage = 1;     // ÇöÀç ½ºÅ×ÀÌÁö - ³ªÁß¿¡ GameManager¿¡¼­ ÂüÁ¶ °¡´É
-    public ObjectColor playerObjectColor; // ÇöÀç ÇÃ·¹ÀÌ¾î »ö»ó
-    GameObject testPlayer; // Å×½ºÆ®¿ë ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®
+    [SerializeField] private int currentStage = 1;     // í˜„ì¬ ìŠ¤í…Œì´ì§€ - ë‚˜ì¤‘ì— GameManagerì—ì„œ ì°¸ì¡° ê°€ëŠ¥
+    public ObjectColor playerObjectColor; // í˜„ì¬ í”Œë ˆì´ì–´ ìƒ‰ìƒ
 
     private void Start()
     {
-        // ÃÊ±â »óÅÂ ¼³Á¤
+        // ì´ˆê¸° ìƒíƒœ ì„¤ì •
         InitializeAllObjects();
-        //SetActiveObjectsByStage(currentStage); // ÇöÀç ½ºÅ×ÀÌÁö¿¡ ¸Â´Â ¿ÀºêÁ§Æ®¸¸ È°¼ºÈ­
+        //SetActiveObjectsByStage(currentStage); // í˜„ì¬ ìŠ¤í…Œì´ì§€ì— ë§ëŠ” ì˜¤ë¸Œì íŠ¸ë§Œ í™œì„±í™”
         Debug.Log($"ColorChangeManager initialized. Current Stage: {currentStage}, Player ObjectColor: {playerObjectColor}");
     }
 
-    // Å×½ºÆ®¿ë
+    // í…ŒìŠ¤íŠ¸ìš©
     private void Update()
     {
-        //// ÁÂÅ¬¸¯À» ÇØ¼­ ÇÃ·¹ÀÌ¾î »ö»ó º¯°æ (Å×½ºÆ®¿ë)
+        //// ì¢Œí´ë¦­ì„ í•´ì„œ í”Œë ˆì´ì–´ ìƒ‰ìƒ ë³€ê²½ (í…ŒìŠ¤íŠ¸ìš©)
         //if (Input.GetMouseButtonDown(0))
         //{
         //    playerObjectColor = playerObjectColor == ObjectColor.Red ? ObjectColor.Blue : ObjectColor.Red;
@@ -52,47 +43,47 @@ public class ObjectColorChangeManager : MonoBehaviour
         //    ObjectColorChange(playerObjectColor);
         //}
 
-        //// ¼ıÀÚÅ°·Î ½ºÅ×ÀÌÁö º¯°æ (Å×½ºÆ®¿ë)
+        //// ìˆ«ìí‚¤ë¡œ ìŠ¤í…Œì´ì§€ ë³€ê²½ (í…ŒìŠ¤íŠ¸ìš©)
         //if (Input.GetKeyDown(KeyCode.Alpha1)) SetCurrentStage(1);
         //if (Input.GetKeyDown(KeyCode.Alpha2)) SetCurrentStage(2);
         //if (Input.GetKeyDown(KeyCode.Alpha3)) SetCurrentStage(3);
     }
 
     /// <summary>
-    /// ¸ğµç ¿ÀºêÁ§Æ®¸¦ ÃÊ±â »óÅÂ(Åõ¸í)·Î ¼³Á¤
+    /// ëª¨ë“  ì˜¤ë¸Œì íŠ¸ë¥¼ ì´ˆê¸° ìƒíƒœ(íˆ¬ëª…)ë¡œ ì„¤ì •
     /// </summary>
     public void InitializeAllObjects()
     {
-        playerObjectColor = GameManager.Instance.PlayerColor;
-        // ÇÃ·¹ÀÌ¾î »ö»ó¿¡ µû¶ó ÇöÀç ½ºÅ×ÀÌÁöÀÇ »ö»ó ¿ÀºêÁ§Æ®¸¦ Åõ¸íÇÏ°Ô ¼³Á¤
+        playerObjectColor = ObjectColor.Red; // ì´ˆê¸° í”Œë ˆì´ì–´ ìƒ‰ìƒ ì„¤ì • (í•„ìš”ì‹œ ë³€ê²½)
+        // í”Œë ˆì´ì–´ ìƒ‰ìƒì— ë”°ë¼ í˜„ì¬ ìŠ¤í…Œì´ì§€ì˜ ìƒ‰ìƒ ì˜¤ë¸Œì íŠ¸ë¥¼ íˆ¬ëª…í•˜ê²Œ ì„¤ì •
         if (playerObjectColor == ObjectColor.Red)
-        {  // ÇÃ·¹ÀÌ¾î »ö»óÀÌ »¡°£»öÀÌ¸é ÆÄ¶õ»ö ¿ÀºêÁ§Æ®µé Åõ¸íÇÏ°Ô
+        {  // í”Œë ˆì´ì–´ ìƒ‰ìƒì´ ë¹¨ê°„ìƒ‰ì´ë©´ íŒŒë€ìƒ‰ ì˜¤ë¸Œì íŠ¸ë“¤ íˆ¬ëª…í•˜ê²Œ
             SetObjectsSolid(GetObjectColorObjectsList(ObjectColor.Red, currentStage), ObjectColor.Red);
             SetObjectsTransparent(GetObjectColorObjectsList(ObjectColor.Blue, currentStage), ObjectColor.Blue);
         }
         else if (playerObjectColor == ObjectColor.Blue)
-        {  // ÇÃ·¹ÀÌ¾î »ö»óÀÌ ÆÄ¶õ»öÀÌ¸é »¡°£»ö ¿ÀºêÁ§Æ®µé Åõ¸íÇÏ°Ô
+        {  // í”Œë ˆì´ì–´ ìƒ‰ìƒì´ íŒŒë€ìƒ‰ì´ë©´ ë¹¨ê°„ìƒ‰ ì˜¤ë¸Œì íŠ¸ë“¤ íˆ¬ëª…í•˜ê²Œ
             SetObjectsSolid(GetObjectColorObjectsList(ObjectColor.Blue, currentStage), ObjectColor.Blue);
             SetObjectsTransparent(GetObjectColorObjectsList(ObjectColor.Red, currentStage), ObjectColor.Red);
         }
     }
 
     /// <summary>
-    /// ½ºÅ×ÀÌÁö¿¡ µû¶ó ¿ÀºêÁ§Æ®µéÀÇ È°¼ºÈ­/ºñÈ°¼ºÈ­ ¼³Á¤
+    /// ìŠ¤í…Œì´ì§€ì— ë”°ë¼ ì˜¤ë¸Œì íŠ¸ë“¤ì˜ í™œì„±í™”/ë¹„í™œì„±í™” ì„¤ì •
     /// </summary>
-    /// <param name="activeStage">È°¼ºÈ­ÇÒ ½ºÅ×ÀÌÁö ¹øÈ£</param>
+    /// <param name="activeStage">í™œì„±í™”í•  ìŠ¤í…Œì´ì§€ ë²ˆí˜¸</param>
     private void SetActiveObjectsByStage(int activeStage)
     {
-        // ¸ğµç ½ºÅ×ÀÌÁö ¼øÈ¸ÇÏ¸ç È°¼ºÈ­/ºñÈ°¼ºÈ­ ¼³Á¤
+        // ëª¨ë“  ìŠ¤í…Œì´ì§€ ìˆœíšŒí•˜ë©° í™œì„±í™”/ë¹„í™œì„±í™” ì„¤ì •
         for (int stage = 1; stage <= 3; stage++)
         {
             bool shouldActivate = (stage == activeStage);
 
-            // °¢ ½ºÅ×ÀÌÁöÀÇ »¡°£»ö°ú ÆÄ¶õ»ö ¿ÀºêÁ§Æ® ¸®½ºÆ® °¡Á®¿À±â
+            // ê° ìŠ¤í…Œì´ì§€ì˜ ë¹¨ê°„ìƒ‰ê³¼ íŒŒë€ìƒ‰ ì˜¤ë¸Œì íŠ¸ ë¦¬ìŠ¤íŠ¸ ê°€ì ¸ì˜¤ê¸°
             List<GameObject> redObjects = GetObjectColorObjectsList(ObjectColor.Red, stage);
             List<GameObject> blueObjects = GetObjectColorObjectsList(ObjectColor.Blue, stage);
 
-            // ¿ÀºêÁ§Æ®µé È°¼ºÈ­/ºñÈ°¼ºÈ­
+            // ì˜¤ë¸Œì íŠ¸ë“¤ í™œì„±í™”/ë¹„í™œì„±í™”
             SetObjectsActive(redObjects, shouldActivate);
             SetObjectsActive(blueObjects, shouldActivate);
         }
@@ -101,10 +92,10 @@ public class ObjectColorChangeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¿ÀºêÁ§Æ® ¸®½ºÆ®ÀÇ È°¼ºÈ­ »óÅÂ ¼³Á¤
+    /// ì˜¤ë¸Œì íŠ¸ ë¦¬ìŠ¤íŠ¸ì˜ í™œì„±í™” ìƒíƒœ ì„¤ì •
     /// </summary>
-    /// <param name="objects">´ë»ó ¿ÀºêÁ§Æ® ¸®½ºÆ®</param>
-    /// <param name="active">È°¼ºÈ­ ¿©ºÎ</param>
+    /// <param name="objects">ëŒ€ìƒ ì˜¤ë¸Œì íŠ¸ ë¦¬ìŠ¤íŠ¸</param>
+    /// <param name="active">í™œì„±í™” ì—¬ë¶€</param>
     private void SetObjectsActive(List<GameObject> objects, bool active)
     {
         foreach (GameObject obj in objects)
@@ -117,26 +108,26 @@ public class ObjectColorChangeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î »ö»ó¿¡ µû¶ó ¿ÀºêÁ§Æ®µéÀÇ ¸ŞÅ×¸®¾ó°ú ·¹ÀÌ¾î º¯°æ
+    /// í”Œë ˆì´ì–´ ìƒ‰ìƒì— ë”°ë¼ ì˜¤ë¸Œì íŠ¸ë“¤ì˜ ë©”í…Œë¦¬ì–¼ê³¼ ë ˆì´ì–´ ë³€ê²½
     /// </summary>
-    /// <param name="playerObjectColor">ÇÃ·¹ÀÌ¾îÀÇ ÇöÀç »ö»ó</param>
+    /// <param name="playerObjectColor">í”Œë ˆì´ì–´ì˜ í˜„ì¬ ìƒ‰ìƒ</param>
     public void ObjectColorChange(ObjectColor playerObjectColor)
     {
-        // ÇöÀç ½ºÅ×ÀÌÁöÀÇ ¸ğµç »ö»ó ¸®½ºÆ® °¡Á®¿À±â
+        // í˜„ì¬ ìŠ¤í…Œì´ì§€ì˜ ëª¨ë“  ìƒ‰ìƒ ë¦¬ìŠ¤íŠ¸ ê°€ì ¸ì˜¤ê¸°
         List<GameObject> redObjects = GetObjectColorObjectsList(ObjectColor.Red, currentStage);
         List<GameObject> blueObjects = GetObjectColorObjectsList(ObjectColor.Blue, currentStage);
 
-        // ÇÃ·¹ÀÌ¾î »ö»ó¿¡ µû¸¥ Ã³¸®
+        // í”Œë ˆì´ì–´ ìƒ‰ìƒì— ë”°ë¥¸ ì²˜ë¦¬
         switch (playerObjectColor)
         {
             case ObjectColor.Red:
-                SetObjectsSolid(redObjects, ObjectColor.Red);           // »¡°£»ö ¿ÀºêÁ§Æ®¸¦ ¿ø»öÀ¸·Î
-                SetObjectsTransparent(blueObjects, ObjectColor.Blue);   // ³ª¸ÓÁö´Â Åõ¸íÇÏ°Ô            
+                SetObjectsSolid(redObjects, ObjectColor.Red);           // ë¹¨ê°„ìƒ‰ ì˜¤ë¸Œì íŠ¸ë¥¼ ì›ìƒ‰ìœ¼ë¡œ
+                SetObjectsTransparent(blueObjects, ObjectColor.Blue);   // ë‚˜ë¨¸ì§€ëŠ” íˆ¬ëª…í•˜ê²Œ            
                 break;
 
             case ObjectColor.Blue:
-                SetObjectsSolid(blueObjects, ObjectColor.Blue);         // ÆÄ¶õ»ö ¿ÀºêÁ§Æ®¸¦ ¿ø»öÀ¸·Î
-                SetObjectsTransparent(redObjects, ObjectColor.Red);     // ³ª¸ÓÁö´Â Åõ¸íÇÏ°Ô
+                SetObjectsSolid(blueObjects, ObjectColor.Blue);         // íŒŒë€ìƒ‰ ì˜¤ë¸Œì íŠ¸ë¥¼ ì›ìƒ‰ìœ¼ë¡œ
+                SetObjectsTransparent(redObjects, ObjectColor.Red);     // ë‚˜ë¨¸ì§€ëŠ” íˆ¬ëª…í•˜ê²Œ
                 break;
         }
 
@@ -144,11 +135,11 @@ public class ObjectColorChangeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÁöÁ¤µÈ »ö»ó°ú ½ºÅ×ÀÌÁö¿¡ ÇØ´çÇÏ´Â ¿ÀºêÁ§Æ® ¸®½ºÆ® ¹İÈ¯
+    /// ì§€ì •ëœ ìƒ‰ìƒê³¼ ìŠ¤í…Œì´ì§€ì— í•´ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ë¦¬ìŠ¤íŠ¸ ë°˜í™˜
     /// </summary>
-    /// <param name="ObjectColor">»ö»ó</param>
-    /// <param name="stage">½ºÅ×ÀÌÁö</param>
-    /// <returns>ÇØ´çÇÏ´Â ¿ÀºêÁ§Æ® ¸®½ºÆ®</returns>
+    /// <param name="ObjectColor">ìƒ‰ìƒ</param>
+    /// <param name="stage">ìŠ¤í…Œì´ì§€</param>
+    /// <returns>í•´ë‹¹í•˜ëŠ” ì˜¤ë¸Œì íŠ¸ ë¦¬ìŠ¤íŠ¸</returns>
     private List<GameObject> GetObjectColorObjectsList(ObjectColor ObjectColor, int stage)
     {
         return GetStageObjectColorList(ObjectColor);
@@ -198,19 +189,19 @@ public class ObjectColorChangeManager : MonoBehaviour
     //}
 
     /// <summary>
-    /// ¿ÀºêÁ§Æ®µéÀ» ¿ø»ö(ºÒÅõ¸í) »óÅÂ·Î º¯°æ
+    /// ì˜¤ë¸Œì íŠ¸ë“¤ì„ ì›ìƒ‰(ë¶ˆíˆ¬ëª…) ìƒíƒœë¡œ ë³€ê²½
     /// </summary>
-    /// <param name="objects">º¯°æÇÒ ¿ÀºêÁ§Æ® ¸®½ºÆ®</param>
-    /// <param name="ObjectColor">»ö»ó</param>
+    /// <param name="objects">ë³€ê²½í•  ì˜¤ë¸Œì íŠ¸ ë¦¬ìŠ¤íŠ¸</param>
+    /// <param name="ObjectColor">ìƒ‰ìƒ</param>
     private void SetObjectsSolid(List<GameObject> objects, ObjectColor ObjectColor)
     {
         Material solidMaterial = GetSolidMaterial(ObjectColor);
 
         foreach (GameObject obj in objects)
         {
-            if (obj != null && obj.activeInHierarchy) // È°¼ºÈ­µÈ ¿ÀºêÁ§Æ®¸¸ Ã³¸®
+            if (obj != null && obj.activeInHierarchy) // í™œì„±í™”ëœ ì˜¤ë¸Œì íŠ¸ë§Œ ì²˜ë¦¬
             {
-                // ¸ŞÅ×¸®¾ó º¯°æ
+                // ë©”í…Œë¦¬ì–¼ ë³€ê²½
                 Renderer renderer = obj.GetComponent<Renderer>();
                 if (renderer != null)
                 {
@@ -218,7 +209,7 @@ public class ObjectColorChangeManager : MonoBehaviour
                 }
 
                 /*
-                // Äİ¶óÀÌ´õ È°¼ºÈ­ (ÇÊ¿äÇÑ °æ¿ì)
+                // ì½œë¼ì´ë” í™œì„±í™” (í•„ìš”í•œ ê²½ìš°)
                 Collider collider = obj.GetComponent<Collider>();
                 if (collider != null)
                 {
@@ -230,19 +221,19 @@ public class ObjectColorChangeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¿ÀºêÁ§Æ®µéÀ» Åõ¸í »óÅÂ·Î º¯°æ
+    /// ì˜¤ë¸Œì íŠ¸ë“¤ì„ íˆ¬ëª… ìƒíƒœë¡œ ë³€ê²½
     /// </summary>
-    /// <param name="objects">º¯°æÇÒ ¿ÀºêÁ§Æ® ¸®½ºÆ®</param>
-    /// <param name="ObjectColor">»ö»ó</param>
+    /// <param name="objects">ë³€ê²½í•  ì˜¤ë¸Œì íŠ¸ ë¦¬ìŠ¤íŠ¸</param>
+    /// <param name="ObjectColor">ìƒ‰ìƒ</param>
     private void SetObjectsTransparent(List<GameObject> objects, ObjectColor ObjectColor)
     {
         Material transparentMaterial = GetTransparentMaterial(ObjectColor);
 
         foreach (GameObject obj in objects)
         {
-            if (obj != null && obj.activeInHierarchy) // È°¼ºÈ­µÈ ¿ÀºêÁ§Æ®¸¸ Ã³¸®
+            if (obj != null && obj.activeInHierarchy) // í™œì„±í™”ëœ ì˜¤ë¸Œì íŠ¸ë§Œ ì²˜ë¦¬
             {
-                // ¸ŞÅ×¸®¾ó º¯°æ
+                // ë©”í…Œë¦¬ì–¼ ë³€ê²½
                 Renderer renderer = obj.GetComponent<Renderer>();
                 if (renderer != null)
                 {
@@ -250,7 +241,7 @@ public class ObjectColorChangeManager : MonoBehaviour
                 }
 
                 /*
-                // Äİ¶óÀÌ´õ ºñÈ°¼ºÈ­ (ÇÊ¿äÇÑ °æ¿ì)
+                // ì½œë¼ì´ë” ë¹„í™œì„±í™” (í•„ìš”í•œ ê²½ìš°)
                 Collider collider = obj.GetComponent<Collider>();
                 if (collider != null)
                 {
@@ -262,7 +253,7 @@ public class ObjectColorChangeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// »ö»ó¿¡ ÇØ´çÇÏ´Â ¿ø»ö ¸ŞÅ×¸®¾ó ¹İÈ¯
+    /// ìƒ‰ìƒì— í•´ë‹¹í•˜ëŠ” ì›ìƒ‰ ë©”í…Œë¦¬ì–¼ ë°˜í™˜
     /// </summary>
     private Material GetSolidMaterial(ObjectColor ObjectColor)
     {
@@ -275,7 +266,7 @@ public class ObjectColorChangeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// »ö»ó¿¡ ÇØ´çÇÏ´Â Åõ¸í ¸ŞÅ×¸®¾ó ¹İÈ¯
+    /// ìƒ‰ìƒì— í•´ë‹¹í•˜ëŠ” íˆ¬ëª… ë©”í…Œë¦¬ì–¼ ë°˜í™˜
     /// </summary>
     private Material GetTransparentMaterial(ObjectColor ObjectColor)
     {
@@ -288,28 +279,28 @@ public class ObjectColorChangeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇöÀç ½ºÅ×ÀÌÁö º¯°æ
+    /// í˜„ì¬ ìŠ¤í…Œì´ì§€ ë³€ê²½
     /// </summary>
-    /// <param name="stage">»õ·Î¿î ½ºÅ×ÀÌÁö ¹øÈ£</param>
+    /// <param name="stage">ìƒˆë¡œìš´ ìŠ¤í…Œì´ì§€ ë²ˆí˜¸</param>
     public void SetCurrentStage(int stage)
     {
         currentStage = stage;
-        SetActiveObjectsByStage(currentStage); // ½ºÅ×ÀÌÁöº° ¿ÀºêÁ§Æ® È°¼ºÈ­/ºñÈ°¼ºÈ­
-        InitializeAllObjects(); // ½ºÅ×ÀÌÁö º¯°æ ½Ã ÃÊ±âÈ­
+        SetActiveObjectsByStage(currentStage); // ìŠ¤í…Œì´ì§€ë³„ ì˜¤ë¸Œì íŠ¸ í™œì„±í™”/ë¹„í™œì„±í™”
+        InitializeAllObjects(); // ìŠ¤í…Œì´ì§€ ë³€ê²½ ì‹œ ì´ˆê¸°í™”
         Debug.Log($"Stage changed to: {stage}");
     }
 
     /// <summary>
-    /// ¿ÜºÎ¿¡¼­ È£ÃâÇÒ ¼ö ÀÖ´Â »ö»ó º¯°æ ÇÔ¼ö (´Ù¸¥ ½ºÅ©¸³Æ®¿¡¼­ »ç¿ë)
+    /// ì™¸ë¶€ì—ì„œ í˜¸ì¶œí•  ìˆ˜ ìˆëŠ” ìƒ‰ìƒ ë³€ê²½ í•¨ìˆ˜ (ë‹¤ë¥¸ ìŠ¤í¬ë¦½íŠ¸ì—ì„œ ì‚¬ìš©)
     /// </summary>
-    /// <param name="playerObjectColor">ÇÃ·¹ÀÌ¾î »ö»ó</param>
+    /// <param name="playerObjectColor">í”Œë ˆì´ì–´ ìƒ‰ìƒ</param>
     public void OnPlayerObjectColorChanged(ObjectColor playerObjectColor)
     {
         ObjectColorChange(playerObjectColor);
     }
 
     /// <summary>
-    /// ÇöÀç ½ºÅ×ÀÌÁö ¹İÈ¯ (¿ÜºÎ¿¡¼­ ÂüÁ¶¿ë)
+    /// í˜„ì¬ ìŠ¤í…Œì´ì§€ ë°˜í™˜ (ì™¸ë¶€ì—ì„œ ì°¸ì¡°ìš©)
     /// </summary>
     public int GetCurrentStage()
     {
@@ -317,10 +308,10 @@ public class ObjectColorChangeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Æ¯Á¤ ½ºÅ×ÀÌÁöÀÇ ¸ğµç ¿ÀºêÁ§Æ®¸¦ °­Á¦·Î È°¼ºÈ­/ºñÈ°¼ºÈ­ (µğ¹ö±×¿ë)
+    /// íŠ¹ì • ìŠ¤í…Œì´ì§€ì˜ ëª¨ë“  ì˜¤ë¸Œì íŠ¸ë¥¼ ê°•ì œë¡œ í™œì„±í™”/ë¹„í™œì„±í™” (ë””ë²„ê·¸ìš©)
     /// </summary>
-    /// <param name="stage">´ë»ó ½ºÅ×ÀÌÁö</param>
-    /// <param name="active">È°¼ºÈ­ ¿©ºÎ</param>
+    /// <param name="stage">ëŒ€ìƒ ìŠ¤í…Œì´ì§€</param>
+    /// <param name="active">í™œì„±í™” ì—¬ë¶€</param>
     public void ForceSetStageObjectsActive(int stage, bool active)
     {
         List<GameObject> redObjects = GetObjectColorObjectsList(ObjectColor.Red, stage);

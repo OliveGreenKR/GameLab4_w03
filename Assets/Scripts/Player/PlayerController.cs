@@ -183,7 +183,7 @@ public class PlayerController : MonoBehaviour, IReSpawnable
 
     private void OnMouseClicked(InputAction.CallbackContext context)
     {
-        GameManager.Instance.OnPlayerClicked();
+        Debug.Log("Mouse Clicked"); 
     }
 
     private void OnJumpPerformed(InputAction.CallbackContext context)
