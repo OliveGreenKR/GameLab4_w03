@@ -19,14 +19,24 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
 
     [TabGroup("Movement", "Basic")]
     [Header("Movement Settings")]
-    [PropertyRange(0.1f, 20f)]
     [SuffixLabel("units/sec")]
     [SerializeField] private float _moveSpeedUnitsPerSecond = 5f;
 
     [TabGroup("Movement", "Basic")]
-    [PropertyRange(0.1f, 50f)]
     [SuffixLabel("units/sec")]
     [SerializeField] private float _maxSpeedUnitsPerSecond = 10f;
+
+    [TabGroup("Movement", "Basic")]
+    [PropertyRange(0f, 720f)]
+    [SuffixLabel("degrees/sec")]
+    [SerializeField] private float _characterRotateSpeed = 180f;
+
+    [TabGroup("Gravity")]
+    [SerializeField] private bool _usePhysicsScale = true;
+
+    [TabGroup("Gravity")]
+    [ShowIf("@_usePhysicsScale == false")]
+    [SerializeField] private float _gravityScale = 9.81f;
 
     [TabGroup("Movement", "Air")]
     [Header("Air Movement")]
@@ -36,9 +46,9 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
 
     [TabGroup("Jump")]
     [Header("Jump Settings")]
-    [PropertyRange(1f, 20f)]
-    [SuffixLabel("units/sec")]
-    [SerializeField] private float _jumpSpeedUnitsPerSecond = 10f;
+    [PropertyRange(1f, 100f)]
+    [SuffixLabel("units")]
+    [SerializeField] private float _jumpHeight = 10.0f;
 
     [TabGroup("Jump")]
     [PropertyRange(0.1f, 1f)]
@@ -64,7 +74,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public bool IsGrounded => _characterController != null && _characterController.isGrounded;
+    public bool IsGrounded => _isGrounded;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -83,8 +93,12 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
     private Vector3 _currentVelocity = Vector3.zero;
     private Vector2 _currentMoveInput = Vector2.zero;
     private Vector3 _lastSpawnPosition = Vector3.zero;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
     private float _coyoteTimeRemaining = 0f;
-    private bool _wasGroundedLastFrame = false;
+
+    private bool _isGrounded = false;
     #endregion
 
     #region Unity Lifecycle
@@ -107,7 +121,6 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
         UpdateGroundedState();
         UpdateCoyoteTime();
         HandleMovement();
-        HandleJump();
         ApplyMovement();
     }
 
@@ -140,7 +153,6 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
         _currentVelocity = Vector3.zero;
         _currentMoveInput = Vector2.zero;
         _coyoteTimeRemaining = 0f;
-        _wasGroundedLastFrame = false;
 
         // 스폰 위치 기록
         _lastSpawnPosition = worldPosition;
@@ -192,16 +204,16 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
     /// <param name="speedUnitsPerSecond">이동 속도</param>
     public void SetMoveSpeed(float speedUnitsPerSecond)
     {
-        _moveSpeedUnitsPerSecond = Mathf.Clamp(speedUnitsPerSecond, 0.1f, 20f);
+        _moveSpeedUnitsPerSecond = Mathf.Clamp(speedUnitsPerSecond, 0.1f, _maxSpeedUnitsPerSecond);
     }
 
     /// <summary>
     /// 점프 속도 설정
     /// </summary>
     /// <param name="jumpSpeedUnitsPerSecond">점프 속도</param>
-    public void SetJumpSpeed(float jumpSpeedUnitsPerSecond)
+    public void SetJumpHeight(float jumpHeight)
     {
-        _jumpSpeedUnitsPerSecond = Mathf.Clamp(jumpSpeedUnitsPerSecond, 1f, 20f);
+        _jumpHeight = jumpHeight;
     }
     #endregion
 
@@ -242,6 +254,24 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
 
     private void HandleMovement()
     {
+
+        // 중력 적용 (지면이 아닐 때만)
+        if (!_characterController.isGrounded)
+        {
+            if (_usePhysicsScale)
+            {
+                _currentVelocity.y += Physics.gravity.y * Time.deltaTime;
+            }
+            else
+            {
+                _currentVelocity.y -= _gravityScale * Time.deltaTime;
+            }
+        }
+        else if (_currentVelocity.y < 0)
+        {
+            _currentVelocity.y = 0f;
+        }
+
         if (_currentMoveInput.magnitude < 0.1f)
         {
             // 입력이 없으면 감속
@@ -251,17 +281,22 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
             return;
         }
 
-        // 입력 방향 계산
-        Vector3 inputDirection = new Vector3(_currentMoveInput.x, 0f, _currentMoveInput.y);
+        // 입력 방향 계산 (월드 좌표)
+        Vector3 inputDirection = new Vector3(_currentMoveInput.x, 0f, _currentMoveInput.y).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(inputDirection);
 
-        // 카메라 기준 방향 변환
-        if (_camera != null)
+        // 각도 차이 계산
+        float angleDifference = Quaternion.Angle(transform.rotation, targetRotation);
+
+        // 5도 이하면 즉시 조정, 그 외는 Lerp
+        if (angleDifference <= 5f)
         {
-            Quaternion cameraRotation = Quaternion.Euler(0f, _camera.transform.eulerAngles.y, 0f);
-            inputDirection = cameraRotation * inputDirection;
+            transform.rotation = targetRotation;
         }
-
-        inputDirection = inputDirection.normalized;
+        else
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, _characterRotateSpeed * Time.deltaTime);
+        }
 
         // 이동 속도 계산
         float currentMoveSpeed = _moveSpeedUnitsPerSecond;
@@ -270,10 +305,10 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
             currentMoveSpeed *= _airControlMultiplier;
         }
 
-        // 수평 속도 설정
-        Vector3 targetVelocity = inputDirection * currentMoveSpeed;
-        _currentVelocity.x = targetVelocity.x;
-        _currentVelocity.z = targetVelocity.z;
+        // Forward 방향으로 이동
+        Vector3 forwardMovement = transform.forward * currentMoveSpeed;
+        _currentVelocity.x = forwardMovement.x;
+        _currentVelocity.z = forwardMovement.z;
 
         // 최대 속도 제한
         Vector3 horizontalVelocity = new Vector3(_currentVelocity.x, 0f, _currentVelocity.z);
@@ -283,20 +318,16 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
             _currentVelocity.x = horizontalVelocity.x;
             _currentVelocity.z = horizontalVelocity.z;
         }
-    }
 
-    private void HandleJump()
-    {
-        // 점프 입력은 OnJumpPerformed에서 처리
-        // 여기서는 추가적인 점프 로직이 필요할 경우 구현
     }
 
     private void UpdateGroundedState()
     {
-        _wasGroundedLastFrame = IsGrounded;
+        bool previousGrounded = _isGrounded;
+        _isGrounded = _characterController.isGrounded;
 
         // 지면에서 떨어진 순간 코요테 타임 시작
-        if (_wasGroundedLastFrame && !IsGrounded)
+        if (previousGrounded && !_isGrounded)
         {
             _coyoteTimeRemaining = _coyoteTimeDurationSeconds;
         }
@@ -312,7 +343,8 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
 
     private void ApplyMovement()
     {
-        if (_characterController == null) return;
+        if (_characterController == null) 
+            return;
 
         Vector3 movement = _currentVelocity * Time.deltaTime;
         _characterController.Move(movement);
@@ -333,9 +365,15 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
         // 지면에 있거나 코요테 타임 내에서만 점프 가능
         if (IsGrounded || _coyoteTimeRemaining > 0f)
         {
-            _currentVelocity.y = _jumpSpeedUnitsPerSecond;
+            if(_usePhysicsScale)
+                _currentVelocity.y = Mathf.Sqrt(_jumpHeight * 2.0f * Physics.gravity.magnitude);
+            else
+                _currentVelocity.y = Mathf.Sqrt(_jumpHeight * 2.0f * _gravityScale);
+
             _coyoteTimeRemaining = 0f; // 코요테 타임 소모
         }
+
+        Debug.Log($"Jump Performed : {_currentVelocity.y}");  
     }
 
     private void OnMouseClicked(InputAction.CallbackContext context)
