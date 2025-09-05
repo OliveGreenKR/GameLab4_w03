@@ -281,22 +281,20 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
             return;
         }
 
-        // 입력 방향 계산 (월드 좌표)
-        Vector3 inputDirection = new Vector3(_currentMoveInput.x, 0f, _currentMoveInput.y).normalized;
-        Quaternion targetRotation = Quaternion.LookRotation(inputDirection);
+        // 카메라의 Forward 벡터에서 Y축을 제외하여 평면상의 전방 벡터를 얻음
+        Vector3 cameraForward = Vector3.Scale(_camera.transform.forward, new Vector3(1, 0, 1)).normalized;
+        // 카메라의 Right 벡터는 이미 평면상에 있으므로 그대로 사용
+        Vector3 cameraRight = _camera.transform.right;
 
-        // 각도 차이 계산
-        float angleDifference = Quaternion.Angle(transform.rotation, targetRotation);
+        // 입력 방향을 카메라의 전방 및 우측 벡터를 기준으로 변환
+        Vector3 moveDirection = (cameraForward * _currentMoveInput.y + cameraRight * _currentMoveInput.x).normalized;
 
-        // 5도 이하면 즉시 조정, 그 외는 Lerp
-        if (angleDifference <= 5f)
-        {
-            transform.rotation = targetRotation;
-        }
-        else
-        {
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, _characterRotateSpeed * Time.deltaTime);
-        }
+        //// 캐릭터 회전
+        //if (moveDirection.magnitude > 0.1f) // 입력이 있을 때만 회전
+        //{
+        //    Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+        //    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _characterRotateSpeed * Time.deltaTime);
+        //}
 
         // 이동 속도 계산
         float currentMoveSpeed = _moveSpeedUnitsPerSecond;
@@ -305,10 +303,10 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
             currentMoveSpeed *= _airControlMultiplier;
         }
 
-        // Forward 방향으로 이동
-        Vector3 forwardMovement = transform.forward * currentMoveSpeed;
-        _currentVelocity.x = forwardMovement.x;
-        _currentVelocity.z = forwardMovement.z;
+        // 입력 방향으로 이동
+        Vector3 inputMoveVelocity = moveDirection * currentMoveSpeed;
+        _currentVelocity.x = inputMoveVelocity.x;
+        _currentVelocity.z = inputMoveVelocity.z;
 
         // 최대 속도 제한
         Vector3 horizontalVelocity = new Vector3(_currentVelocity.x, 0f, _currentVelocity.z);
