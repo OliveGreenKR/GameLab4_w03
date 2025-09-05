@@ -1,8 +1,8 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class MouseAngleController : MonoBehaviour
 {
-    #region Serialized Fields
+    #region Serialized Fieldswea
     [Header("References")]
     [SerializeField] private InputSystem_Actions _inputs;
     [SerializeField] private GameObject _angleControllerGameObject;
@@ -66,28 +66,28 @@ public class MouseAngleController : MonoBehaviour
 
     #region Public Methods
     /// <summary>
-    /// ¸¶¿ì½º ÀÔ·Â È°¼ºÈ­/ºñÈ°¼ºÈ­
+    /// ë§ˆìš°ìŠ¤ ì…ë ¥ í™œì„±í™”/ë¹„í™œì„±í™”
     /// </summary>
-    /// <param name="enabled">È°¼ºÈ­ ¿©ºÎ</param>
+    /// <param name="enabled">í™œì„±í™” ì—¬ë¶€</param>
     public void SetMouseInputEnabled(bool enabled)
     {
         IsMouseInputEnabled = enabled;
     }
 
     /// <summary>
-    /// µ¨Å¸ ¹èÀ² ¼³Á¤
+    /// ë¸íƒ€ ë°°ìœ¨ ì„¤ì •
     /// </summary>
-    /// <param name="multiplier">µ¨Å¸ ÀÔ·Â ¹èÀ²</param>
+    /// <param name="multiplier">ë¸íƒ€ ì…ë ¥ ë°°ìœ¨</param>
     public void SetDeltaMultiplier(float multiplier)
     {
         _deltaMultiplier = Mathf.Clamp(multiplier, 0.01f, 5f);
     }
 
     /// <summary>
-    /// ¸¶¿ì½º ¹Î°¨µµ ¼³Á¤
+    /// ë§ˆìš°ìŠ¤ ë¯¼ê°ë„ ì„¤ì •
     /// </summary>
-    /// <param name="sensitivityX">XÃà ¹Î°¨µµ</param>
-    /// <param name="sensitivityY">YÃà ¹Î°¨µµ</param>
+    /// <param name="sensitivityX">Xì¶• ë¯¼ê°ë„</param>
+    /// <param name="sensitivityY">Yì¶• ë¯¼ê°ë„</param>
     public void SetMouseSensitivity(float sensitivityX, float sensitivityY)
     {
         _mouseSensitivityX = Mathf.Clamp(sensitivityX, 0.1f, 10f);
@@ -95,10 +95,10 @@ public class MouseAngleController : MonoBehaviour
     }
 
     /// <summary>
-    /// ±âº» °¢µµ ¼³Á¤
+    /// ê¸°ë³¸ ê°ë„ ì„¤ì •
     /// </summary>
-    /// <param name="yawDegrees">±âº» Yaw °¢µµ</param>
-    /// <param name="pitchDegrees">±âº» Pitch °¢µµ</param>
+    /// <param name="yawDegrees">ê¸°ë³¸ Yaw ê°ë„</param>
+    /// <param name="pitchDegrees">ê¸°ë³¸ Pitch ê°ë„</param>
     public void SetDefaultAngles(float yawDegrees, float pitchDegrees)
     {
         _defaultYawDegrees = Mathf.Clamp(yawDegrees, -180f, 180f);
@@ -164,21 +164,21 @@ public class MouseAngleController : MonoBehaviour
 
     private void HandleMouseInput()
     {
-        // ÇöÀç Look ÀÔ·Â°ª »ç¿ë
+        // í˜„ì¬ Look ì…ë ¥ê°’ ì‚¬ìš©
         Vector2 lookDelta = _currentLookInput;
 
-        // µ¨Å¸ ¹èÀ² Àû¿ë (ÀüÃ¼ ÀÔ·Â°ª Á¶Àı)
+        // ë¸íƒ€ ë°°ìœ¨ ì ìš© (ì „ì²´ ì…ë ¥ê°’ ì¡°ì ˆ)
         lookDelta *= _deltaMultiplier;
 
-        // ¹Î°¨µµ Àû¿ë
+        // ë¯¼ê°ë„ ì ìš©
         lookDelta.x *= _mouseSensitivityX;
         lookDelta.y *= _mouseSensitivityY;
 
-        // Ãà ¹İÀü Àû¿ë
+        // ì¶• ë°˜ì „ ì ìš©
         if (_invertXAxis) lookDelta.x = -lookDelta.x;
         if (_invertYAxis) lookDelta.y = -lookDelta.y;
 
-        // °¢µµ Á¶Á¤ (YÃàÀº PitchÀÌ¹Ç·Î ¹İÀü)
+        // ê°ë„ ì¡°ì • (Yì¶•ì€ Pitchì´ë¯€ë¡œ ë°˜ì „)
         _angleController.AdjustAngles(lookDelta.x, -lookDelta.y);
     }
     #endregion
