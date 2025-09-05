@@ -180,7 +180,7 @@ public class MouseAngleController : MonoBehaviour
 
         // 각도 조정 (Y축은 Pitch이므로 반전)
         _angleController.AdjustAngles(lookDelta.x, -lookDelta.y);
-        Debug.Log($"MouseInput Adjust to : {lookDelta.x}, {lookDelta.y}");
+        //Debug.Log($"MouseInput Adjust to : {lookDelta.x}, {lookDelta.y}");
     }
     #endregion
 }

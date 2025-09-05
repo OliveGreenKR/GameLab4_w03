@@ -190,6 +190,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Zoom"",
+                    ""type"": ""Button"",
+                    ""id"": ""c8538cb3-8235-4e39-a8dd-f294f37008ef"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -597,6 +606,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""ResetLook"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a9657878-2e4e-4c84-8e60-8fbf266c7cc5"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Zoom"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1195,6 +1215,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_ColorChange = m_Player.FindAction("ColorChange", throwIfNotFound: true);
         m_Player_ResetLook = m_Player.FindAction("ResetLook", throwIfNotFound: true);
+        m_Player_Zoom = m_Player.FindAction("Zoom", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1299,6 +1320,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_ColorChange;
     private readonly InputAction m_Player_ResetLook;
+    private readonly InputAction m_Player_Zoom;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1354,6 +1376,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ResetLook".
         /// </summary>
         public InputAction @ResetLook => m_Wrapper.m_Player_ResetLook;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Zoom".
+        /// </summary>
+        public InputAction @Zoom => m_Wrapper.m_Player_Zoom;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1413,6 +1439,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ResetLook.started += instance.OnResetLook;
             @ResetLook.performed += instance.OnResetLook;
             @ResetLook.canceled += instance.OnResetLook;
+            @Zoom.started += instance.OnZoom;
+            @Zoom.performed += instance.OnZoom;
+            @Zoom.canceled += instance.OnZoom;
         }
 
         /// <summary>
@@ -1457,6 +1486,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ResetLook.started -= instance.OnResetLook;
             @ResetLook.performed -= instance.OnResetLook;
             @ResetLook.canceled -= instance.OnResetLook;
+            @Zoom.started -= instance.OnZoom;
+            @Zoom.performed -= instance.OnZoom;
+            @Zoom.canceled -= instance.OnZoom;
         }
 
         /// <summary>
@@ -1834,6 +1866,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnResetLook(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Zoom" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnZoom(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
