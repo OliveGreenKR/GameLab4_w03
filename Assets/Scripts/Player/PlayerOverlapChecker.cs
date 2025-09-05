@@ -6,7 +6,7 @@ public class PlayerOverlapChecker : MonoBehaviour
     #region Serialized Fields
     [Header("References")]
     [SerializeField] private Collider _targetCollider = null;
-    [SerializeField] private PlayerController _targetPlayer = null;
+    [SerializeField] private GameObject _targetPlayer = null;
     [SerializeField] private bool _isOverlap = false;
 
     [Header("Debug Settings")]
