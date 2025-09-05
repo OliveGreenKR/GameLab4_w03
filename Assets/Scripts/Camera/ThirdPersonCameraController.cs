@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
-public class CameraController : MonoBehaviour , IAngleController
+public class ThirdPersonCameraController : MonoBehaviour, IAngleController
 {
     #region Serialized Fields
     [Header("Target")]
     [SerializeField] private GameObject _playerGameObject;
-  
+
     [Header("Camera Angles")]
     [SerializeField][Range(-180f, 180f)] private float _initialYawDegrees = 0f;
     [SerializeField][Range(-80f, 80f)] private float _initialPitchDegrees = 15f;
@@ -48,19 +48,19 @@ public class CameraController : MonoBehaviour , IAngleController
     #endregion
 
     #region Private Fields
-    // Ä«¸Ş¶ó ÄÄÆ÷³ÍÆ®
+    // ì¹´ë©”ë¼ ì»´í¬ë„ŒíŠ¸
     private Camera _camera;
 
-    // ÇÃ·¹ÀÌ¾î ÄÄÆ÷³ÍÆ® Ä³½Ì
+    // í”Œë ˆì´ì–´ ì»´í¬ë„ŒíŠ¸ ìºì‹±
     private Transform _playerTransform;
     private Rigidbody _playerRigidbody;
     private PlayerController _playerController;
 
-    // ±¸¸é ÁÂÇ¥ »óÅÂ
+    // êµ¬ë©´ ì¢Œí‘œ ìƒíƒœ
     private float _currentYawDegrees;
     private float _currentPitchDegrees;
 
-    // »óÅÂ °ü¸®
+    // ìƒíƒœ ê´€ë¦¬
     private float _visibilityCheckTimer;
     private Vector3 _targetWorldPosition;
     [SerializeField] private Vector3 _playerTargetPosition;
@@ -72,28 +72,28 @@ public class CameraController : MonoBehaviour , IAngleController
     {
         InitializeReferences();
 
-        // ÃÊ±â Ä«¸Ş¶ó °¢µµ ¼³Á¤
+        // ì´ˆê¸° ì¹´ë©”ë¼ ê°ë„ ì„¤ì •
         _currentYawDegrees = _initialYawDegrees;
         _currentPitchDegrees = _initialPitchDegrees;
         CurrentYawDegrees = _currentYawDegrees;
         CurrentPitchDegrees = _currentPitchDegrees;
 
-        // ÃÊ±â °Å¸® ¼³Á¤
+        // ì´ˆê¸° ê±°ë¦¬ ì„¤ì •
         CurrentDistanceUnits = _baseDistanceUnits;
         _currentTargetDistanceUnits = _baseDistanceUnits;
 
-        // ÃÊ±â »óÅÂ
+        // ì´ˆê¸° ìƒíƒœ
         IsPlayerVisible = true;
         _visibilityCheckTimer = 0f;
 
-        // ÃÊ±â Ä«¸Ş¶ó À§Ä¡ Áï½Ã ¼³Á¤
+        // ì´ˆê¸° ì¹´ë©”ë¼ ìœ„ì¹˜ ì¦‰ì‹œ ì„¤ì •
         if (_playerTransform != null)
         {
             UpdatePlayerTargetPosition();
             CalculateTargetPosition();
             transform.position = _targetWorldPosition;
 
-            // ÇÃ·¹ÀÌ¾î¸¦ ¹Ù¶óº¸µµ·Ï ÃÊ±â È¸Àü ¼³Á¤
+            // í”Œë ˆì´ì–´ë¥¼ ë°”ë¼ë³´ë„ë¡ ì´ˆê¸° íšŒì „ ì„¤ì •
             Vector3 lookDirection = (_playerTargetPosition - transform.position).normalized;
             transform.rotation = Quaternion.LookRotation(lookDirection);
         }
@@ -113,31 +113,31 @@ public class CameraController : MonoBehaviour , IAngleController
 
     #region Public Methods
     /// <summary>
-    /// ÃßÀûÇÒ ÇÃ·¹ÀÌ¾î ¼³Á¤
+    /// ì¶”ì í•  í”Œë ˆì´ì–´ ì„¤ì •
     /// </summary>
-    /// <param name="playerGameObject">ÇÃ·¹ÀÌ¾î GameObject</param>
+    /// <param name="playerGameObject">í”Œë ˆì´ì–´ GameObject</param>
     public void SetTargetPlayer(GameObject playerGameObject)
     {
         _playerGameObject = playerGameObject;
 
         if (_playerGameObject != null)
         {
-            // ÄÄÆ÷³ÍÆ® ´Ù½Ã Ä³½Ì
+            // ì»´í¬ë„ŒíŠ¸ ë‹¤ì‹œ ìºì‹±
             _playerTransform = _playerGameObject.transform;
             _playerRigidbody = _playerGameObject.GetComponent<Rigidbody>();
             _playerController = _playerGameObject.GetComponent<PlayerController>();
 
-            // Áï½Ã À§Ä¡ ¾÷µ¥ÀÌÆ®
+            // ì¦‰ì‹œ ìœ„ì¹˜ ì—…ë°ì´íŠ¸
             UpdatePlayerTargetPosition();
             CalculateTargetPosition();
         }
     }
 
     /// <summary>
-    /// Ä«¸Ş¶ó °¢µµ ¼³Á¤ (¸¶¿ì½º ÀÔ·Â¿ë)
+    /// ì¹´ë©”ë¼ ê°ë„ ì„¤ì • (ë§ˆìš°ìŠ¤ ì…ë ¥ìš©)
     /// </summary>
-    /// <param name="yawDegrees">¼öÆò È¸Àü °¢µµ (-180 ~ 180)</param>
-    /// <param name="pitchDegrees">¼öÁ÷ È¸Àü °¢µµ (-80 ~ 80)</param>
+    /// <param name="yawDegrees">ìˆ˜í‰ íšŒì „ ê°ë„ (-180 ~ 180)</param>
+    /// <param name="pitchDegrees">ìˆ˜ì§ íšŒì „ ê°ë„ (-80 ~ 80)</param>
     public void SetAngles(float yawDegrees, float pitchDegrees)
     {
         _currentYawDegrees = Mathf.Clamp(yawDegrees, -180f, 180f);
@@ -145,26 +145,26 @@ public class CameraController : MonoBehaviour , IAngleController
     }
 
     /// <summary>
-    /// Ä«¸Ş¶ó °¢µµ Á¶Á¤ (¸¶¿ì½º µ¨Å¸ ÀÔ·Â¿ë)
+    /// ì¹´ë©”ë¼ ê°ë„ ì¡°ì • (ë§ˆìš°ìŠ¤ ë¸íƒ€ ì…ë ¥ìš©)
     /// </summary>
-    /// <param name="deltaYawDegrees">¼öÆò È¸Àü º¯È­·®</param>
-    /// <param name="deltaPitchDegrees">¼öÁ÷ È¸Àü º¯È­·®</param>
+    /// <param name="deltaYawDegrees">ìˆ˜í‰ íšŒì „ ë³€í™”ëŸ‰</param>
+    /// <param name="deltaPitchDegrees">ìˆ˜ì§ íšŒì „ ë³€í™”ëŸ‰</param>
     public void AdjustAngles(float deltaYawDegrees, float deltaPitchDegrees)
     {
-        if(Mathf.Abs(deltaYawDegrees) > _rotationDeadZoneDegrees)
+        if (Mathf.Abs(deltaYawDegrees) > _rotationDeadZoneDegrees)
         {
             _currentYawDegrees += deltaYawDegrees;
-            _currentYawDegrees = Mathf.Repeat(_currentYawDegrees + 180f, 360f) - 180f; // -180 ~ 180 ¼øÈ¯
+            _currentYawDegrees = Mathf.Repeat(_currentYawDegrees + 180f, 360f) - 180f; // -180 ~ 180 ìˆœí™˜
         }
-        if(Mathf.Abs(deltaPitchDegrees) > _rotationDeadZoneDegrees)
+        if (Mathf.Abs(deltaPitchDegrees) > _rotationDeadZoneDegrees)
         {
             _currentPitchDegrees += deltaPitchDegrees;
-            _currentPitchDegrees = Mathf.Clamp(_currentPitchDegrees, -80f, 80f);       // -80 ~ 80 Á¦ÇÑ
+            _currentPitchDegrees = Mathf.Clamp(_currentPitchDegrees, -80f, 80f);       // -80 ~ 80 ì œí•œ
         }
     }
 
     /// <summary>
-    /// ÇöÀç Ä«¸Ş¶ó °¢µµ °¡Á®¿À±â
+    /// í˜„ì¬ ì¹´ë©”ë¼ ê°ë„ ê°€ì ¸ì˜¤ê¸°
     /// </summary>
     /// <returns>Vector2(yaw, pitch)</returns>
     public Vector2 GetCurrentAngles()
@@ -189,7 +189,7 @@ public class CameraController : MonoBehaviour , IAngleController
     {
         if (!IsPlayerVisible)
         {
-            // ÇÃ·¹ÀÌ¾î°¡ ¾È º¸ÀÌ¸é °Å¸®¸¦ ÁÙ¿©¼­ °¡±îÀÌ ÀÌµ¿
+            // í”Œë ˆì´ì–´ê°€ ì•ˆ ë³´ì´ë©´ ê±°ë¦¬ë¥¼ ì¤„ì—¬ì„œ ê°€ê¹Œì´ ì´ë™
             float adjustedDistance = _currentTargetDistanceUnits * 0.7f;
             _currentTargetDistanceUnits = Mathf.Max(adjustedDistance, _minDistanceUnits);
         }
@@ -199,7 +199,7 @@ public class CameraController : MonoBehaviour , IAngleController
     {
         if (_playerTransform == null) return;
 
-        // ÇÃ·¹ÀÌ¾î À§Ä¡¿¡ ³ôÀÌ ¿ÀÇÁ¼Â Àû¿ë (Çã¸® ±âÁØÁ¡)
+        // í”Œë ˆì´ì–´ ìœ„ì¹˜ì— ë†’ì´ ì˜¤í”„ì…‹ ì ìš© (í—ˆë¦¬ ê¸°ì¤€ì )
         _playerTargetPosition = _playerTransform.position + Vector3.up * _playerHeightOffsetUnits;
     }
 
@@ -207,31 +207,31 @@ public class CameraController : MonoBehaviour , IAngleController
     {
         if (_playerTransform == null) return;
 
-        // ±¸¸é ÁÂÇ¥¸¦ Ä«¸£Å×½Ã¾È ÁÂÇ¥·Î º¯È¯
+        // êµ¬ë©´ ì¢Œí‘œë¥¼ ì¹´ë¥´í…Œì‹œì•ˆ ì¢Œí‘œë¡œ ë³€í™˜
         float yawRadians = _currentYawDegrees * Mathf.Deg2Rad;
         float pitchRadians = _currentPitchDegrees * Mathf.Deg2Rad;
 
-        // ±¸¸é ÁÂÇ¥ °è»ê (Y-up ÁÂÇ¥°è)
+        // êµ¬ë©´ ì¢Œí‘œ ê³„ì‚° (Y-up ì¢Œí‘œê³„)
         float horizontalDistance = _currentTargetDistanceUnits * Mathf.Cos(pitchRadians);
         float verticalOffset = _currentTargetDistanceUnits * Mathf.Sin(pitchRadians);
 
         Vector3 horizontalOffset = new Vector3(
-            horizontalDistance * Mathf.Sin(yawRadians),    // XÃà (ÁÂ¿ì)
-            0f,                                            // YÃà (³ôÀÌ´Â º°µµ °è»ê)
-            horizontalDistance * Mathf.Cos(yawRadians)     // ZÃà (¾ÕµÚ)
+            horizontalDistance * Mathf.Sin(yawRadians),    // Xì¶• (ì¢Œìš°)
+            0f,                                            // Yì¶• (ë†’ì´ëŠ” ë³„ë„ ê³„ì‚°)
+            horizontalDistance * Mathf.Cos(yawRadians)     // Zì¶• (ì•ë’¤)
         );
 
-        // ÃÖÁ¾ Ä«¸Ş¶ó À§Ä¡ = ÇÃ·¹ÀÌ¾î Å¸°Ù À§Ä¡ + ¼öÆò ¿ÀÇÁ¼Â + ¼öÁ÷ ¿ÀÇÁ¼Â
+        // ìµœì¢… ì¹´ë©”ë¼ ìœ„ì¹˜ = í”Œë ˆì´ì–´ íƒ€ê²Ÿ ìœ„ì¹˜ + ìˆ˜í‰ ì˜¤í”„ì…‹ + ìˆ˜ì§ ì˜¤í”„ì…‹
         _targetWorldPosition = _playerTargetPosition + horizontalOffset + Vector3.up * verticalOffset;
     }
 
     private void ApplySmoothMovement()
     {
-        
-        bool updatePosition = false;   
-        
 
-        //À§Ä¡º¯È­·®ÀÌ ÇÑ°è°ª ÀÌ»ó
+        bool updatePosition = false;
+
+
+        //ìœ„ì¹˜ë³€í™”ëŸ‰ì´ í•œê³„ê°’ ì´ìƒ
         Vector3 currentPosition = transform.position;
         float positionDistance = Vector3.Distance(currentPosition, _targetWorldPosition);
         float positionDistMag = Mathf.Abs(positionDistance);
@@ -242,7 +242,7 @@ public class CameraController : MonoBehaviour , IAngleController
 
         if (updatePosition)
         {
-            // °´Ã¼ ¼Óµµ¿¡ ±Ù°ÅÇÑ Lerp Àû¿ë
+            // ê°ì²´ ì†ë„ì— ê·¼ê±°í•œ Lerp ì ìš©
             if (positionDistMag < _positionLerpthresholdVelocitypRatio * playerSpeed)
             {
                 transform.position = _targetWorldPosition;
@@ -251,12 +251,12 @@ public class CameraController : MonoBehaviour , IAngleController
             {
                 transform.position = Vector3.Lerp(currentPosition, _targetWorldPosition, _positionDampingSpeed * Time.deltaTime);
             }
-            
+
         }
 
 
         bool updateRotation = false;
-        // È¸Àü º¯È­·®ÀÌ ÇÑ°è°ª ÀÌ»ó
+        // íšŒì „ ë³€í™”ëŸ‰ì´ í•œê³„ê°’ ì´ìƒ
         if (_playerTransform != null)
         {
             Vector3 lookDirection = (_playerTargetPosition - transform.position).normalized;
@@ -272,15 +272,15 @@ public class CameraController : MonoBehaviour , IAngleController
             }
         }
 
-        // ÇöÀç ½ÇÁ¦ °Å¸® ¾÷µ¥ÀÌÆ®
+        // í˜„ì¬ ì‹¤ì œ ê±°ë¦¬ ì—…ë°ì´íŠ¸
         if (_playerTransform != null)
         {
             CurrentDistanceUnits = Vector3.Distance(transform.position, _playerTargetPosition);
         }
 
-        
 
-        // Properties ¾÷µ¥ÀÌÆ®
+
+        // Properties ì—…ë°ì´íŠ¸
         CurrentYawDegrees = _currentYawDegrees;
         CurrentPitchDegrees = _currentPitchDegrees;
     }
@@ -296,19 +296,19 @@ public class CameraController : MonoBehaviour , IAngleController
 
         if (Physics.Raycast(visibilityRay, out RaycastHit hit, distanceToPlayer, _obstacleLayerMask))
         {
-            // Àå¾Ö¹°ÀÌ ÇÃ·¹ÀÌ¾î¸¦ °¡¸®°í ÀÖÀ½
+            // ì¥ì• ë¬¼ì´ í”Œë ˆì´ì–´ë¥¼ ê°€ë¦¬ê³  ìˆìŒ
             IsPlayerVisible = false;
         }
         else
         {
-            // ÇÃ·¹ÀÌ¾î°¡ º¸ÀÓ
+            // í”Œë ˆì´ì–´ê°€ ë³´ì„
             IsPlayerVisible = true;
         }
     }
 
     private void InitializeReferences()
     {
-        // Ä«¸Ş¶ó ÄÄÆ÷³ÍÆ® Ä³½Ì
+        // ì¹´ë©”ë¼ ì»´í¬ë„ŒíŠ¸ ìºì‹±
         if (_camera == null)
         {
             _camera = GetComponent<Camera>();
@@ -319,14 +319,14 @@ public class CameraController : MonoBehaviour , IAngleController
             Debug.LogError("[CameraController] Camera component required!");
         }
 
-        // ÇÃ·¹ÀÌ¾î GameObject¿¡¼­ ÇÊ¿äÇÑ ÄÄÆ÷³ÍÆ®µé Ä³½Ì
+        // í”Œë ˆì´ì–´ GameObjectì—ì„œ í•„ìš”í•œ ì»´í¬ë„ŒíŠ¸ë“¤ ìºì‹±
         if (_playerGameObject != null)
         {
             _playerTransform = _playerGameObject.transform;
             _playerRigidbody = _playerGameObject.GetComponent<Rigidbody>();
             _playerController = _playerGameObject.GetComponent<PlayerController>();
 
-            // ÇÊ¼ö ÄÄÆ÷³ÍÆ® °ËÁõ
+            // í•„ìˆ˜ ì»´í¬ë„ŒíŠ¸ ê²€ì¦
             if (_playerTransform == null)
             {
                 Debug.LogError("[CameraController] Player Transform not found!");
@@ -352,7 +352,7 @@ public class CameraController : MonoBehaviour , IAngleController
     {
         float baseDistance = _baseDistanceUnits;
 
-        // ÇÃ·¹ÀÌ¾î ¼Óµµ¿¡ µû¸¥ °Å¸® Á¶Àı (Ä³½ÌµÈ ÄÄÆ÷³ÍÆ® »ç¿ë)
+        // í”Œë ˆì´ì–´ ì†ë„ì— ë”°ë¥¸ ê±°ë¦¬ ì¡°ì ˆ (ìºì‹±ëœ ì»´í¬ë„ŒíŠ¸ ì‚¬ìš©)
         if (_playerController != null && _playerRigidbody != null)
         {
             float playerSpeed = _playerRigidbody.linearVelocity.magnitude;
@@ -361,10 +361,10 @@ public class CameraController : MonoBehaviour , IAngleController
             baseDistance += speedDistanceOffset;
         }
 
-        // ÃÖ¼Ò/ÃÖ´ë °Å¸® Á¦ÇÑ
+        // ìµœì†Œ/ìµœëŒ€ ê±°ë¦¬ ì œí•œ
         _currentTargetDistanceUnits = Mathf.Clamp(baseDistance, _minDistanceUnits, _maxDistanceUnits);
 
-        // °¡½Ã¼º¿¡ µû¸¥ °Å¸® Á¶Àı
+        // ê°€ì‹œì„±ì— ë”°ë¥¸ ê±°ë¦¬ ì¡°ì ˆ
         AdjustDistanceForVisibility();
     }
     #endregion
