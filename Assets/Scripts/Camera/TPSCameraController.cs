@@ -99,12 +99,64 @@ public class TPSCameraController : MonoBehaviour, IAngleController
     [PropertyRange(0.1f, 2f)]
     [SuffixLabel("seconds")]
     [SerializeField] private float _visibilityCheckInterval = 0.2f;
+
+    [TabGroup("Aiming", "Settings")]
+    [Header("Aiming FOV")]
+    [PropertyRange(0.3f, 0.8f)]
+    [SuffixLabel("ratio")]
+    [SerializeField] private float _aimingFOVRatio = 0.6f;
+
+    [TabGroup("Aiming", "Settings")]
+    [Header("Aiming Distance")]
+    [PropertyRange(-5f, 5f)]
+    [SuffixLabel("units")]
+    [SerializeField] private float _aimingDistanceOffset = -2f;
+
+    [TabGroup("Aiming", "Settings")]
+    [Header("Aiming Screen Position")]
+    [PropertyRange(0f, 1f)]
+    [SuffixLabel("screen ratio")]
+    [SerializeField] private float _aimingScreenPositionX = 0.3f;
+
+    [TabGroup("Aiming", "Settings")]
+    [PropertyRange(0f, 1f)]
+    [SuffixLabel("screen ratio")]
+    [SerializeField] private float _aimingScreenPositionY = 0.5f;
+
+    [TabGroup("Aiming", "Settings")]
+    [Header("Aiming Height Offset")]
+    [PropertyRange(-2f, 2f)]
+    [SuffixLabel("units")]
+    [SerializeField] private float _aimingHeightOffset = 0.3f;
+
+    [TabGroup("Aiming", "Settings")]
+    [Header("Aiming Transition")]
+    [PropertyRange(1f, 10f)]
+    [SuffixLabel("speed")]
+    [SerializeField] private float _aimingTransitionSpeed = 5f;
+
+    [TabGroup("Aiming", "Debug")]
+    [Button("Toggle Aiming Mode")]
+    private void DebugToggleAiming()
+    {
+        ToggleAimingMode();
+    }
+
     #endregion
 
     #region Properties
     public float CurrentDistanceUnits { get; private set; }
     public bool IsTargetVisible { get; private set; }
     public Vector2 TargetScreenPosition => new Vector2(_targetScreenPositionX, _targetScreenPositionY);
+
+    [TabGroup("Aiming", "Debug")]
+    [ShowInInspector, ReadOnly]
+    public bool IsAimingMode { get; private set; }
+
+    [TabGroup("Aiming", "Debug")]
+    [ShowInInspector, ReadOnly]
+    [ProgressBar(0, 1)]
+    public float AimingProgress { get; private set; }
     #endregion
 
     #region Private Fields
@@ -124,6 +176,9 @@ public class TPSCameraController : MonoBehaviour, IAngleController
     private Vector3 _targetWorldPosition;
     private Vector3 _targetPositionWithOffset;
     private float _currentTargetDistanceUnits;
+    private float _baseFOV;
+    [SerializeField] private float _targetFOV;
+
     #endregion
 
     #region Unity Lifecycle
@@ -142,6 +197,10 @@ public class TPSCameraController : MonoBehaviour, IAngleController
         // 초기 상태
         IsTargetVisible = true;
         _visibilityCheckTimer = 0f;
+
+        // 초기 카메라 상태 캐싱
+        _baseFOV = _camera.fieldOfView;
+        _targetFOV = _baseFOV;
 
         // 초기 카메라 위치 즉시 설정
         if (_targetTransform != null)
@@ -165,6 +224,7 @@ public class TPSCameraController : MonoBehaviour, IAngleController
         CalculateTargetDistance();
         CalculateTargetPosition();
         ApplySmoothMovement();
+        UpdateAimingTransition();
     }
     #endregion
 
@@ -248,6 +308,23 @@ public class TPSCameraController : MonoBehaviour, IAngleController
     {
         return new Vector2(_currentYawDegrees, _currentPitchDegrees);
     }
+
+    /// <summary>
+    /// 에이밍 모드 설정
+    /// </summary>
+    /// <param name="isAiming">에이밍 모드 활성화 여부</param>
+    public void SetAimingMode(bool isAiming)
+    {
+        IsAimingMode = isAiming;
+    }
+
+    /// <summary>
+    /// 에이밍 모드 토글
+    /// </summary>
+    public void ToggleAimingMode()
+    {
+        SetAimingMode(!IsAimingMode);
+    }
     #endregion
 
     #region Private Methods
@@ -276,10 +353,9 @@ public class TPSCameraController : MonoBehaviour, IAngleController
     {
         if (_targetTransform == null) return;
 
-        // 타겟 위치에 높이 오프셋 적용
-        Vector3 baseTargetPosition = _targetTransform.position + Vector3.up * _targetHeightOffsetUnits;
+        // 에이밍 모드에 따른 높이 오프셋 사용
+        Vector3 baseTargetPosition = _targetTransform.position + Vector3.up * GetCurrentTargetHeightOffset();
 
-        // 화면 오프셋 계산 및 적용
         Vector3 screenOffset = CalculateScreenOffset();
         _targetPositionWithOffset = baseTargetPosition + screenOffset;
     }
@@ -288,23 +364,18 @@ public class TPSCameraController : MonoBehaviour, IAngleController
     {
         if (_camera == null) return Vector3.zero;
 
-        // 화면 중앙(0.5, 0.5)에서의 오프셋 계산
-        Vector2 offsetFromCenter = new Vector2(_targetScreenPositionX - 0.5f, _targetScreenPositionY - 0.5f);
+        // 에이밍 모드에 따른 스크린 포지션 사용
+        Vector2 offsetFromCenter = new Vector2(GetCurrentTargetScreenPositionX() - 0.5f, GetCurrentTargetScreenPositionY() - 0.5f);
 
-        // 카메라의 FOV와 현재 거리를 사용하여 월드 스케일 계산
         float halfFOVRadians = _camera.fieldOfView * 0.5f * Mathf.Deg2Rad;
         float verticalSize = _currentTargetDistanceUnits * Mathf.Tan(halfFOVRadians);
         float horizontalSize = verticalSize * _camera.aspect;
 
-        // 카메라의 로컬 좌표계에서 오프셋 계산
         Vector3 cameraRight = transform.right;
         Vector3 cameraUp = transform.up;
 
-        // 스크린 오프셋을 월드 좌표로 변환
-        Vector3 worldOffset = cameraRight * (offsetFromCenter.x * horizontalSize * 2f) +
-                             cameraUp * (offsetFromCenter.y * verticalSize * 2f);
-
-        return worldOffset;
+        return cameraRight * (offsetFromCenter.x * horizontalSize * 2f) +
+               cameraUp * (offsetFromCenter.y * verticalSize * 2f);
     }
 
     private void CalculateTargetPosition()
@@ -441,7 +512,8 @@ public class TPSCameraController : MonoBehaviour, IAngleController
 
     private void CalculateTargetDistance()
     {
-        float baseDistance = _baseDistanceUnits;
+        // 에이밍 모드에 따른 기본 거리 사용
+        float baseDistance = GetCurrentBaseDistance();
 
         // 타겟 속도에 따른 거리 조절 (CharacterController 사용)
         if (_targetCharacterController != null)
@@ -457,6 +529,47 @@ public class TPSCameraController : MonoBehaviour, IAngleController
 
         // 가시성에 따른 거리 조절
         AdjustDistanceForVisibility();
+    }
+
+    private void UpdateAimingTransition()
+    {
+        float targetProgress = IsAimingMode ? 1f : 0f;
+        AimingProgress = Mathf.Lerp(AimingProgress, targetProgress, _aimingTransitionSpeed * Time.deltaTime);
+
+        if (Mathf.Abs(AimingProgress - targetProgress) < 0.01f)
+        {
+            AimingProgress = targetProgress;
+        }
+
+        UpdateAimingFOV();
+    }
+
+    private void UpdateAimingFOV()
+    {
+        if (_camera == null) return;
+
+        float targetFOV = Mathf.Lerp(_baseFOV, _baseFOV * _aimingFOVRatio, AimingProgress);
+        _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, targetFOV, _rotationDampingSpeed * Time.deltaTime);
+    }
+
+    private float GetCurrentTargetScreenPositionX()
+    {
+        return Mathf.Lerp(_targetScreenPositionX, _aimingScreenPositionX, AimingProgress);
+    }
+
+    private float GetCurrentTargetScreenPositionY()
+    {
+        return Mathf.Lerp(_targetScreenPositionY, _aimingScreenPositionY, AimingProgress);
+    }
+
+    private float GetCurrentTargetHeightOffset()
+    {
+        return Mathf.Lerp(_targetHeightOffsetUnits, _targetHeightOffsetUnits + _aimingHeightOffset, AimingProgress);
+    }
+
+    private float GetCurrentBaseDistance()
+    {
+        return _baseDistanceUnits + (_aimingDistanceOffset * AimingProgress);
     }
     #endregion
 }
