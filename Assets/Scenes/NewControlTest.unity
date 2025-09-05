@@ -584,7 +584,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1173287274}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6992e359526b2cd42997f1d2b42f73b5, type: 3}
   m_Name: 
@@ -592,6 +592,10 @@ MonoBehaviour:
   _targetWorldPosition: {x: 0, y: 0, z: 0}
   _targetWorldRotationDegrees: {x: 0, y: 0, z: 0}
   _targetWorldScale: {x: 0, y: 0, z: 0}
+  _lockRotateX: 0
+  _lockRotateY: 0
+  _lockRotateZ: 1
+  _lockPositionTrack: 1
   _positionDampingSpeed: 5
   _rotationDampingSpeed: 180
   _scaleDampingSpeed: 10
@@ -620,7 +624,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1173287274}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14582467188e1e241ae8ca91aaa562ec, type: 3}
   m_Name: 
@@ -934,10 +938,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 1173287276}
   _enablePositionTracking: 1
-  _enableRotationTracking: 0
-  _offsetRotationDegrees: {x: 0, y: 0, z: 0}
-  _offsetDistance: {x: 0, y: 2, z: -5}
-  _positionDampingSpeed: {x: 10, y: 10, z: 10}
+  _enableRotationTracking: 1
+  _offsetRotationDegrees: {x: -8, y: 0, z: 0}
+  _offsetDistance: {x: 1, y: 0.5, z: -3.5}
+  _positionDampingSpeed: {x: 20, y: 20, z: 20}
   _rotationDampingSpeed: {x: 90, y: 90, z: 90}
   _dampingThresholdRatio: 0.05
   _positionThreshold: 0.0001
@@ -1436,7 +1440,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1802387322}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1464,7 +1468,7 @@ MonoBehaviour:
   _usePhysicsScale: 1
   _gravityScale: 9.81
   _airControlMultiplier: 0.5
-  _jumpHeight: 5
+  _jumpHeight: 2
   _coyoteTimeDurationSeconds: 0.2
   _groundDampingSpeed: 10
   _airDampingSpeed: 5
@@ -1722,5 +1726,5 @@ SceneRoots:
   - {fileID: 1344922857}
   - {fileID: 2126545940}
   - {fileID: 663990586}
-  - {fileID: 1802387326}
   - {fileID: 1605510716}
+  - {fileID: 1802387326}

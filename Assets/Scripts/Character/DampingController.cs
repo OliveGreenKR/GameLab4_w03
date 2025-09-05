@@ -10,6 +10,16 @@ public class DampingController : MonoBehaviour, IAngleController
     [TabGroup("Target", "Transform")]
     [SerializeField] private Vector3 _targetWorldScale = Vector3.zero;
 
+    [TabGroup("Target", "Settings")]
+    [SerializeField] private bool _lockRotateX = true;
+    [TabGroup("Target", "Settings")]
+    [SerializeField] private bool _lockRotateY = false;
+    [TabGroup("Target", "Settings")]
+    [SerializeField] private bool _lockRotateZ = true;
+    [TabGroup("Target", "Settings")]
+    [SerializeField] private bool _lockPositionTrack = true;
+
+
     [TabGroup("Damping", "Settings")]
     [SuffixLabel("units per seconds")]
     [SerializeField, Range(0f, 50.0f)] private float _positionDampingSpeed = 10.0f;
@@ -57,25 +67,41 @@ public class DampingController : MonoBehaviour, IAngleController
     #region IAngleController Implementation
     public void SetAngles(float yawDegrees, float pitchDegrees)
     {
-        _targetWorldRotationDegrees.y = yawDegrees;
-        _targetWorldRotationDegrees.x = pitchDegrees;
+        if(!_lockRotateY)
+        {
+            _targetWorldRotationDegrees.y = yawDegrees;
+        }
+ 
+        if(!_lockRotateX)
+        {
+            _targetWorldRotationDegrees.x = pitchDegrees;
+        }
+        
     }
 
     public void AdjustAngles(float deltaYawDegrees, float deltaPitchDegrees)
     {
-        _targetWorldRotationDegrees.y += deltaYawDegrees;
-        _targetWorldRotationDegrees.x += deltaPitchDegrees;
-        // Pitch 제한 (-80 ~ 80)
-        _targetWorldRotationDegrees.x = Mathf.Clamp(_targetWorldRotationDegrees.x, -89f, 89f);
-        // Yaw를 -180 ~ 180 범위로 유지
-        if (_targetWorldRotationDegrees.y > 180f)
+        if (!_lockRotateY)
         {
-            _targetWorldRotationDegrees.y -= 360f;
+            _targetWorldRotationDegrees.y += deltaYawDegrees;
+            // Yaw를 -180 ~ 180 범위로 유지
+            if (_targetWorldRotationDegrees.y > 180f)
+            {
+                _targetWorldRotationDegrees.y -= 360f;
+            }
+            else if (_targetWorldRotationDegrees.y < -180f)
+            {
+                _targetWorldRotationDegrees.y += 360f;
+            }
         }
-        else if (_targetWorldRotationDegrees.y < -180f)
+        if (!_lockRotateX)
         {
-            _targetWorldRotationDegrees.y += 360f;
+            _targetWorldRotationDegrees.x += deltaPitchDegrees;
+            // Pitch 제한 (-80 ~ 80)
+            _targetWorldRotationDegrees.x = Mathf.Clamp(_targetWorldRotationDegrees.x, -89f, 89f);
+
         }
+        
     }
     public Vector2 GetCurrentAngles()
     {
@@ -86,7 +112,9 @@ public class DampingController : MonoBehaviour, IAngleController
     #region Privates - Damping Tracking
     private void TrackToTarget()
     {
-        TrackPosition();
+        if(!_lockPositionTrack)
+            TrackPosition();
+
         TrackRotation();
         TrackScale();
     }

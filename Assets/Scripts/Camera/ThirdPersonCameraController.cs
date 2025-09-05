@@ -98,6 +98,11 @@ public class ThirdPersonCameraController : MonoBehaviour
         if (_targetTransform == null) return;
 
         CalculateTargetTransform();
+    }
+
+    private void LateUpdate()
+    {
+        if (_targetTransform == null) return;
         TrackToTarget();
     }
     #endregion
