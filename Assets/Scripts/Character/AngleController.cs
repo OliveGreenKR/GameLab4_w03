@@ -1,55 +1,61 @@
 ﻿using UnityEngine;
 
+public enum RotationSpace
+{
+    Local,
+    World
+}
+
 public class AngleController : MonoBehaviour, IAngleController
 {
+    #region Serialized Fields
+    [Header("Rotation Settings")]
+    [SerializeField] private RotationSpace _rotationSpace = RotationSpace.Local;
+
+    [Header("Angle Limits")]
+    [SerializeField][Range(-89f, 89f)] private float _maxPitchDegrees = 89f;
+    [SerializeField][Range(-89f, 89f)] private float _minPitchDegrees = -89f;
+    #endregion
+
+    #region Properties
+    public RotationSpace CurrentRotationSpace => _rotationSpace;
+    public float MaxPitchDegrees => _maxPitchDegrees;
+    public float MinPitchDegrees => _minPitchDegrees;
+    #endregion
+
     #region Public Methods
     /// <summary>
-    /// 현재 각도에 델타 값을 더해서 즉시 회전 적용
+    /// 현재 각도에 델타 값을 더해서 회전 적용
     /// </summary>
     /// <param name="deltaYawDegrees">Yaw 각도 증가량</param>
     /// <param name="deltaPitchDegrees">Pitch 각도 증가량</param>
     public void AdjustAngles(float deltaYawDegrees, float deltaPitchDegrees)
     {
-        Vector3 currentEulerAngles = transform.eulerAngles;
+        Vector2 currentAngles = GetCurrentAngles();
+        float newYaw = currentAngles.x + deltaYawDegrees;
+        float newPitch = currentAngles.y + deltaPitchDegrees;
 
-        // 현재 각도를 -180~180 범위로 변환
-        float currentYaw = currentEulerAngles.y;
-        if (currentYaw > 180f) currentYaw -= 360f;
-
-        float currentPitch = currentEulerAngles.x;
-        if (currentPitch > 180f) currentPitch -= 360f;
-
-        // 델타 값 적용
-        float newYaw = currentYaw + deltaYawDegrees;
-        float newPitch = currentPitch + deltaPitchDegrees;
-
-        // Pitch 제한 (-89 ~ 89)
-        newPitch = Mathf.Clamp(newPitch, -89f, 89f);
-
-        // Yaw를 -180 ~ 180 범위로 유지
-        while (newYaw > 180f) newYaw -= 360f;
-        while (newYaw < -180f) newYaw += 360f;
-
-        // 즉시 회전 적용
-        transform.rotation = Quaternion.Euler(newPitch, newYaw, 0f);
+        SetAngles(newYaw, newPitch);
     }
 
     /// <summary>
-    /// 지정된 각도로 즉시 회전 설정
+    /// 지정된 각도로 회전 설정
     /// </summary>
     /// <param name="yawDegrees">Yaw 각도</param>
     /// <param name="pitchDegrees">Pitch 각도</param>
     public void SetAngles(float yawDegrees, float pitchDegrees)
     {
-        // Pitch 제한
-        pitchDegrees = Mathf.Clamp(pitchDegrees, -89f, 89f);
+        float clampedPitch = ClampPitch(pitchDegrees);
+        float normalizedYaw = NormalizeAngle(yawDegrees);
 
-        // Yaw 범위 정규화
-        while (yawDegrees > 180f) yawDegrees -= 360f;
-        while (yawDegrees < -180f) yawDegrees += 360f;
-
-        // 즉시 회전 적용
-        transform.rotation = Quaternion.Euler(pitchDegrees, yawDegrees, 0f);
+        if (_rotationSpace == RotationSpace.Local)
+        {
+            ApplyLocalRotation(normalizedYaw, clampedPitch);
+        }
+        else
+        {
+            ApplyWorldRotation(normalizedYaw, clampedPitch);
+        }
     }
 
     /// <summary>
@@ -58,9 +64,53 @@ public class AngleController : MonoBehaviour, IAngleController
     /// <returns>x: Yaw, y: Pitch</returns>
     public Vector2 GetCurrentAngles()
     {
-        Vector3 eulerAngles = transform.eulerAngles;
+        return GetAnglesFromRotation(transform.rotation);
+    }
 
-        // -180~180 범위로 변환
+    /// <summary>
+    /// 회전 공간 설정
+    /// </summary>
+    /// <param name="space">로컬 또는 월드 공간</param>
+    public void SetRotationSpace(RotationSpace space)
+    {
+        _rotationSpace = space;
+    }
+
+    /// <summary>
+    /// Pitch 제한 설정
+    /// </summary>
+    /// <param name="minPitch">최소 Pitch 각도</param>
+    /// <param name="maxPitch">최대 Pitch 각도</param>
+    public void SetPitchLimits(float minPitch, float maxPitch)
+    {
+        _minPitchDegrees = Mathf.Clamp(minPitch, -89f, 89f);
+        _maxPitchDegrees = Mathf.Clamp(maxPitch, -89f, 89f);
+
+        if (_minPitchDegrees > _maxPitchDegrees)
+        {
+            float temp = _minPitchDegrees;
+            _minPitchDegrees = _maxPitchDegrees;
+            _maxPitchDegrees = temp;
+        }
+    }
+    #endregion
+
+    #region Private Methods
+    private void ApplyLocalRotation(float yawDegrees, float pitchDegrees)
+    {
+        transform.rotation = Quaternion.Euler(pitchDegrees, yawDegrees, 0f);
+    }
+
+    private void ApplyWorldRotation(float yawDegrees, float pitchDegrees)
+    {
+        // 월드 축 기준 절대 회전 (로컬과 동일한 결과)
+        transform.rotation = Quaternion.Euler(pitchDegrees, yawDegrees, 0f);
+    }
+
+    private Vector2 GetAnglesFromRotation(Quaternion rotation)
+    {
+        Vector3 eulerAngles = rotation.eulerAngles;
+
         float yaw = eulerAngles.y;
         if (yaw > 180f) yaw -= 360f;
 
@@ -68,6 +118,18 @@ public class AngleController : MonoBehaviour, IAngleController
         if (pitch > 180f) pitch -= 360f;
 
         return new Vector2(yaw, pitch);
+    }
+
+    private float ClampPitch(float pitchDegrees)
+    {
+        return Mathf.Clamp(pitchDegrees, _minPitchDegrees, _maxPitchDegrees);
+    }
+
+    private float NormalizeAngle(float angleDegrees)
+    {
+        while (angleDegrees > 180f) angleDegrees -= 360f;
+        while (angleDegrees < -180f) angleDegrees += 360f;
+        return angleDegrees;
     }
     #endregion
 }
