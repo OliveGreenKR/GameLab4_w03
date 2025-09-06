@@ -57,11 +57,15 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
 
     public float DealDamage(IBattleEntity target, float baseDamage)
     {
-        return BattleInteractionSystem.ProcessDamageInteraction(this, target, baseDamage);
+        float actualDamage = BattleInteractionSystem.ProcessDamageInteraction(this, target, baseDamage);    
+        _battleStat.ApplyDamage(1.0f);//투사체는 공격시도마다 체력 1 감소 (관통 방지)
+
+        return actualDamage;
     }
 
     public void OnDeath(IBattleEntity killer = null)
     {
+        Debug.Log("[ProjectileBase] Projectile has been destroyed.", this); 
         DestroyProjectile();
     }
 
@@ -264,6 +268,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
         IBattleEntity targetEntity = other.GetComponent<IBattleEntity>();
         if (targetEntity != null)
         {
+            Debug.Log($"{gameObject.name} ({TeamId}) attacks {other.gameObject.name} ({targetEntity.TeamId}) for {_baseDamage} damage.");
             DealDamage(targetEntity, _baseDamage);
         }
     }

@@ -519,7 +519,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecb752aaf75e34c4bae0599e05e9a873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _forwardSpeedUnitsPerSecond: 10
+  _forwardSpeedUnitsPerSecond: 100
   _lifetimeSeconds: 2
   _attackTrigger: {fileID: 718214833}
   _rigid: {fileID: 718214837}
@@ -782,6 +782,7 @@ GameObject:
   - component: {fileID: 823887399}
   - component: {fileID: 823887398}
   - component: {fileID: 823887401}
+  - component: {fileID: 823887402}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -896,6 +897,22 @@ MonoBehaviour:
   _baseEffectRange: 1
   _teamId: 1
   _statData: {fileID: 11400000, guid: bde5c934bd0e9aa4a9d77850234a8cb3, type: 2}
+--- !u!114 &823887402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 823887396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 099471cc0fbdc1940a80ffca63d62b50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _battleStat: {fileID: 823887401}
+  _teamId: 1
+  _baseDamage: 20
+  _invulnerabilityDuration: 1
 --- !u!1 &866606502
 GameObject:
   m_ObjectHideFlags: 0

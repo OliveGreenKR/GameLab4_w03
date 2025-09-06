@@ -5,26 +5,26 @@ using UnityEngine;
 public class BattleStatComponent : MonoBehaviour
 {
     #region Serialized Fields
-    [TabGroup("Initial Stats")]
-    [Header("Base Stats")]
-    [SuffixLabel("units")]
-    [PropertyRange(1f, 100000f)]
-    [SerializeField] private float _baseHealth = 100f;
+    //[TabGroup("Initial Stats")]
+    //[Header("Base Stats")]
+    //[SuffixLabel("units")]
+    //[PropertyRange(1f, 100000f)]
+    //[SerializeField] private float _baseHealth = 100f;
 
-    [TabGroup("Initial Stats")]
-    [SuffixLabel("damage")]
-    [PropertyRange(1f, 100000f)]
-    [SerializeField] private float _baseAttack = 10f;
+    //[TabGroup("Initial Stats")]
+    //[SuffixLabel("damage")]
+    //[PropertyRange(1f, 100000f)]
+    //[SerializeField] private float _baseAttack = 10f;
 
-    [TabGroup("Initial Stats")]
-    [SuffixLabel("attacks/sec")]
-    [PropertyRange(0.1f, 100f)]
-    [SerializeField] private float _baseAttackSpeed = 1f;
+    //[TabGroup("Initial Stats")]
+    //[SuffixLabel("attacks/sec")]
+    //[PropertyRange(0.1f, 100f)]
+    //[SerializeField] private float _baseAttackSpeed = 1f;
 
-    [TabGroup("Initial Stats")]
-    [SuffixLabel("multiplier")]
-    [PropertyRange(0.1f, 100f)]
-    [SerializeField] private float _baseEffectRange = 1f;
+    //[TabGroup("Initial Stats")]
+    //[SuffixLabel("multiplier")]
+    //[PropertyRange(0.1f, 100f)]
+    //[SerializeField] private float _baseEffectRange = 1f;
 
     [TabGroup("Settings")]
     [Header("Team Settings")]
