@@ -16,6 +16,7 @@ MonoBehaviour:
     keys:
     - 27c54805f7c521b4ba84ae89797e2ee6
     - 674dac6e05f8d5b4fa7307ee0be52d4d
+    - f0230b2f773680e49a4b12c68398d409
     values:
     - goDatas_byGlobalId:
         keys: []
@@ -49,6 +50,14 @@ MonoBehaviour:
           iconNameOrGuid: CharacterController Icon
           isIconRecursive: 0
           isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+    - goDatas_byGlobalId:
+        keys:
+        - globalObjectIdString: GlobalObjectId_V1-2-f0230b2f773680e49a4b12c68398d409-120238662-0
+        values:
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
           isIconRecursive: 0

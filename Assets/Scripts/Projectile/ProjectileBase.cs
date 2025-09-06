@@ -7,7 +7,7 @@ using UnityEngine;
 ///  Projectile Base, 이펙트 부착이 가능하며
 /// 생명 주기는 스스로 관리. 매니저를 통해 생명주기의 완료 프로세스를 위탁
 /// </summary>
-public abstract class ProjectileBase : MonoBehaviour
+public class ProjectileBase : MonoBehaviour
 {
     #region Serialized Fields
     [TabGroup("Movement")]
@@ -24,6 +24,11 @@ public abstract class ProjectileBase : MonoBehaviour
     [Header("Attack Trigger")]
     [Required]
     [SerializeField] protected Collider _attackTrigger;
+
+    [TabGroup("Components")]
+    [Header("RigidBody")]
+    [Required]
+    [SerializeField] protected Rigidbody _rigid;
     #endregion
 
     #region Properties
@@ -61,7 +66,11 @@ public abstract class ProjectileBase : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"{gameObject.name} hit {other.gameObject.name}");    
+
         ProcessEffectsOnHit(other);
+        InteractBattleStat(); // 배틀 스탯 상호작용 처리
+
     }
 
     private void OnEnable()
@@ -185,6 +194,14 @@ public abstract class ProjectileBase : MonoBehaviour
     private void SortEffectsByPriority()
     {
         _effects = _effects.OrderBy(effect => effect.Priority).ToList();
+    }
+    #endregion
+
+    #region Battle Stat Modifier
+    private void InteractBattleStat()
+    {
+        Debug.Log($"{gameObject.name} Battle Stat Interaction!");
+
     }
     #endregion
 }
