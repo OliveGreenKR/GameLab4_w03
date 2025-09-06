@@ -184,7 +184,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     {
         if (_inputs == null) return;
 
-        _inputs.Enable();
+        _inputs.Player.Enable();
         _inputs.Player.Move.performed += OnMovePerformed;
         _inputs.Player.Move.canceled += OnMoveCanceled;
         _inputs.Player.Jump.performed += OnJumpPerformed;
@@ -200,7 +200,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     {
         if (_inputs == null) return;
 
-        _inputs.Disable();
+        _inputs.Player.Disable();
         _inputs.Player.Move.performed -= OnMovePerformed;
         _inputs.Player.Move.canceled -= OnMoveCanceled;
         _inputs.Player.Jump.performed -= OnJumpPerformed;
@@ -362,6 +362,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
         _characterController.Move(movement);
     }
     #endregion
+
     #region Input Callbacks
     private void OnMovePerformed(InputAction.CallbackContext context)
     {

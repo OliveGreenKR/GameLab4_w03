@@ -1051,6 +1051,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Debug",
+            "id": "8f27fd4a-3110-4a31-846f-3efca784fbd7",
+            "actions": [
+                {
+                    "name": "Debug01",
+                    "type": "Button",
+                    "id": "4c53c836-9f53-446f-8e8f-7896c14e7116",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "ce57accc-3945-436d-b8fe-b2652027fe09",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Debug01",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

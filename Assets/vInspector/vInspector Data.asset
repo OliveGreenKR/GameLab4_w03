@@ -12,4 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7915df4cd4da490ab52fc8fa9ee9127, type: 3}
   m_Name: vInspector Data
   m_EditorClassIdentifier: 
-  bookmarks: []
+  bookmarks:
+  - _obj: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    globalId:
+      globalObjectIdString: GlobalObjectId_V1-1-052faaac586de48259a63d0c4782560b-17502115434096073164-0
+    isSceneGameObject: 0
+    isAsset: 1
+    _typeString: UnityEngine.InputSystem.InputActionAsset, Unity.InputSystem, Version=1.14.2.0,
+      Culture=neutral, PublicKeyToken=null
