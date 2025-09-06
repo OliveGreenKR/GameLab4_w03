@@ -44,13 +44,17 @@ public class ThirdPersonCameraController : MonoBehaviour
     [TabGroup("Threshold")]
     [Header("Tracking Thresholds")]
     [SuffixLabel("units")]
-    [Range(0.0001f, 1.0f)]
+    [Range(0.0f, 1.0f)]
     [SerializeField] private float _positionThreshold = 0.001f;
 
     [TabGroup("Threshold")]
     [SuffixLabel("degrees")]
-    [Range(0.0001f, 1.0f)]
+    [Range(0.0f, 1.0f)]
     [SerializeField] private float _rotationThreshold = 0.001f;
+
+    [TabGroup("Settings")]
+    [Header("Damping Control")]
+    [SerializeField] private bool _enableDamping = true;
 
     [TabGroup("Settings")]
     [Header("Default Camera Settings")]
@@ -99,6 +103,10 @@ public class ThirdPersonCameraController : MonoBehaviour
     #endregion
 
     #region Properties
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public bool IsDampingEnabled => _enableDamping;
+
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public Transform TargetTransform => _targetTransform;
@@ -178,6 +186,16 @@ public class ThirdPersonCameraController : MonoBehaviour
     #endregion
 
     #region Public Methods
+    /// <summary>
+    /// 댐핑 활성화/비활성화 설정
+    /// </summary>
+    /// <param name="enabled">댐핑 활성화 여부</param>
+    public void SetDampingEnabled(bool enabled)
+    {
+        _enableDamping = enabled;
+        Debug.Log($"ThirdPersonCamera : Damping : {enabled} ");
+    }
+
     /// <summary>
     /// 추적할 타겟 설정
     /// </summary>
@@ -281,9 +299,16 @@ public class ThirdPersonCameraController : MonoBehaviour
         Vector3 currentPosition = transform.position;
         float positionDistance = Vector3.Distance(currentPosition, _targetWorldPosition);
 
+        if (!_enableDamping)
+        {
+            transform.position = _targetWorldPosition;
+            return;
+        }
+
         if (positionDistance > _positionThreshold)
         {
-            // 각 축별로 개별 댐핑 적용
+
+            // 기존 댐핑 로직
             Vector3 dampingSpeed = new Vector3(
                 _positionDampingSpeed.x * Time.deltaTime,
                 _positionDampingSpeed.y * Time.deltaTime,
@@ -299,7 +324,6 @@ public class ThirdPersonCameraController : MonoBehaviour
             float stepDistance = Vector3.Distance(currentPosition, nextPosition);
             float avgDampingSpeed = (_positionDampingSpeed.x + _positionDampingSpeed.y + _positionDampingSpeed.z) / 3f;
 
-            // 진동 방지: 스텝 거리가 댐핑 속도 기반 임계값보다 작으면 즉시 이동
             if (stepDistance < avgDampingSpeed * _dampingThresholdRatio * Time.deltaTime)
             {
                 transform.position = _targetWorldPosition;
@@ -320,7 +344,13 @@ public class ThirdPersonCameraController : MonoBehaviour
 
         if (rotationAngle > _rotationThreshold)
         {
-            // 각 축별로 개별 댐핑 적용
+            if (!_enableDamping)
+            {
+                transform.rotation = targetRotation;
+                return;
+            }
+
+            // 기존 댐핑 로직
             Vector3 dampingSpeed = new Vector3(
                 _rotationDampingSpeed.x * Time.deltaTime,
                 _rotationDampingSpeed.y * Time.deltaTime,
@@ -330,7 +360,6 @@ public class ThirdPersonCameraController : MonoBehaviour
             Vector3 currentEuler = currentRotation.eulerAngles;
             Vector3 targetEuler = _targetWorldRotationDegrees;
 
-            // 각 축별 각도 차이 계산 (최단 경로)
             float deltaX = Mathf.DeltaAngle(currentEuler.x, targetEuler.x);
             float deltaY = Mathf.DeltaAngle(currentEuler.y, targetEuler.y);
             float deltaZ = Mathf.DeltaAngle(currentEuler.z, targetEuler.z);
@@ -345,7 +374,6 @@ public class ThirdPersonCameraController : MonoBehaviour
             float stepAngle = Quaternion.Angle(currentRotation, nextRotation);
             float avgDampingSpeed = (_rotationDampingSpeed.x + _rotationDampingSpeed.y + _rotationDampingSpeed.z) / 3f;
 
-            // 진동 방지: 스텝 각도가 댐핑 속도 기반 임계값보다 작으면 즉시 회전
             if (stepAngle < avgDampingSpeed * _dampingThresholdRatio * Time.deltaTime)
             {
                 transform.rotation = targetRotation;

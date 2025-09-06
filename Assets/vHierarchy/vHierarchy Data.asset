@@ -26,6 +26,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-1605510715-0
         - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-2126545936-0
         - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-1683555926-0
+        - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-112232674-0
         values:
         - colorIndex: 0
           iconNameOrGuid: CapsuleCollider Icon
@@ -41,6 +42,10 @@ MonoBehaviour:
           isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: DirectionalLight Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: CharacterController Icon
           isIconRecursive: 0
           isColorRecursive: 0
   bookmarks: []
