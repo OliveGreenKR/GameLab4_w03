@@ -168,6 +168,11 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     private void Update()
     {
+        
+    }
+
+    private void LateUpdate()
+    {
         if (_targetTransform == null) return;
 
         CalculateTargetTransform();
@@ -175,11 +180,8 @@ public class ThirdPersonCameraController : MonoBehaviour
         if (_isTransitioningSettings)
         {
             UpdateSettingsTransition();
-        }
-    }
 
-    private void LateUpdate()
-    {
+        }
         if (_targetTransform == null) return;
         TrackToTarget();
     }
@@ -299,14 +301,14 @@ public class ThirdPersonCameraController : MonoBehaviour
         Vector3 currentPosition = transform.position;
         float positionDistance = Vector3.Distance(currentPosition, _targetWorldPosition);
 
-        if (!_enableDamping)
-        {
-            transform.position = _targetWorldPosition;
-            return;
-        }
-
+       
         if (positionDistance > _positionThreshold)
         {
+            if (!_enableDamping)
+            {
+                transform.position = _targetWorldPosition;
+                return;
+            }
 
             // 기존 댐핑 로직
             Vector3 dampingSpeed = new Vector3(
@@ -423,6 +425,7 @@ public class ThirdPersonCameraController : MonoBehaviour
         _offsetRotationDegrees = settings.OffsetRotationDegrees;
         _positionDampingSpeed = settings.PositionDampingSpeed;
         _rotationDampingSpeed = settings.RotationDampingSpeed;
+        _enableDamping = settings.IsEnableDamping;
 
         if (_camera != null)
         {
