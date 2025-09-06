@@ -296,6 +296,9 @@ public class ThirdPersonCameraController : MonoBehaviour
         Vector3 offsetDirection = finalRotation * _offsetDistance;
         Vector3 finalPosition = _targetTransform.position + offsetDirection;
 
+
+        Debug.Log($"Target moved: {_targetWorldPosition:F6}");
+
         // 타겟 값 설정
         _targetWorldPosition = finalPosition;
         _targetWorldRotationDegrees = finalRotation.eulerAngles;
@@ -328,23 +331,37 @@ public class ThirdPersonCameraController : MonoBehaviour
                 return;
             }
 
-            // 기존 댐핑 로직
-            Vector3 dampingSpeed = new Vector3(
-                _positionDampingSpeed.x * Time.deltaTime,
-                _positionDampingSpeed.y * Time.deltaTime,
-                _positionDampingSpeed.z * Time.deltaTime
-            );
+            //// 기존 댐핑 로직
+            //Vector3 dampingSpeed = new Vector3(
+            //    _positionDampingSpeed.x * Time.deltaTime,
+            //    _positionDampingSpeed.y * Time.deltaTime,
+            //    _positionDampingSpeed.z * Time.deltaTime
+            //);
 
-            Vector3 nextPosition = new Vector3(
-                Mathf.Lerp(currentPosition.x, _targetWorldPosition.x, dampingSpeed.x),
-                Mathf.Lerp(currentPosition.y, _targetWorldPosition.y, dampingSpeed.y),
-                Mathf.Lerp(currentPosition.z, _targetWorldPosition.z, dampingSpeed.z)
-            );
+            //Vector3 nextPosition = new Vector3(
+            //    Mathf.Lerp(currentPosition.x, _targetWorldPosition.x, dampingSpeed.x),
+            //    Mathf.Lerp(currentPosition.y, _targetWorldPosition.y, dampingSpeed.y),
+            //    Mathf.Lerp(currentPosition.z, _targetWorldPosition.z, dampingSpeed.z)
+            //);
 
-            float stepDistance = Vector3.Distance(currentPosition, nextPosition);
-            float avgDampingSpeed = (_positionDampingSpeed.x + _positionDampingSpeed.y + _positionDampingSpeed.z) / 3f;
+            //float stepDistance = Vector3.Distance(currentPosition, nextPosition);
+            //float avgDampingSpeed = (_positionDampingSpeed.x + _positionDampingSpeed.y + _positionDampingSpeed.z) / 3f;
 
-            if (stepDistance < avgDampingSpeed * _dampingThresholdRatio * Time.deltaTime)
+            //if (stepDistance < avgDampingSpeed * _dampingThresholdRatio * Time.deltaTime)
+            //{
+            //    transform.position = _targetWorldPosition;
+            //}
+            //else
+            //{
+            //    transform.position = nextPosition;
+            //}
+
+            // 통합 댐핑 - 단일 Lerp 사용
+            float dampingSpeed = _positionDampingSpeed.x * Time.deltaTime;
+            Vector3 nextPosition = Vector3.Lerp(currentPosition, _targetWorldPosition, dampingSpeed);
+
+            // 단순한 거리 기반 임계값
+            if (Vector3.Distance(nextPosition, _targetWorldPosition) < _positionThreshold)
             {
                 transform.position = _targetWorldPosition;
             }
@@ -352,6 +369,8 @@ public class ThirdPersonCameraController : MonoBehaviour
             {
                 transform.position = nextPosition;
             }
+
+   
         }
     }
 
