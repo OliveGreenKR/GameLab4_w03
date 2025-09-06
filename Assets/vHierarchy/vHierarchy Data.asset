@@ -15,9 +15,33 @@ MonoBehaviour:
   sceneDatas_byGuid:
     keys:
     - 27c54805f7c521b4ba84ae89797e2ee6
+    - 674dac6e05f8d5b4fa7307ee0be52d4d
     values:
     - goDatas_byGlobalId:
         keys: []
         values: []
+    - goDatas_byGlobalId:
+        keys:
+        - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-1802387322-0
+        - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-1605510715-0
+        - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-2126545936-0
+        - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-1683555926-0
+        values:
+        - colorIndex: 0
+          iconNameOrGuid: CapsuleCollider Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Camera Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: DirectionalLight Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
   bookmarks: []
   bookmarkedScenePaths: []

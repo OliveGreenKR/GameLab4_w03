@@ -809,8 +809,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1605510715}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.12218326, z: 0, w: 0.9925076}
-  m_LocalPosition: {x: 2.58, y: 1.622, z: -2}
+  m_LocalRotation: {x: -0.02824753, y: 0.7500042, z: -0.03209723, w: -0.6600497}
+  m_LocalPosition: {x: 8.875108, y: 2.3783057, z: -7.252503}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -893,7 +893,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 90
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -927,12 +927,16 @@ MonoBehaviour:
   _enablePositionTracking: 1
   _enableRotationTracking: 1
   _offsetRotationDegrees: {x: 0, y: 0, z: 0}
-  _offsetDistance: {x: 0, y: 2, z: -5}
-  _positionDampingSpeed: {x: 10, y: 10, z: 10}
+  _offsetDistance: {x: 1.61, y: 0.59, z: -2.44}
+  _positionDampingSpeed: {x: 20, y: 5, z: 20}
   _rotationDampingSpeed: {x: 90, y: 90, z: 90}
   _dampingThresholdRatio: 0.05
   _positionThreshold: 0.001
   _rotationThreshold: 0.001
+  _defaultSettings: {fileID: 11400000, guid: 381cfbc436f22cf4ab8cbbba182b71a5, type: 2}
+  _currentSettings: {fileID: 11400000, guid: 381cfbc436f22cf4ab8cbbba182b71a5, type: 2}
+  _targetSettings: {fileID: 0}
+  _settingsTransitionSpeed: 5
 --- !u!1 &1660262971
 GameObject:
   m_ObjectHideFlags: 0

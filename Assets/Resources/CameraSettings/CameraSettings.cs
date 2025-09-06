@@ -33,11 +33,35 @@ public class CameraSettings : ScriptableObject
     #endregion
 
     #region Properties
-    public Vector3 OffsetDistance => _offsetDistance;
-    public Vector3 OffsetRotationDegrees => _offsetRotationDegrees;
-    public float FieldOfView => _fieldOfView;
-    public Vector3 PositionDampingSpeed => _positionDampingSpeed;
-    public Vector3 RotationDampingSpeed => _rotationDampingSpeed;
+    public Vector3 OffsetDistance
+    {
+        get => _offsetDistance;
+        set => _offsetDistance = value;
+    }
+
+    public Vector3 OffsetRotationDegrees
+    {
+        get => _offsetRotationDegrees;
+        set => _offsetRotationDegrees = value;
+    }
+
+    public float FieldOfView
+    {
+        get => _fieldOfView;
+        set => _fieldOfView = value;
+    }
+
+    public Vector3 PositionDampingSpeed
+    {
+        get => _positionDampingSpeed;
+        set => _positionDampingSpeed = value;
+    }
+
+    public Vector3 RotationDampingSpeed
+    {
+        get => _rotationDampingSpeed;
+        set => _rotationDampingSpeed = value;
+    }
     #endregion
 
     #region Public Methods

@@ -51,6 +51,51 @@ public class ThirdPersonCameraController : MonoBehaviour
     [SuffixLabel("degrees")]
     [Range(0.0001f, 1.0f)]
     [SerializeField] private float _rotationThreshold = 0.001f;
+
+    [TabGroup("Settings")]
+    [Header("Default Camera Settings")]
+    [SerializeField] private CameraSettings _defaultSettings;
+
+    [TabGroup("Settings")]
+    [Header("Aim Camera Settings")]
+    [SerializeField] private CameraSettings _aimCameraSettings;
+
+    [TabGroup("Settings")]
+    [Header("Current Camera Settings")]
+    [SerializeField, ReadOnly] private CameraSettings _currentSettings;
+
+    [TabGroup("Settings")]
+    [Header("Target Camera Settings")]
+    [SerializeField] private CameraSettings _targetSettings;
+
+    [TabGroup("Settings")]
+    [Header("Settings Transition Speed")]
+    [SerializeField, Range(0.1f, 50f)] private float _settingsTransitionSpeed = 5f;
+
+    [GUIColor("green")]
+    [Button(ButtonSizes.Large)]
+    [ButtonGroup("Apply Settings")]
+    private void ApplyAimSettings() => ApplyCameraSettings(_aimCameraSettings,true, _settingsTransitionSpeed);
+
+    [GUIColor("cyan")]
+    [ButtonGroup("Apply Settings")]
+    private void ApplyDefaultSettings() => ApplyCameraSettings(_defaultSettings, true, _settingsTransitionSpeed);
+
+
+    [Button(ButtonSizes.Large)]
+    [GUIColor(1, 0.5f, 0)]
+    private void SaveCurrentSetting()
+    {
+        _currentSettings.PositionDampingSpeed = _positionDampingSpeed;
+        _currentSettings.RotationDampingSpeed = _rotationDampingSpeed;
+        _currentSettings.OffsetDistance = _offsetDistance;
+        _currentSettings.OffsetRotationDegrees = _offsetRotationDegrees;
+        if (_camera != null)
+        {
+            _currentSettings.FieldOfView = _camera.fieldOfView;
+        }
+        Debug.Log("[ThirdPersonCameraController] Current settings saved to _currentSettings.");
+    }
     #endregion
 
     #region Properties
@@ -73,16 +118,31 @@ public class ThirdPersonCameraController : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public Vector3 CurrentWorldRotationDegrees => transform.rotation.eulerAngles;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public bool IsTransitioningSettings => _isTransitioningSettings;
     #endregion
 
     #region Private Fields
     private Vector3 _targetWorldPosition;
     private Vector3 _targetWorldRotationDegrees;
+
+    // Settings Transition
+    private Camera _camera;
+    private bool _isTransitioningSettings = false;
+ 
     #endregion
 
     #region Unity Lifecycle
     private void Start()
     {
+        _camera = GetComponent<Camera>();
+        if (_camera == null)
+        {
+            Debug.LogError("[ThirdPersonCameraController] Camera component not found!");
+        }
+
         if (_targetTransform != null)
         {
             CalculateTargetTransform();
@@ -91,6 +151,11 @@ public class ThirdPersonCameraController : MonoBehaviour
         {
             Debug.LogError("[ThirdPersonCameraController] Target Transform not assigned!");
         }
+
+        if (_defaultSettings != null)
+        {
+            ApplySettingsImmediately(_defaultSettings);
+        }
     }
 
     private void Update()
@@ -98,6 +163,11 @@ public class ThirdPersonCameraController : MonoBehaviour
         if (_targetTransform == null) return;
 
         CalculateTargetTransform();
+
+        if (_isTransitioningSettings)
+        {
+            UpdateSettingsTransition();
+        }
     }
 
     private void LateUpdate()
@@ -144,6 +214,33 @@ public class ThirdPersonCameraController : MonoBehaviour
     {
         _positionDampingSpeed = positionDamping;
         _rotationDampingSpeed = rotationDamping;
+    }
+
+    /// <summary>
+    /// Camera Settings 적용
+    /// </summary>
+    /// <param name="settings"> 적용할 카메라 세팅 에셋</param>
+    /// <param name="isLerp"> lerp transition 적용 여부</param>
+    /// <param name="dampSpeed">lerp transition 속도</param>
+    public void ApplyCameraSettings(CameraSettings settings, bool isLerp = false, float dampSpeed = 5f)
+    {
+        if (settings == null) return;
+
+        if (isLerp)
+        {
+            _targetSettings = settings;
+            _settingsTransitionSpeed = dampSpeed;
+            _isTransitioningSettings = true;
+
+            if (_currentSettings == null)
+            {
+                _currentSettings = _defaultSettings;
+            }
+        }
+        else
+        {
+            ApplySettingsImmediately(settings);
+        }
     }
     #endregion
 
@@ -258,6 +355,54 @@ public class ThirdPersonCameraController : MonoBehaviour
                 transform.rotation = nextRotation;
             }
         }
+    }
+    #endregion
+
+    #region Private Methods - Settings Transition
+    private void UpdateSettingsTransition()
+    {
+        if (_targetSettings == null || _currentSettings == null) return;
+
+        float deltaTime = Time.deltaTime;
+        float speed = _settingsTransitionSpeed * deltaTime;
+
+        // Lerp 설정값들
+        _offsetDistance = Vector3.Lerp(_offsetDistance, _targetSettings.OffsetDistance, speed);
+        _offsetRotationDegrees = Vector3.Lerp(_offsetRotationDegrees, _targetSettings.OffsetRotationDegrees, speed);
+        _positionDampingSpeed = Vector3.Lerp(_positionDampingSpeed, _targetSettings.PositionDampingSpeed, speed);
+        _rotationDampingSpeed = Vector3.Lerp(_rotationDampingSpeed, _targetSettings.RotationDampingSpeed, speed);
+
+        if (_camera != null)
+        {
+            _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, _targetSettings.FieldOfView, speed);
+        }
+
+        // 전환 완료 체크
+        if (Vector3.Distance(_offsetDistance, _targetSettings.OffsetDistance) < _positionThreshold &&
+            Vector3.Distance(_offsetRotationDegrees, _targetSettings.OffsetRotationDegrees) < _rotationThreshold &&
+            (_camera == null || Mathf.Abs(_camera.fieldOfView - _targetSettings.FieldOfView) < 0.1f))
+        {
+            ApplySettingsImmediately(_targetSettings);
+            _isTransitioningSettings = false;
+        }
+    }
+
+    private void ApplySettingsImmediately(CameraSettings settings)
+    {
+        if (settings == null) return;
+
+        _offsetDistance = settings.OffsetDistance;
+        _offsetRotationDegrees = settings.OffsetRotationDegrees;
+        _positionDampingSpeed = settings.PositionDampingSpeed;
+        _rotationDampingSpeed = settings.RotationDampingSpeed;
+
+        if (_camera != null)
+        {
+            _camera.fieldOfView = settings.FieldOfView;
+        }
+
+        _currentSettings = settings;
+        _isTransitioningSettings = false;
     }
     #endregion
 }

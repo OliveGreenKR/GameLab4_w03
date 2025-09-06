@@ -275,9 +275,10 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
         if (_currentMoveInput.magnitude < 0.1f)
         {
             // 입력이 없으면 감속
-            float dampingSpeed = IsGrounded ? _groundDampingSpeed : _airDampingSpeed;
-            _currentVelocity.x = Mathf.Lerp(_currentVelocity.x, 0f, dampingSpeed * Time.deltaTime);
-            _currentVelocity.z = Mathf.Lerp(_currentVelocity.z, 0f, dampingSpeed * Time.deltaTime);
+            _currentVelocity = new Vector3(0, _currentVelocity.y, 0);
+            //float dampingSpeed = IsGrounded ? _groundDampingSpeed : _airDampingSpeed;
+            //_currentVelocity.x = Mathf.Lerp(_currentVelocity.x, 0f, dampingSpeed * Time.deltaTime);
+            //_currentVelocity.z = Mathf.Lerp(_currentVelocity.z, 0f, dampingSpeed * Time.deltaTime);
             return;
         }
 

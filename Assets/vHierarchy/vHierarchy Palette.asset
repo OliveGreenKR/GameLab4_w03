@@ -62,6 +62,10 @@ MonoBehaviour:
     - MeshCollider Icon
     customIcons: []
     enabled: 1
+  - builtinIcons: []
+    customIcons:
+    - CharacterController Icon
+    enabled: 1
   - builtinIcons:
     - AudioSource Icon
     - AudioClip Icon
@@ -77,5 +81,8 @@ MonoBehaviour:
     - PreMatQuad
     - Favorite
     - Settings Icon
+    customIcons: []
+    enabled: 1
+  - builtinIcons: []
     customIcons: []
     enabled: 1
