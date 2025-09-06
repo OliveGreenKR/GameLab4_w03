@@ -43,6 +43,28 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     [SerializeField] private float _baseDamage = 10f;
     #endregion
 
+    #region Events
+    /// <summary>
+    /// 투사체가 활성화될 때 발생하는 이벤트
+    /// </summary>
+    public event System.Action<ProjectileBase> OnProjectileActivated;
+
+    /// <summary>
+    /// 투사체가 충돌했을 때 발생하는 이벤트
+    /// </summary>
+    public event System.Action<ProjectileBase, Collider> OnProjectileHit;
+
+    /// <summary>
+    /// 투사체가 소멸될 때 발생하는 이벤트
+    /// </summary>
+    public event System.Action<ProjectileBase> OnProjectileDestroyed;
+
+    /// <summary>
+    /// 투사체 업데이트 시 발생하는 이벤트 (매 프레임)
+    /// </summary>
+    public event System.Action<ProjectileBase> OnProjectileUpdate;
+    #endregion
+
     #region IBattleEntity Implementation
     public Transform Transform => transform;
     public GameObject GameObject => gameObject;
@@ -109,9 +131,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
 
     #region Private Fields
     private float _remainingLifetime;
-
-    [SerializeField]
-    private List<IProjectileEffect> _effects = new List<IProjectileEffect>();
     #endregion
 
     #region Unity Lifecycle
@@ -123,32 +142,33 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     {
         UpdateLifetime();
         GoForward();
-        ProcessEffectsOnUpdate();
+        OnProjectileUpdate?.Invoke(this);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log($"{gameObject.name} hit {other.gameObject.name}");
-
-        ProcessEffectsOnHit(other);
+        OnProjectileHit?.Invoke(this, other);
         ProcessBattleInteraction(other);
     }
 
     private void OnEnable()
     {
         _remainingLifetime = _lifetimeSeconds;
-        OnProjectileActivated();
+        OnProjectileActivated?.Invoke(this);
         InitializeBattleStatEvents();
     }
 
     private void OnDisable()
     {
         UnsubscribeBattleStatEvents();
-        OnProjectileDeactivated();
+        OnProjectileDestroyed?.Invoke(this);
     }
 
     private void OnDestroy()
     {
+        OnProjectileDestroyed?.Invoke(this);
+        ClearAllEvents();
         UnsubscribeBattleStatEvents();
     }
 
@@ -180,31 +200,8 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
         _baseDamage = Mathf.Max(0f, damage);
     }
 
-    public void AddEffect(IProjectileEffect effect)
-    {
-        if (effect == null) return;
-
-        bool shouldAdd = effect.OnAttachedProjectile(this, _effects);
-
-        if (shouldAdd)
-        {
-            _effects.Add(effect);
-            SortEffectsByPriority();
-        }
-    }
-
-    public void RemoveEffect(IProjectileEffect effect)
-    {
-        if (effect != null)
-        {
-            _effects.Remove(effect);
-        }
-    }
-
     public void DestroyProjectile()
     {
-        ProcessEffectsOnDestroy();
-
         if (ProjectileManager.Instance != null)
         {
             ProjectileManager.Instance.ReturnProjectile(this);
@@ -221,16 +218,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     {
         transform.Translate(Vector3.forward * _forwardSpeedUnitsPerSecond * Time.deltaTime);
     }
-
-    protected virtual void OnProjectileActivated()
-    {
-        // 자식 클래스에서 오버라이드
-    }
-
-    protected virtual void OnProjectileDeactivated()
-    {
-        // 자식 클래스에서 오버라이드
-    }
     #endregion
 
     #region Private Methods
@@ -243,38 +230,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
             DestroyProjectile();
         }
     }
-
-    private void ProcessEffectsOnHit(Collider target)
-    {
-        for (int i = 0; i < _effects.Count; i++)
-        {
-            _effects[i].OnHit(this, target);
-        }
-    }
-
-    private void ProcessEffectsOnDestroy()
-    {
-        for (int i = 0; i < _effects.Count; i++)
-        {
-            _effects[i].OnDestroy(this);
-        }
-
-        _effects.Clear();
-    }
-
-    private void ProcessEffectsOnUpdate()
-    {
-        for (int i = 0; i < _effects.Count; i++)
-        {
-            _effects[i].OnUpdate(this);
-        }
-    }
-
-    private void SortEffectsByPriority()
-    {
-        _effects = _effects.OrderBy(effect => effect.Priority).ToList();
-    }
-
     private void ProcessBattleInteraction(Collider other)
     {
         IBattleEntity targetEntity = other.GetComponent<IBattleEntity>();
@@ -283,6 +238,13 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
             Debug.Log($"{gameObject.name} ({TeamId}) attacks {other.gameObject.name} ({targetEntity.TeamId}) for {_baseDamage} damage.");
             DealDamage(targetEntity, _baseDamage);
         }
+    }
+    private void ClearAllEvents()
+    {
+        OnProjectileActivated = null;
+        OnProjectileHit = null;
+        OnProjectileDestroyed = null;
+        OnProjectileUpdate = null;
     }
     #endregion
 
