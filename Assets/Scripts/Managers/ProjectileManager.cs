@@ -1,8 +1,10 @@
 ﻿using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class ProjectileManager : MonoBehaviour
 {
     #region Singleton
@@ -19,9 +21,11 @@ public class ProjectileManager : MonoBehaviour
     #endregion
 
     #region Private Fields
+
+    [OdinSerialize]
     private Dictionary<Type, Queue<ProjectileBase>> _projectilePools;
 
-    [SerializeField]
+    [OdinSerialize]
     [DictionaryDrawerSettings(KeyLabel = "Projectile Type", ValueLabel = "Prefabs")]
     private Dictionary<Type, ProjectileBase> _projectilePrefabs;
     #endregion
