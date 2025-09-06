@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: testWallStat
   m_EditorClassIdentifier: 
   _baseHealth: 1
-  _maxHealth: 5
-  _baseAttack: 1
+  _maxHealth: 1
+  _baseAttack: 0
   _baseAttackSpeed: 0.1
   _baseEffectRange: 0.1

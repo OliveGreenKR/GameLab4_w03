@@ -235,8 +235,9 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
         IBattleEntity targetEntity = other.GetComponent<IBattleEntity>();
         if (targetEntity != null)
         {
-            Debug.Log($"{gameObject.name} ({TeamId}) attacks {other.gameObject.name} ({targetEntity.TeamId}) for {_baseDamage} damage.");
-            DealDamage(targetEntity, _baseDamage);
+            float damage = DealDamage(targetEntity, _baseDamage);
+            Debug.Log($"{gameObject.name} ({TeamId}) attacks {other.gameObject.name} ({targetEntity.TeamId}) for {_baseDamage} base damage.");
+            
         }
     }
     private void ClearAllEvents()
