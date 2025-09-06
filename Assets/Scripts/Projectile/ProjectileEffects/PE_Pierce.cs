@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 
-using System.Collections.Generic;
-
 /// <summary>
 /// 투사체의 관통력 추가, 관통할 때마다 데미지 감소시킴.
-/// 중복 추가 시 관통력만 추가하고, 실제로 부착되지는 않음(데미지 감소 중복 획득 방지)
+/// 플레이어가 소유하며 투사체에 이벤트 구독 방식으로 효과 적용
 /// </summary>
 public class PierceEffect : IProjectileEffect
 {
@@ -24,46 +22,34 @@ public class PierceEffect : IProjectileEffect
     #endregion
 
     #region IProjectileEffect Implementation
-    public bool OnAttachedProjectile(ProjectileBase owner, List<IProjectileEffect> existingEffects)
+    public void AttachToProjectile(ProjectileBase projectile)
     {
-        // 항상 체력 증가 (관통력 누적)
-        owner.ModifyStat(BattleStatType.Health, _pierceCount);
+        // 관통력 증가 (체력 증가)
+        projectile.ModifyStat(BattleStatType.Health, _pierceCount);
 
-        // 기존 PE 존재시 새로운 PE는 리스트에 추가 안 함
-        for (int i = 0; i < existingEffects.Count; i++)
-        {
-            if (existingEffects[i] is PierceEffect)
-            {
-                return false; // 리스트 추가 거부
-            }
-        }
+        // 관통시 데미지 감소 이벤트 구독
+        projectile.OnProjectileHit += OnProjectileHit;
 
-        return true; // 최초 PE만 리스트 추가
+        Debug.Log($"[PierceEffect] Attached to {projectile.name} with {_pierceCount} pierce count");
     }
 
-    public void OnHit(ProjectileBase owner, Collider target)
+    public void DetachFromProjectile(ProjectileBase projectile)
     {
-        // 단일 PE만 존재하므로 정확히 1회만 호출됨
-        float currentAttack = owner.GetStat(BattleStatType.Attack);
-        owner.SetStat(BattleStatType.Attack, currentAttack * 0.4f);
-    }
+        // 이벤트 구독 해제
+        projectile.OnProjectileHit -= OnProjectileHit;
 
-    public void OnDestroy(ProjectileBase owner)
-    {
-        // 소멸 시 특별한 처리 없음
-    }
-
-    public void OnUpdate(ProjectileBase owner)
-    {
-        // 매 프레임 처리 없음
+        Debug.Log($"[PierceEffect] Detached from {projectile.name}");
     }
     #endregion
 
-    #region Battle Stat Modifier
-    private void OnAttached()
+    #region Private Methods
+    private void OnProjectileHit(ProjectileBase projectile, Collider target)
     {
-        Debug.Log("PierceAttached!");
+        // 관통할 때마다 데미지 감소 (60% 유지)
+        float currentAttack = projectile.GetStat(BattleStatType.Attack);
+        projectile.SetStat(BattleStatType.Attack, currentAttack * 0.6f);
+
+        Debug.Log($"[PierceEffect] Pierce damage reduced to {currentAttack * 0.6f}");
     }
     #endregion
-
 }
