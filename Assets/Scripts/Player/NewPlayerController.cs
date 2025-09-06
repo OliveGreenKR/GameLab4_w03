@@ -1,8 +1,9 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
-public class NewPlayerController : MonoBehaviour, IReSpawnable
+public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvider
 {
     #region Serialized Fields
     [TabGroup("References")]
@@ -26,10 +27,10 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
     [SuffixLabel("units/sec")]
     [SerializeField] private float _maxSpeedUnitsPerSecond = 10f;
 
-    [TabGroup("Movement", "Basic")]
-    [PropertyRange(0f, 720f)]
-    [SuffixLabel("degrees/sec")]
-    [SerializeField] private float _characterRotateSpeed = 180f;
+    //[TabGroup("Movement", "Basic")]
+    //[PropertyRange(0f, 720f)]
+    //[SuffixLabel("degrees/sec")]
+    //[SerializeField] private float _characterRotateSpeed = 180f;
 
     [TabGroup("Gravity")]
     [SerializeField] private bool _usePhysicsScale = true;
@@ -133,6 +134,18 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
     {
         DisableInput();
     }
+    #endregion
+
+    #region IInputEventProvider Implementation
+    /// <summary>
+    /// 조준 모드 시작 이벤트
+    /// </summary>
+    public event Action OnAimModeStarted;
+
+    /// <summary>
+    /// 조준 모드 종료 이벤트
+    /// </summary>
+    public event Action OnAimModeEnded;
     #endregion
 
     #region IReSpawnable Implementation
@@ -348,7 +361,8 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
         Vector3 movement = _currentVelocity * Time.deltaTime;
         _characterController.Move(movement);
     }
-
+    #endregion
+    #region Input Callbacks
     private void OnMovePerformed(InputAction.CallbackContext context)
     {
         _currentMoveInput = context.ReadValue<Vector2>();
@@ -364,7 +378,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
         // 지면에 있거나 코요테 타임 내에서만 점프 가능
         if (IsGrounded || _coyoteTimeRemaining > 0f)
         {
-            if(_usePhysicsScale)
+            if (_usePhysicsScale)
                 _currentVelocity.y = Mathf.Sqrt(_jumpHeight * 2.0f * Physics.gravity.magnitude);
             else
                 _currentVelocity.y = Mathf.Sqrt(_jumpHeight * 2.0f * _gravityScale);
@@ -372,7 +386,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
             _coyoteTimeRemaining = 0f; // 코요테 타임 소모
         }
 
-        Debug.Log($"Jump Performed : {_currentVelocity.y}");  
+        Debug.Log($"Jump Performed : {_currentVelocity.y}");
     }
 
     private void OnMouseClicked(InputAction.CallbackContext context)
@@ -382,12 +396,15 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable
 
     private void OnMouseRightPressed(InputAction.CallbackContext context)
     {
+        OnAimModeStarted?.Invoke();
         Debug.Log("[NewPlayerController] Mouse Right Pressed");
     }
 
     private void OnMouseRightCancled(InputAction.CallbackContext context)
     {
+        OnAimModeEnded?.Invoke();
         Debug.Log("[NewPlayerController] Mouse Right Cancled");
     }
     #endregion
+
 }

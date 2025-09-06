@@ -15,5 +15,6 @@ MonoBehaviour:
   _offsetDistance: {x: 1.61, y: 0.59, z: -1.99}
   _offsetRotationDegrees: {x: 0, y: 0, z: 0}
   _fieldOfView: 60
+  _isEnableDamping: 0
   _positionDampingSpeed: {x: 20, y: 5, z: 20}
   _rotationDampingSpeed: {x: 90, y: 90, z: 90}

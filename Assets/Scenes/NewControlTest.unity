@@ -1038,21 +1038,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 1173287276}
+  _inputEventProviderGameObject: {fileID: 1802387322}
   _enablePositionTracking: 1
   _enableRotationTracking: 1
   _offsetRotationDegrees: {x: 0, y: 0, z: 0}
-  _offsetDistance: {x: 1.61, y: 0.59, z: -2.44}
+  _offsetDistance: {x: 1.61, y: 0.59, z: -1.99}
   _positionDampingSpeed: {x: 20, y: 5, z: 20}
   _rotationDampingSpeed: {x: 90, y: 90, z: 90}
   _dampingThresholdRatio: 0.05
-  _positionThreshold: 0.001
-  _rotationThreshold: 0.001
-  _enableDamping: 1
+  _positionThreshold: 0.00001
+  _rotationThreshold: 0.000001
+  _enableDamping: 0
   _defaultSettings: {fileID: 11400000, guid: 381cfbc436f22cf4ab8cbbba182b71a5, type: 2}
   _aimCameraSettings: {fileID: 11400000, guid: 27ff910b321311b4199767a92d435d91, type: 2}
-  _currentSettings: {fileID: 11400000, guid: 381cfbc436f22cf4ab8cbbba182b71a5, type: 2}
+  _currentSettings: {fileID: 11400000, guid: 27ff910b321311b4199767a92d435d91, type: 2}
   _targetSettings: {fileID: 11400000, guid: 27ff910b321311b4199767a92d435d91, type: 2}
-  _settingsTransitionSpeed: 5
+  _settingsTransitionSpeed: 20
 --- !u!1 &1660262971
 GameObject:
   m_ObjectHideFlags: 0
@@ -1465,6 +1466,37 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!1 &1706992993
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1706992994}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1706992994
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706992993}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.9923763, y: 2.1441977, z: 0.08062489}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1752932337
 GameObject:
   m_ObjectHideFlags: 0
@@ -1616,8 +1648,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterController: {fileID: 1802387328}
   _camera: {fileID: 1605510719}
-  _moveSpeedUnitsPerSecond: 10
-  _maxSpeedUnitsPerSecond: 10
+  _moveSpeedUnitsPerSecond: 20
+  _maxSpeedUnitsPerSecond: 30
   _characterRotateSpeed: 180
   _usePhysicsScale: 1
   _gravityScale: 9.81
@@ -1874,3 +1906,4 @@ SceneRoots:
   - {fileID: 663990586}
   - {fileID: 1605510716}
   - {fileID: 1802387326}
+  - {fileID: 1706992994}
