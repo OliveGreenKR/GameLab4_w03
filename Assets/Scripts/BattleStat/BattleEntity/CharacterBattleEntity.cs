@@ -52,7 +52,7 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     public void OnDeath(IBattleEntity killer = null)
     {
         Debug.Log($"{gameObject.name} has died.", this);
-        OnPlayerDeath?.Invoke(killer);
+        OnCharacterDeath?.Invoke(killer);
     }
 
     public float GetStat(BattleStatType statType)
@@ -83,14 +83,14 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
 
     #region Events
     /// <summary>
-    /// 플레이어가 죽었을 때 발생하는 이벤트
+    /// 캐릭터가 죽었을 때 발생하는 이벤트
     /// </summary>
-    public event Action<IBattleEntity> OnPlayerDeath;
+    public event Action<IBattleEntity> OnCharacterDeath;
 
     /// <summary>
-    /// 플레이어가 데미지를 받았을 때 발생하는 이벤트
+    /// 캐릭터가 데미지를 받았을 때 발생하는 이벤트
     /// </summary>
-    public event Action<float, IBattleEntity> OnPlayerDamaged;
+    public event Action<float, IBattleEntity> OnCharacterDamaged;
     #endregion
 
     #region Private Fields
@@ -195,7 +195,7 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
 
     private void OnBattleStatDamageTaken(float damage, IBattleEntity attacker)
     {
-        OnPlayerDamaged?.Invoke(damage, attacker);
+        OnCharacterDamaged?.Invoke(damage, attacker);
     }
 
     private void OnBattleStatDeath(IBattleEntity killer)
