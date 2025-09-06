@@ -21,7 +21,7 @@ public class BattleStatData : ScriptableObject
     [BoxGroup("Base Stats")]
     [Header("Combat")]
     [SuffixLabel("damage")]
-    [PropertyRange(1f, 10000f)]
+    [PropertyRange(0.0f, 10000f)]
     [SerializeField] private float _baseAttack = 10f;
 
     [BoxGroup("Base Stats")]

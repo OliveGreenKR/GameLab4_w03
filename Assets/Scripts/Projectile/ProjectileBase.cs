@@ -7,7 +7,7 @@ using UnityEngine;
 ///  Projectile Base, 이펙트 부착이 가능하며
 /// 생명 주기는 스스로 관리. 매니저를 통해 생명주기의 완료 프로세스를 위탁
 /// </summary>
-public class ProjectileBase : MonoBehaviour
+public class ProjectileBase : MonoBehaviour, IBattleEntity
 {
     #region Serialized Fields
     [TabGroup("Movement")]
@@ -29,6 +29,56 @@ public class ProjectileBase : MonoBehaviour
     [Header("RigidBody")]
     [Required]
     [SerializeField] protected Rigidbody _rigid;
+
+    [TabGroup("Battle")]
+    [Header("Battle System")]
+    [Required]
+    [SerializeField] private BattleStatComponent _battleStat;
+
+    [TabGroup("Battle")]
+    [SerializeField] private int _teamId = 0;
+
+    [TabGroup("Battle")]
+    [SuffixLabel("damage")]
+    [SerializeField] private float _baseDamage = 10f;
+    #endregion
+
+    #region IBattleEntity Implementation
+    public Transform Transform => transform;
+    public GameObject GameObject => gameObject;
+    public bool IsAlive => gameObject.activeInHierarchy && _battleStat != null && _battleStat.IsAlive;
+    public int TeamId => _teamId;
+
+    public float TakeDamage(IBattleEntity attacker, float damage)
+    {
+        if (_battleStat == null) return 0f;
+        return _battleStat.ApplyDamage(damage, attacker);
+    }
+
+    public float DealDamage(IBattleEntity target, float baseDamage)
+    {
+        return BattleInteractionSystem.ProcessDamageInteraction(this, target, baseDamage);
+    }
+
+    public void OnDeath(IBattleEntity killer = null)
+    {
+        DestroyProjectile();
+    }
+
+    public float GetStat(BattleStatType statType)
+    {
+        return _battleStat != null ? _battleStat.GetStat(statType) : 0f;
+    }
+
+    public void SetStat(BattleStatType statType, float value)
+    {
+        _battleStat?.SetStat(statType, value);
+    }
+
+    public void ModifyStat(BattleStatType statType, float delta)
+    {
+        _battleStat?.ModifyStat(statType, delta);
+    }
     #endregion
 
     #region Properties
@@ -47,6 +97,10 @@ public class ProjectileBase : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public bool IsActive => gameObject.activeInHierarchy;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float BaseDamage => _baseDamage;
     #endregion
 
     #region Private Fields
@@ -66,11 +120,10 @@ public class ProjectileBase : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"{gameObject.name} hit {other.gameObject.name}");    
+        Debug.Log($"{gameObject.name} hit {other.gameObject.name}");
 
         ProcessEffectsOnHit(other);
-        InteractBattleStat(); // 배틀 스탯 상호작용 처리
-
+        ProcessBattleInteraction(other);
     }
 
     private void OnEnable()
@@ -99,6 +152,16 @@ public class ProjectileBase : MonoBehaviour
         }
 
         _remainingLifetime = _lifetimeSeconds;
+    }
+
+    public void SetTeamId(int teamId)
+    {
+        _teamId = teamId;
+    }
+
+    public void SetBaseDamage(float damage)
+    {
+        _baseDamage = Mathf.Max(0f, damage);
     }
 
     public void AddEffect(IProjectileEffect effect)
@@ -195,13 +258,14 @@ public class ProjectileBase : MonoBehaviour
     {
         _effects = _effects.OrderBy(effect => effect.Priority).ToList();
     }
-    #endregion
 
-    #region Battle Stat Modifier
-    private void InteractBattleStat()
+    private void ProcessBattleInteraction(Collider other)
     {
-        Debug.Log($"{gameObject.name} Battle Stat Interaction!");
-
+        IBattleEntity targetEntity = other.GetComponent<IBattleEntity>();
+        if (targetEntity != null)
+        {
+            DealDamage(targetEntity, _baseDamage);
+        }
     }
     #endregion
 }
