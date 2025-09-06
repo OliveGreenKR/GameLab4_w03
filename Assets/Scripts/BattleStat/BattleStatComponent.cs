@@ -204,10 +204,15 @@ public class BattleStatComponent : MonoBehaviour
         if (!IsAlive || damage <= 0f)
             return 0f;
 
+        float oldHealth = CurrentHealth;
         float actualDamage = Mathf.Min(damage, CurrentHealth);
         CurrentHealth -= actualDamage;
 
+        // 즉시 데미지 이벤트 호출
         OnDamageTaken?.Invoke(actualDamage, attacker);
+
+        // 체력 변화 이벤트도 즉시 호출
+        TriggerStatChanged(BattleStatType.Health, oldHealth, CurrentHealth);
 
         if (CurrentHealth <= 0f)
         {

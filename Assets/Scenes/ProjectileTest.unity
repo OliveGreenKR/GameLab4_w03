@@ -297,10 +297,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseHealth: 100
-  _baseAttack: 10
-  _baseAttackSpeed: 1
-  _baseEffectRange: 1
   _teamId: 1
   _statData: {fileID: 11400000, guid: bde5c934bd0e9aa4a9d77850234a8cb3, type: 2}
 --- !u!65 &183619628
@@ -519,7 +515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecb752aaf75e34c4bae0599e05e9a873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _forwardSpeedUnitsPerSecond: 100
+  _forwardSpeedUnitsPerSecond: 30
   _lifetimeSeconds: 2
   _attackTrigger: {fileID: 718214833}
   _rigid: {fileID: 718214837}
@@ -641,7 +637,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &718214838
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -654,10 +650,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseHealth: 100
-  _baseAttack: 10
-  _baseAttackSpeed: 1
-  _baseEffectRange: 1
   _teamId: 0
   _statData: {fileID: 11400000, guid: dc50f5d2a5597a64e8b57e45f7a22b7a, type: 2}
 --- !u!1 &734082807
@@ -891,10 +883,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseHealth: 100
-  _baseAttack: 10
-  _baseAttackSpeed: 1
-  _baseEffectRange: 1
   _teamId: 1
   _statData: {fileID: 11400000, guid: bde5c934bd0e9aa4a9d77850234a8cb3, type: 2}
 --- !u!114 &823887402
@@ -1505,10 +1493,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseHealth: 100
-  _baseAttack: 10
-  _baseAttackSpeed: 1
-  _baseEffectRange: 1
   _teamId: 1
   _statData: {fileID: 11400000, guid: bde5c934bd0e9aa4a9d77850234a8cb3, type: 2}
 --- !u!65 &1835436096

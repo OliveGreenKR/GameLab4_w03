@@ -115,6 +115,10 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     #endregion
 
     #region Unity Lifecycle
+    private void Start()
+    {
+        InitializeBattleStatEvents();
+    }
     private void Update()
     {
         UpdateLifetime();
@@ -134,12 +138,20 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     {
         _remainingLifetime = _lifetimeSeconds;
         OnProjectileActivated();
+        InitializeBattleStatEvents();
     }
 
     private void OnDisable()
     {
+        UnsubscribeBattleStatEvents();
         OnProjectileDeactivated();
     }
+
+    private void OnDestroy()
+    {
+        UnsubscribeBattleStatEvents();
+    }
+
     #endregion
 
     #region Public Methods
@@ -273,4 +285,21 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
         }
     }
     #endregion
+
+    #region Privae Binding BattleCompoenet Events
+    private void InitializeBattleStatEvents()
+    {
+        if (_battleStat == null) return;
+
+        _battleStat.OnDeath -= OnDeath;
+        _battleStat.OnDeath += OnDeath;
+    }
+
+    private void UnsubscribeBattleStatEvents()
+    {
+        if (_battleStat == null) return;
+
+        _battleStat.OnDeath -= OnDeath;
+    }
+    #endregion 
 }
