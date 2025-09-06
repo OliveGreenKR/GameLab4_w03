@@ -80,6 +80,7 @@ public interface IBattleEntity
 public enum BattleStatType
 {
     Health,         // 체력 (수치)
+    MaxHealth,      // 최대 체력 (수치)
     Attack,         // 공격력 (수치)
     AttackSpeed,    // 공격속도 (수치)
     EffectRange,    // 효과범위 (배수)
