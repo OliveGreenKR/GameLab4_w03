@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-public class PlayerBattleEntity : MonoBehaviour, IBattleEntity
+public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
 {
     #region Serialized Fields
     [TabGroup("Battle")]
@@ -51,7 +51,7 @@ public class PlayerBattleEntity : MonoBehaviour, IBattleEntity
 
     public void OnDeath(IBattleEntity killer = null)
     {
-        Debug.Log("[PlayerBattleEntity] Player has died.", this);
+        Debug.Log($"{gameObject.name} has died.", this);
         OnPlayerDeath?.Invoke(killer);
     }
 

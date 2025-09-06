@@ -235,8 +235,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
         {
             float damage = DealDamage(targetEntity, _baseDamage);
             _battleStat.ApplyDamage(1.0f);//투사체는 공격시도마다 체력 1 감소 (관통 방지)
-            Debug.Log($"{gameObject.name} ({TeamId}) attacks {other.gameObject.name} ({targetEntity.TeamId}) for {_baseDamage} base damage.");
-            
+            //Debug.Log($"{gameObject.name} ({TeamId}) attacks {other.gameObject.name} ({targetEntity.TeamId}) for {_baseDamage} base damage.");
         }
     }
     private void ClearAllEvents()
