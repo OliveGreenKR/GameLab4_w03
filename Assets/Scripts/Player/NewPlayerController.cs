@@ -56,16 +56,6 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     [SuffixLabel("seconds")]
     [SerializeField] private float _coyoteTimeDurationSeconds = 0.2f;
 
-    [TabGroup("Movement", "Damping")]
-    [Header("Movement Damping")]
-    [PropertyRange(1f, 20f)]
-    [SuffixLabel("speed")]
-    [SerializeField] private float _groundDampingSpeed = 10f;
-
-    [TabGroup("Movement", "Damping")]
-    [PropertyRange(1f, 20f)]
-    [SuffixLabel("speed")]
-    [SerializeField] private float _airDampingSpeed = 5f;
     #endregion
 
     #region Properties

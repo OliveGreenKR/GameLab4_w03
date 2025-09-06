@@ -1,8 +1,20 @@
 ﻿using Sirenix.OdinInspector;
+using System;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class ThirdPersonCameraController : MonoBehaviour
 {
+    enum DampingMode
+    {
+        IndependentAxis,
+        ExponentialDecay,
+        UnifiedDirectionPreserving,
+        CriticalDamping,
+    }
+
     #region Serialized Fields
     [TabGroup("Target")]
     [Header("Follow Target")]
@@ -40,10 +52,16 @@ public class ThirdPersonCameraController : MonoBehaviour
     [SuffixLabel("degrees per second")]
     [SerializeField] private Vector3 _rotationDampingSpeed = new Vector3(90f, 90f, 90f);
 
-    [TabGroup("Damping", "Settings")]
-    [Header("Damping Settings")]
-    [InfoBox("Prevents overshooting when close to target")]
-    [SerializeField] private float _dampingThresholdRatio = 0.05f;
+    [TabGroup("Damping", "Mode")]
+    [Header("Damping Mode")]
+    [SerializeField] private DampingMode _positionDampMode = DampingMode.ExponentialDecay;
+    [TabGroup("Damping", "Mode")]
+    [SerializeField] private DampingMode _rotationDampMode = DampingMode.ExponentialDecay;
+
+    //[TabGroup("Damping", "Settings")]
+    //[Header("Damping Settings")]
+    //[InfoBox("Prevents overshooting when close to target")]
+    //[SerializeField] private float _dampingThresholdRatio = 0.05f;
 
     [TabGroup("Threshold")]
     [Header("Tracking Thresholds")]
@@ -303,7 +321,9 @@ public class ThirdPersonCameraController : MonoBehaviour
         _targetWorldPosition = finalPosition;
         _targetWorldRotationDegrees = finalRotation.eulerAngles;
     }
+    #endregion
 
+    #region Damping and Tracking
     private void TrackToTarget()
     {
         if (_enablePositionTracking)
@@ -322,7 +342,6 @@ public class ThirdPersonCameraController : MonoBehaviour
         Vector3 currentPosition = transform.position;
         float positionDistance = Vector3.Distance(currentPosition, _targetWorldPosition);
 
-       
         if (positionDistance > _positionThreshold)
         {
             if (!_enableDamping)
@@ -331,57 +350,19 @@ public class ThirdPersonCameraController : MonoBehaviour
                 return;
             }
 
-            //// 기존 댐핑 로직
-            //Vector3 dampingSpeed = new Vector3(
-            //    _positionDampingSpeed.x * Time.deltaTime,
-            //    _positionDampingSpeed.y * Time.deltaTime,
-            //    _positionDampingSpeed.z * Time.deltaTime
-            //);
-
-            //Vector3 nextPosition = new Vector3(
-            //    Mathf.Lerp(currentPosition.x, _targetWorldPosition.x, dampingSpeed.x),
-            //    Mathf.Lerp(currentPosition.y, _targetWorldPosition.y, dampingSpeed.y),
-            //    Mathf.Lerp(currentPosition.z, _targetWorldPosition.z, dampingSpeed.z)
-            //);
-
-            //float stepDistance = Vector3.Distance(currentPosition, nextPosition);
-            //float avgDampingSpeed = (_positionDampingSpeed.x + _positionDampingSpeed.y + _positionDampingSpeed.z) / 3f;
-
-            //if (stepDistance < avgDampingSpeed * _dampingThresholdRatio * Time.deltaTime)
-            //{
-            //    transform.position = _targetWorldPosition;
-            //}
-            //else
-            //{
-            //    transform.position = nextPosition;
-            //}
-
-            // 통합 댐핑 - 단일 Lerp 사용
-            float dampingSpeed = _positionDampingSpeed.x * Time.deltaTime;
-            Vector3 nextPosition = Vector3.Lerp(currentPosition, _targetWorldPosition, dampingSpeed);
-
-            // 단순한 거리 기반 임계값
-            if (Vector3.Distance(nextPosition, _targetWorldPosition) < _positionThreshold)
-            {
-                transform.position = _targetWorldPosition;
-            }
-            else
-            {
-                transform.position = nextPosition;
-            }
-
-   
+            Vector3 nextPosition = DampVector3(currentPosition, _targetWorldPosition, _positionDampMode);
+            transform.position = nextPosition;
         }
     }
 
     private void TrackRotation()
     {
-        Quaternion targetRotation = Quaternion.Euler(_targetWorldRotationDegrees);
         Quaternion currentRotation = transform.rotation;
+        Quaternion targetRotation = Quaternion.Euler(_targetWorldRotationDegrees);
 
-        float rotationAngle = Quaternion.Angle(currentRotation, targetRotation);
+        float angularDistance = Quaternion.Angle(currentRotation, targetRotation);
 
-        if (rotationAngle > _rotationThreshold)
+        if (angularDistance > _rotationThreshold)
         {
             if (!_enableDamping)
             {
@@ -389,38 +370,103 @@ public class ThirdPersonCameraController : MonoBehaviour
                 return;
             }
 
-            // 기존 댐핑 로직
-            Vector3 dampingSpeed = new Vector3(
-                _rotationDampingSpeed.x * Time.deltaTime,
-                _rotationDampingSpeed.y * Time.deltaTime,
-                _rotationDampingSpeed.z * Time.deltaTime
-            );
+            Quaternion nextRotation = DampQuaternion(currentRotation, targetRotation, _rotationDampMode);
+            transform.rotation = nextRotation;
+        }
+    }
 
-            Vector3 currentEuler = currentRotation.eulerAngles;
-            Vector3 targetEuler = _targetWorldRotationDegrees;
+    private Vector3 DampVector3(Vector3 current, Vector3 target, DampingMode mode)
+    {
+        float distance = Vector3.Distance(current, target);
 
-            float deltaX = Mathf.DeltaAngle(currentEuler.x, targetEuler.x);
-            float deltaY = Mathf.DeltaAngle(currentEuler.y, targetEuler.y);
-            float deltaZ = Mathf.DeltaAngle(currentEuler.z, targetEuler.z);
+        switch (mode)
+        {
+            case DampingMode.IndependentAxis:
+                {
+                    Vector3 dampingSpeed = new Vector3(
+                        _positionDampingSpeed.x * Time.deltaTime,
+                        _positionDampingSpeed.y * Time.deltaTime,
+                        _positionDampingSpeed.z * Time.deltaTime
+                    );
+                    return new Vector3(
+                        Mathf.Lerp(current.x, target.x, dampingSpeed.x),
+                        Mathf.Lerp(current.y, target.y, dampingSpeed.y),
+                        Mathf.Lerp(current.z, target.z, dampingSpeed.z)
+                    );
+                }
+            case DampingMode.UnifiedDirectionPreserving:
+                {
+                    Vector3 direction = (target - current).normalized;
+                    float dampingRate = _positionDampingSpeed.x;
+                    float dampedDistance = distance * Mathf.Exp(-dampingRate * Time.deltaTime);
+                    return current + direction * (distance - dampedDistance);
+                }
+            case DampingMode.ExponentialDecay:
+                {
+                    float dampingRate = _positionDampingSpeed.x;
+                    return target + (current - target) * Mathf.Exp(-dampingRate * Time.deltaTime);
+                }
+            case DampingMode.CriticalDamping:
+                {
+                    float dampingRate = _positionDampingSpeed.x;
+                    float t = 1.0f - Mathf.Exp(-dampingRate * Time.deltaTime);
+                    return Vector3.Lerp(current, target, t);
+                }
+            default:
+                return current;
+        }
+    }
 
-            Vector3 nextEuler = new Vector3(
-                currentEuler.x + deltaX * dampingSpeed.x,
-                currentEuler.y + deltaY * dampingSpeed.y,
-                currentEuler.z + deltaZ * dampingSpeed.z
-            );
+    private Quaternion DampQuaternion(Quaternion current, Quaternion target, DampingMode mode)
+    {
+        float angularDistance = Quaternion.Angle(current, target);
 
-            Quaternion nextRotation = Quaternion.Euler(nextEuler);
-            float stepAngle = Quaternion.Angle(currentRotation, nextRotation);
-            float avgDampingSpeed = (_rotationDampingSpeed.x + _rotationDampingSpeed.y + _rotationDampingSpeed.z) / 3f;
+        switch (mode)
+        {
+            case DampingMode.IndependentAxis:
+                {
+                    Vector3 dampingSpeed = new Vector3(
+                        _rotationDampingSpeed.x * Time.deltaTime,
+                        _rotationDampingSpeed.y * Time.deltaTime,
+                        _rotationDampingSpeed.z * Time.deltaTime
+                    );
 
-            if (stepAngle < avgDampingSpeed * _dampingThresholdRatio * Time.deltaTime)
-            {
-                transform.rotation = targetRotation;
-            }
-            else
-            {
-                transform.rotation = nextRotation;
-            }
+                    Vector3 currentEuler = current.eulerAngles;
+                    Vector3 targetEuler = target.eulerAngles;
+
+                    float deltaX = Mathf.DeltaAngle(currentEuler.x, targetEuler.x);
+                    float deltaY = Mathf.DeltaAngle(currentEuler.y, targetEuler.y);
+                    float deltaZ = Mathf.DeltaAngle(currentEuler.z, targetEuler.z);
+
+                    Vector3 nextEuler = new Vector3(
+                        currentEuler.x + deltaX * dampingSpeed.x,
+                        currentEuler.y + deltaY * dampingSpeed.y,
+                        currentEuler.z + deltaZ * dampingSpeed.z
+                    );
+
+                    return Quaternion.Euler(nextEuler);
+                }
+            case DampingMode.UnifiedDirectionPreserving:
+                {
+                    float dampingRate = _rotationDampingSpeed.x;
+                    float dampedAngle = angularDistance * Mathf.Exp(-dampingRate * Time.deltaTime);
+                    float progress = (angularDistance - dampedAngle) / angularDistance;
+                    return Quaternion.Slerp(current, target, progress);
+                }
+            case DampingMode.ExponentialDecay:
+                {
+                    float dampingRate = _rotationDampingSpeed.x;
+                    float t = 1.0f - Mathf.Exp(-dampingRate * Time.deltaTime);
+                    return Quaternion.Slerp(current, target, t);
+                }
+            case DampingMode.CriticalDamping:
+                {
+                    float dampingRate = _rotationDampingSpeed.x;
+                    float t = 1.0f - Mathf.Exp(-dampingRate * Time.deltaTime);
+                    return Quaternion.Slerp(current, target, t);
+                }
+            default:
+                return current;
         }
     }
     #endregion
