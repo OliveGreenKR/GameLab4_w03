@@ -51,8 +51,8 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
 
     public float TakeDamage(IBattleEntity attacker, float damage)
     {
-        if (_battleStat == null) return 0f;
-        return _battleStat.ApplyDamage(damage, attacker);
+        //투사체는 외부로부터 데미지를 받지 않음.
+        return 0.0f;
     }
 
     public float DealDamage(IBattleEntity target, float baseDamage)
