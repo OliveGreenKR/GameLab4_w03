@@ -12,44 +12,53 @@ public class PierceEffect : IProjectileEffect
 
     #region Private Fields
     private int _pierceCount = 1;
+    private float _damageReductionRatio = 0.6f;
     #endregion
 
     #region Constructor
-    public PierceEffect(int pierceCount = 1)
+    public PierceEffect(int pierceCount = 1, float damageReductionRatio = 0.6f)
     {
         _pierceCount = pierceCount;
+        _damageReductionRatio = Mathf.Clamp01(damageReductionRatio);
     }
     #endregion
 
     #region IProjectileEffect Implementation
-    public void AttachToProjectile(ProjectileBase projectile)
+    public void AttachToProjectile(IProjectile projectile)
     {
-        // 관통력 증가 (체력 증가)
-        projectile.ModifyStat(BattleStatType.Health, _pierceCount);
+        if (projectile == null)
+        {
+            Debug.LogWarning("[PierceEffect] Cannot attach to null projectile");
+            return;
+        }
+
+        // 관통력 증가 (순수 투사체 시스템)
+        projectile.ModifyPierceCount(_pierceCount);
 
         // 관통시 데미지 감소 이벤트 구독
         projectile.OnProjectileHit += OnProjectileHit;
 
-        Debug.Log($"[PierceEffect] Attached to {projectile.name} with {_pierceCount} pierce count");
+        Debug.Log($"[PierceEffect] Attached to {projectile.GameObject.name} with {_pierceCount} pierce count");
     }
 
-    public void DetachFromProjectile(ProjectileBase projectile)
+    public void DetachFromProjectile(IProjectile projectile)
     {
+        if (projectile == null) return;
+
         // 이벤트 구독 해제
         projectile.OnProjectileHit -= OnProjectileHit;
 
-        Debug.Log($"[PierceEffect] Detached from {projectile.name}");
+        Debug.Log($"[PierceEffect] Detached from {projectile.GameObject.name}");
     }
     #endregion
 
     #region Private Methods
-    private void OnProjectileHit(ProjectileBase projectile, Collider target)
+    private void OnProjectileHit(IProjectile projectile, Collider target)
     {
-        // 관통할 때마다 데미지 감소 (60% 유지)
-        float currentAttack = projectile.GetStat(BattleStatType.Attack);
-        projectile.SetStat(BattleStatType.Attack, currentAttack * 0.6f);
+        // 관통할 때마다 데미지 배율 감소 (순수 투사체 시스템)
+        projectile.ModifyDamageMultiplier(_damageReductionRatio);
 
-        Debug.Log($"[PierceEffect] Pierce damage reduced to {currentAttack * 0.6f}");
+        Debug.Log($"[PierceEffect] Pierce damage reduced by ratio {_damageReductionRatio}. Current multiplier: {projectile.DamageMultiplier}");
     }
     #endregion
 }

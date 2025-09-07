@@ -7,9 +7,13 @@ using UnityEngine;
 ///  Projectile Base, 이펙트 부착이 가능하며
 /// 생명 주기는 스스로 관리. 매니저를 통해 생명주기의 완료 프로세스를 위탁
 /// </summary>
-public class ProjectileBase : MonoBehaviour, IBattleEntity
+public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 {
     #region Serialized Fields
+    [TabGroup("Projectile")]
+    [Header("Projectile Type")]
+    [SerializeField] private ProjectileType _projectileType = ProjectileType.BasicProjectile;
+
     [TabGroup("Movement")]
     [Header("Movement Settings")]
     [SuffixLabel("units/sec")]
@@ -19,6 +23,12 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     [Header("Lifetime Settings")]
     [SuffixLabel("seconds")]
     [SerializeField] private float _lifetimeSeconds = 5f;
+
+    [TabGroup("Projectile")]
+    [Header("Projectile Stats")]
+    [SerializeField] private int _basePierceCount = 0;
+    [TabGroup("Projectile")]
+    [SerializeField] private float _baseDamageMultiplier = 1f;
 
     [TabGroup("Components")]
     [Header("Attack Trigger")]
@@ -43,26 +53,26 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     [SerializeField] private float _baseDamage = 10f;
     #endregion
 
-    #region Events
+    #region Events - IProjectile
     /// <summary>
     /// 투사체가 활성화될 때 발생하는 이벤트
     /// </summary>
-    public event System.Action<ProjectileBase> OnProjectileActivated;
+    public event System.Action<IProjectile> OnProjectileActivated;
 
     /// <summary>
     /// 투사체가 충돌했을 때 발생하는 이벤트
     /// </summary>
-    public event System.Action<ProjectileBase, Collider> OnProjectileHit;
+    public event System.Action<IProjectile, Collider> OnProjectileHit;
 
     /// <summary>
     /// 투사체가 소멸될 때 발생하는 이벤트
     /// </summary>
-    public event System.Action<ProjectileBase> OnProjectileDestroyed;
+    public event System.Action<IProjectile> OnProjectileDestroyed;
 
     /// <summary>
     /// 투사체 업데이트 시 발생하는 이벤트 (매 프레임)
     /// </summary>
-    public event System.Action<ProjectileBase> OnProjectileUpdate;
+    public event System.Action<IProjectile> OnProjectileUpdate;
     #endregion
 
     #region IBattleEntity Implementation
@@ -76,32 +86,64 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
         //투사체는 외부로부터 데미지를 받지 않음.
         return 0.0f;
     }
-     
+
     public float DealDamage(IBattleEntity target, float baseDamage)
     {
-        float actualDamage = BattleInteractionSystem.ProcessDamageInteraction(this, target, baseDamage);    
+        // 투사체 데미지 배율 적용
+        float finalDamage = baseDamage * _currentDamageMultiplier;
+        float actualDamage = BattleInteractionSystem.ProcessDamageInteraction(this, target, finalDamage);
         return actualDamage;
     }
 
     public void OnDeath(IBattleEntity killer = null)
     {
-        Debug.Log("[ProjectileBase] Projectile has been destroyed.", this); 
+        Debug.Log("[ProjectileBase] Projectile has been destroyed.", this);
         DestroyProjectile();
     }
 
-    public float GetStat(BattleStatType statType)
+    public float GetCurrentStat(BattleStatType statType)
     {
-        return _battleStat != null ? _battleStat.GetStat(statType) : 0f;
+        return _battleStat != null ? _battleStat.GetCurrentStat(statType) : 0f;
     }
 
-    public void SetStat(BattleStatType statType, float value)
+    public void SetCurrentStat(BattleStatType statType, float value)
     {
-        _battleStat?.SetStat(statType, value);
+        _battleStat?.SetCurrentStat(statType, value);
     }
 
     public void ModifyStat(BattleStatType statType, float delta)
     {
         _battleStat?.ModifyStat(statType, delta);
+    }
+    #endregion
+
+    #region IProjectile Implementation
+    public ProjectileType ProjectileType => _projectileType;
+    public bool IsActive => gameObject.activeInHierarchy;
+    public float RemainingLifetime => _remainingLifetime;
+    public float ForwardSpeed => _forwardSpeedUnitsPerSecond;
+    public int PierceCount => _currentPierceCount;
+    public float DamageMultiplier => _currentDamageMultiplier;
+
+    public void SetPierceCount(int pierceCount)
+    {
+        _currentPierceCount = Mathf.Max(0, pierceCount);
+        SyncPierceCountToBattleStat();
+    }
+
+    public void ModifyPierceCount(int delta)
+    {
+        SetPierceCount(_currentPierceCount + delta);
+    }
+
+    public void SetDamageMultiplier(float multiplier)
+    {
+        _currentDamageMultiplier = Mathf.Max(0f, multiplier);
+    }
+
+    public void ModifyDamageMultiplier(float multiplier)
+    {
+        SetDamageMultiplier(_currentDamageMultiplier * multiplier);
     }
     #endregion
 
@@ -112,23 +154,21 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public float ForwardSpeed => _forwardSpeedUnitsPerSecond;
+    public int CurrentPierceCount => _currentPierceCount;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public float RemainingLifetime => _remainingLifetime;
+    public float CurrentDamageMultiplier => _currentDamageMultiplier;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public bool IsActive => gameObject.activeInHierarchy;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float BaseDamage => _baseDamage;
+    public float CurrentAttackStat => GetCurrentStat(BattleStatType.Attack);
     #endregion
 
     #region Private Fields
     private float _remainingLifetime;
+    private int _currentPierceCount;
+    private float _currentDamageMultiplier;
     #endregion
 
     #region Unity Lifecycle
@@ -153,6 +193,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     private void OnEnable()
     {
         _remainingLifetime = _lifetimeSeconds;
+        InitializeProjectileStats();
         OnProjectileActivated?.Invoke(this);
         InitializeBattleStatEvents();
     }
@@ -186,6 +227,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
         }
 
         _remainingLifetime = _lifetimeSeconds;
+        InitializeProjectileStats();
     }
 
     public void SetTeamId(int teamId)
@@ -200,14 +242,8 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
 
     public void DestroyProjectile()
     {
-        if (ProjectileManager.Instance != null)
-        {
-            ProjectileManager.Instance.ReturnProjectile(this);
-        }
-        else
-        {
-            gameObject.SetActive(false);
-        }
+        // 단순히 비활성화만 처리, 풀 반환은 외부에서 이벤트 구독으로 처리
+        gameObject.SetActive(false);
     }
     #endregion
 
@@ -219,6 +255,22 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity
     #endregion
 
     #region Private Methods
+    private void InitializeProjectileStats()
+    {
+        _currentPierceCount = _basePierceCount;
+        _currentDamageMultiplier = _baseDamageMultiplier;
+        SyncPierceCountToBattleStat();
+    }
+
+    private void SyncPierceCountToBattleStat()
+    {
+        // 관통 횟수를 BattleStat의 Health에 직접 연동 (관통력 = 체력)
+        if (_battleStat != null)
+        {
+            _battleStat.SetCurrentStat(BattleStatType.Health, _currentPierceCount + 1); // +1: 최소 1번 충돌 가능
+        }
+    }
+
     private void UpdateLifetime()
     {
         _remainingLifetime -= Time.deltaTime;

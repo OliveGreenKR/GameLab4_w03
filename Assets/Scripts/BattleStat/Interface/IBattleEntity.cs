@@ -56,14 +56,14 @@ public interface IBattleEntity
     /// </summary>
     /// <param name="statType">스탯 타입</param>
     /// <returns>스탯 값</returns>
-    float GetStat(BattleStatType statType);
+    float GetCurrentStat(BattleStatType statType);
 
     /// <summary>
     /// 특정 스탯 값 수정
     /// </summary>
     /// <param name="statType">스탯 타입</param>
     /// <param name="value">설정할 값</param>
-    void SetStat(BattleStatType statType, float value);
+    void SetCurrentStat(BattleStatType statType, float value);
 
     /// <summary>
     /// 특정 스탯에 값 추가/감소

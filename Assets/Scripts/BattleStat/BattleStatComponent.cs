@@ -122,11 +122,11 @@ public class BattleStatComponent : MonoBehaviour
     }
 
     /// <summary>
-    /// 특정 스탯 값 조회
+    /// 특정 스탯 현재 값 조회
     /// </summary>
     /// <param name="statType">스탯 타입</param>
     /// <returns>현재 스탯 값</returns>
-    public float GetStat(BattleStatType statType)
+    public float GetCurrentStat(BattleStatType statType)
     {
         switch (statType)
         {
@@ -151,9 +151,9 @@ public class BattleStatComponent : MonoBehaviour
     /// </summary>
     /// <param name="statType">스탯 타입</param>
     /// <param name="value">설정할 값</param>
-    public void SetStat(BattleStatType statType, float value)
+    public void SetCurrentStat(BattleStatType statType, float value)
     {
-        float oldValue = GetStat(statType);
+        float oldValue = GetCurrentStat(statType);
 
         switch (statType)
         {
@@ -189,8 +189,8 @@ public class BattleStatComponent : MonoBehaviour
     /// <param name="delta">변화량</param>
     public void ModifyStat(BattleStatType statType, float delta)
     {
-        float currentValue = GetStat(statType);
-        SetStat(statType, currentValue + delta);
+        float currentValue = GetCurrentStat(statType);
+        SetCurrentStat(statType, currentValue + delta);
     }
 
     /// <summary>

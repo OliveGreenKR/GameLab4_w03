@@ -84,5 +84,13 @@ MonoBehaviour:
     customIcons: []
     enabled: 1
   - builtinIcons: []
+    customIcons:
+    - CollabError
+    - CollabConflict
+    - False
+    - console.erroricon.sml
+    - console.erroricon
+    enabled: 1
+  - builtinIcons: []
     customIcons: []
     enabled: 1

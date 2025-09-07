@@ -37,7 +37,7 @@ public static class BattleInteractionSystem
         if (!target.IsAlive)
             return 0f;
 
-        float attackerAttack = attacker.GetStat(BattleStatType.Attack);
+        float attackerAttack = attacker.GetCurrentStat(BattleStatType.Attack);
         float finalDamage = CalculateDamage(attackerAttack, baseDamage);
 
         float actualDamage = target.TakeDamage(attacker, finalDamage);

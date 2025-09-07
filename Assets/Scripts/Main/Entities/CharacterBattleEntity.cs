@@ -55,14 +55,14 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
         OnCharacterDeath?.Invoke(killer);
     }
 
-    public float GetStat(BattleStatType statType)
+    public float GetCurrentStat(BattleStatType statType)
     {
-        return _battleStat != null ? _battleStat.GetStat(statType) : 0f;
+        return _battleStat != null ? _battleStat.GetCurrentStat(statType) : 0f;
     }
 
-    public void SetStat(BattleStatType statType, float value)
+    public void SetCurrentStat(BattleStatType statType, float value)
     {
-        _battleStat?.SetStat(statType, value);
+        _battleStat?.SetCurrentStat(statType, value);
     }
 
     public void ModifyStat(BattleStatType statType, float delta)
@@ -236,7 +236,7 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
         }
 
         // 접촉 데미지 처리 (적 엔티티와 직접 접촉)
-        float contactDamage = otherEntity.GetStat(BattleStatType.Attack);
+        float contactDamage = otherEntity.GetCurrentStat(BattleStatType.Attack);
         if (contactDamage > 0f)
         {
             otherEntity.DealDamage(this, contactDamage);

@@ -1871,6 +1871,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2036164277}
+  - component: {fileID: 2036164278}
   m_Layer: 0
   m_Name: Shooter
   m_TagString: Untagged
@@ -1894,6 +1895,24 @@ Transform:
   - {fileID: 2147367924}
   m_Father: {fileID: 1676449837}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2036164278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2036164276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0f9c0f3b3eb2d342a7dac5ae6fd68d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ownerEntityGameObject: {fileID: 0}
+  _projectilePrefab: {fileID: 0}
+  _shootTransform: {fileID: 0}
+  _fireRatePerSecond: 1
+  _projectileLifetime: 5
+  _projectileSpeed: 20
 --- !u!1 &2147367923
 GameObject:
   m_ObjectHideFlags: 0
