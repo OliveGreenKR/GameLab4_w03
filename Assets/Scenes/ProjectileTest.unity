@@ -1876,10 +1876,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 435775317057005993, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: _baseSplitProjectileCount
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1923,10 +1919,6 @@ PrefabInstance:
     - target: {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
       propertyPath: m_Name
       value: ProjectileBase
-      objectReference: {fileID: 0}
-    - target: {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
