@@ -44,7 +44,6 @@ public class ProjectileLauncher : MonoBehaviour
     [SerializeField] private List<IProjectileEffect> _effects = new List<IProjectileEffect>();
     #endregion
 
-
     #region Properties
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
