@@ -55,30 +55,21 @@ public class PiercingEffectSO : ProjectileEffectSO
         if (!ValidateProjectile(projectile))
             return;
 
-        // 관통 횟수 추가
-        if (_pierceCount > 0)
+        // 관통 횟수 설정
+        if (_applicationMode == PierceApplicationMode.SetAbsolute)
         {
-            // 적용 방식에 따른 관통 횟수 설정
-            if (_applicationMode == PierceApplicationMode.SetAbsolute)
+            if (_pierceCount >= 0)
             {
                 projectile.SetPierceCount(_pierceCount);
-                LogEffect($"Set pierce count to {_pierceCount}. Current total: {projectile.PierceCount}", projectile);
-            }
-            else // AddToExisting
-            {
-                projectile.ModifyPierceCount(_pierceCount);
-                LogEffect($"Added {_pierceCount} pierce count. New total: {projectile.PierceCount}", projectile);
             }
         }
 
-        // 데미지 배수 적용
+        // 충돌 이벤트 구독 (데미지 배수는 충돌할 때마다 적용)
         if (!Mathf.Approximately(_pierceCountDamageMultiplier, 1.0f))
         {
-            projectile.ModifyDamageMultiplier(_pierceCountDamageMultiplier);
-            LogEffect($"Applied damage multiplier: {_pierceCountDamageMultiplier:F2}x. New total: {projectile.DamageMultiplier:F2}x", projectile);
+            projectile.OnProjectileHit += OnProjectileHit;
         }
     }
-
     /// <summary>
     /// 투사체 소멸시 정리 작업
     /// 관통 이펙트는 투사체 속성 변경이므로 특별한 정리 불필요
@@ -86,13 +77,21 @@ public class PiercingEffectSO : ProjectileEffectSO
     /// <param name="projectile">정리할 투사체</param>
     public override void DetachFromProjectile(IProjectile projectile)
     {
-        // 관통 이펙트는 투사체의 영구 속성 변경이므로 
-        // 특별한 정리 작업이 필요하지 않음
         if (ValidateProjectile(projectile))
         {
-            LogEffect("Detached from projectile (no cleanup needed)", projectile);
+            projectile.OnProjectileHit -= OnProjectileHit;
         }
+        LogEffect("Detached from projectile (no cleanup needed)", projectile);
     }
+
+    private void OnProjectileHit(IProjectile projectile, Collider hitCollider)
+    {
+        // 매 충돌마다 데미지 배수 적용
+        projectile.ModifyDamageMultiplier(_pierceCountDamageMultiplier);
+        LogEffect($"Applied pierce damage multiplier: {_pierceCountDamageMultiplier:F2}x. New total: {projectile.DamageMultiplier:F2}x", projectile);
+    }
+
+  
     #endregion
 
     #region Unity Lifecycle
