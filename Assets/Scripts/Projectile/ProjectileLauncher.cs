@@ -59,10 +59,6 @@ public class ProjectileLauncher : MonoBehaviour
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public int ActiveProjectileCount => _activeProjectiles.Count;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
     public bool IsPoolInitialized => _projectilePool?.IsInitialized ?? false;
 
     [TabGroup("Debug")]
@@ -70,6 +66,7 @@ public class ProjectileLauncher : MonoBehaviour
     public Vector3 ShootTransform => _shootTransform.position;
     #endregion
 
+    #region Debug Methods
     [GUIColor("green")]
     [Button(ButtonSizes.Large)]
     [ButtonGroup("Debug")]
@@ -91,12 +88,13 @@ public class ProjectileLauncher : MonoBehaviour
     {
         CancelInvoke(nameof(ShootForward));
     }
+    #endregion
 
     #region Private Fields
     private GameObject _ownerObject;
     private bool _canFire = true;
     private float _cooldownRemaining = 0f;
-    private List<IProjectile> _activeProjectiles = new List<IProjectile>();
+    //private List<IProjectile> _activeProjectiles = new List<IProjectile>();
     #endregion
 
     #region Unity Lifecycle
@@ -146,10 +144,10 @@ public class ProjectileLauncher : MonoBehaviour
         Quaternion spawnRotation = Quaternion.LookRotation(normalizedDirection);
 
         // 투사체 생성
-        IProjectile projectile = CreateProjectile(projectileType, spawnPosition, spawnRotation);
+        IProjectile projectile = CreateProjectile(projectileType, spawnPosition, spawnRotation, true);
         if (projectile == null)
         {
-            Debug.LogWarning("[ProjectileLauncher] Pool empty. ReUse Oldest", this);
+            Debug.LogWarning("[ProjectileLauncher] Pool Creation Failed", this);
             return false;
         }
 
@@ -303,7 +301,7 @@ public class ProjectileLauncher : MonoBehaviour
         }
     }
 
-    private IProjectile CreateProjectile(ProjectileType projectileType, Vector3 worldPosition, Quaternion worldRotation)
+    private IProjectile CreateProjectile(ProjectileType projectileType, Vector3 worldPosition, Quaternion worldRotation, bool isForcely = false)
     {
         if (_projectilePool == null || !_projectilePool.IsInitialized)
         {
@@ -311,7 +309,7 @@ public class ProjectileLauncher : MonoBehaviour
             return null;
         }
 
-        IProjectile projectile = _projectilePool.SpawnProjectile(projectileType, worldPosition, worldRotation);
+        IProjectile projectile = _projectilePool.SpawnProjectile(projectileType, worldPosition, worldRotation, isForcely);
 
         if (projectile != null)
         {
@@ -323,8 +321,8 @@ public class ProjectileLauncher : MonoBehaviour
             projectile.OnProjectileDestroyed -= OnProjectileDestroyed;
             projectile.OnProjectileDestroyed += OnProjectileDestroyed;
 
-            // 활성 투사체 목록에 추가
-            _activeProjectiles.Add(projectile);
+            //// 활성 투사체 목록에 추가
+            //_activeProjectiles.Add(projectile);
         }
 
         return projectile;
@@ -362,7 +360,7 @@ public class ProjectileLauncher : MonoBehaviour
         }
 
         projectile.OnProjectileDestroyed -= OnProjectileDestroyed;
-        _activeProjectiles.Remove(projectile);
+        //_activeProjectiles.Remove(projectile);
         _projectilePool?.ReturnProjectile(projectile);
     }
     #endregion

@@ -169,6 +169,10 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
+    public float RemainingLifeTime => _remainingLifetime;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
     public Collider AttackTrigger => _attackTrigger;
 
     [TabGroup("Debug")]
@@ -270,6 +274,9 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
                 Destroy(gameObject);
                 break;
         }
+
+        // IProjectile 소멸 이벤트 호출
+        OnProjectileDestroyed?.Invoke(this);
     }
 
     /// <summary>
@@ -351,10 +358,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     {
         if (!gameObject.activeInHierarchy) return; // 중복 호출 방지
 
-        // 1. IProjectile 소멸 이벤트 호출
-        OnProjectileDestroyed?.Invoke(this);
-
-        // 2. DestroyProjectile 실행
         DestroyProjectile();
     }
     #endregion

@@ -1,5 +1,6 @@
 ﻿using Sirenix.OdinInspector;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -26,6 +27,9 @@ public class ProjectilePool
     public Dictionary<ProjectileType, int> PoolCounts => GetPoolCounts();
 
     [ShowInInspector, ReadOnly]
+    public int ActivePoolCounts => _activeProjectiles?.Count ?? 0;
+
+    [ShowInInspector, ReadOnly]
     public int RegisteredPrefabCount => _projectilePrefabs?.Count ?? 0;
     #endregion
 
@@ -34,7 +38,7 @@ public class ProjectilePool
     private Dictionary<ProjectileType, GameObject> _projectilePrefabMap;
     private Transform _poolParent;
 
-    // 활성 발사체 추적 
+    // 활성 발사체 추적 [투사체][사용시간]
     private Dictionary<IProjectile, float> _activeProjectiles = new Dictionary<IProjectile, float>();
     #endregion
 
@@ -119,10 +123,12 @@ public class ProjectilePool
         IProjectile recycledProjectile = RecycleOldestProjectile(projectileType);
         if (recycledProjectile != null)
         {
+            Debug.LogWarning($"[ProjectilePool] Pool empty for type: {projectileType}. Reuse new projectile.");
             recycledProjectile.GameObject.SetActive(true);
             return recycledProjectile;
         }
 
+        Debug.LogWarning($"[ProjectilePool] Pool empty for type: {projectileType}. Instantiating new projectile.");
         // 회수할 발사체도 없으면 새로 생성
         return CreateNewProjectile(projectileType);
     }
@@ -157,18 +163,22 @@ public class ProjectilePool
     /// <param name="worldPosition">발사 위치</param>
     /// <param name="worldRotation">발사 방향</param>
     /// <returns>생성된 투사체 인스턴스</returns>
-    public IProjectile SpawnProjectile(ProjectileType projectileType, Vector3 worldPosition, Quaternion worldRotation)
+    public IProjectile SpawnProjectile(ProjectileType projectileType, Vector3 worldPosition, Quaternion worldRotation, bool isForcely = false)
     {
-        IProjectile projectile = GetProjectile(projectileType);
+        IProjectile projectile = isForcely ?
+            GetProjectileFocely(projectileType) : GetProjectile(projectileType);
+
         if (projectile != null)
         {
             projectile.Transform.position = worldPosition;
             projectile.Transform.rotation = worldRotation;
             projectile.GameObject.SetActive(true);
-
             // 활성 발사체로 등록
             _activeProjectiles[projectile] = Time.time;
         }
+        else
+            Debug.LogError($"[ProjectilePool] Failed to Spawn Projectile!");
+
         return projectile;
     }
 
@@ -198,6 +208,34 @@ public class ProjectilePool
         }
 
         Debug.Log($"[ProjectilePool] Prewarmed {count} instances of {projectileType}");
+    }
+
+    /// <summary>
+    /// 현재 활성화된 투사체 개수 반환
+    /// </summary>
+    /// <returns>활성 투사체 개수</returns>
+    public int GetActiveProjectileCount()
+    {
+        return _activeProjectiles.Count;
+    }
+
+    /// <summary>
+    /// 현재 활성화된 모든 투사체 목록 반환
+    /// </summary>
+    /// <returns>활성 투사체 목록 (읽기 전용)</returns>
+    public IEnumerable<IProjectile> GetActiveProjectiles()
+    {
+        return _activeProjectiles.Keys;
+    }
+
+    /// <summary>
+    /// 특정 타입의 활성화된 투사체 개수 반환
+    /// </summary>
+    /// <param name="projectileType">조회할 투사체 타입</param>
+    /// <returns>해당 타입의 활성 투사체 개수</returns>
+    public int GetActiveProjectileCount(ProjectileType projectileType)
+    {
+        return _activeProjectiles.Keys.Count(p => p.ProjectileType == projectileType);
     }
 
     /// <summary>
