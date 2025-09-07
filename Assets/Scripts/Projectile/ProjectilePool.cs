@@ -14,8 +14,8 @@ public class ProjectilePool
     [SerializeField] private int _defaultPoolSize = 50;
 
     [Header("Projectile Prefabs")]
-    [SerializeField, SerializeReference]
-    private List<IProjectile> _projectilePrefabs = new List<IProjectile>();
+    [SerializeField]
+    private List<GameObject> _projectilePrefabs = new List<GameObject>();
     #endregion
 
     #region Properties
@@ -31,7 +31,7 @@ public class ProjectilePool
 
     #region Private Fields
     private Dictionary<ProjectileType, Queue<IProjectile>> _projectilePools;
-    private Dictionary<ProjectileType, IProjectile> _projectilePrefabMap;
+    private Dictionary<ProjectileType, GameObject> _projectilePrefabMap;
     private Transform _poolParent;
     #endregion
 
@@ -176,7 +176,7 @@ public class ProjectilePool
     private void InitializeDictionaries()
     {
         _projectilePools = new Dictionary<ProjectileType, Queue<IProjectile>>();
-        _projectilePrefabMap = new Dictionary<ProjectileType, IProjectile>();
+        _projectilePrefabMap = new Dictionary<ProjectileType, GameObject>();
     }
 
     private void InitializeFromPrefabList()
@@ -187,22 +187,29 @@ public class ProjectilePool
             return;
         }
 
-        foreach (var prefab in _projectilePrefabs)
+        foreach (var prefabGameObject in _projectilePrefabs)
         {
-            if (prefab == null)
+            if (prefabGameObject == null)
             {
                 Debug.LogWarning("[ProjectilePool] Null prefab found in list");
                 continue;
             }
 
-            ProjectileType projectileType = prefab.ProjectileType;
+            IProjectile projectile = prefabGameObject.GetComponent<IProjectile>();
+            if (projectile == null)
+            {
+                Debug.LogWarning($"[ProjectilePool] GameObject {prefabGameObject.name} does not have IProjectile component");
+                continue;
+            }
+
+            ProjectileType projectileType = projectile.ProjectileType;
 
             if (_projectilePrefabMap.ContainsKey(projectileType))
             {
                 Debug.LogWarning($"[ProjectilePool] Duplicate projectile type: {projectileType}. Overwriting.");
             }
 
-            _projectilePrefabMap[projectileType] = prefab;
+            _projectilePrefabMap[projectileType] = prefabGameObject;
 
             // 기본 풀 생성
             PrewarmPool(projectileType, _defaultPoolSize);
@@ -228,8 +235,8 @@ public class ProjectilePool
             return null;
         }
 
-        IProjectile prefab = _projectilePrefabMap[projectileType];
-        GameObject newProjectile = Object.Instantiate(prefab.GameObject);
+        GameObject prefab = _projectilePrefabMap[projectileType];
+        GameObject newProjectile = Object.Instantiate(prefab);
 
         if (_poolParent != null)
         {
