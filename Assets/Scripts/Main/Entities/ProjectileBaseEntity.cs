@@ -203,8 +203,8 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log($"{gameObject.name} hit {other.gameObject.name}");
-        OnProjectileHit?.Invoke(this, other);
         ProcessBattleInteraction(other);
+        OnProjectileHit?.Invoke(this, other);
     }
 
     private void OnEnable()

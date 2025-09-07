@@ -55,12 +55,16 @@ public class PiercingEffectSO : ProjectileEffectSO
         if (!ValidateProjectile(projectile))
             return;
 
-        // 관통 횟수 설정
-        if (_applicationMode == PierceApplicationMode.SetAbsolute)
+        if (_pierceCount >= 0)
         {
-            if (_pierceCount >= 0)
+            if (_applicationMode == PierceApplicationMode.SetAbsolute)
             {
                 projectile.SetPierceCount(_pierceCount);
+            }
+            else
+            {
+                // AddToExisting
+                projectile.ModifyPierceCount(_pierceCount);
             }
         }
 
