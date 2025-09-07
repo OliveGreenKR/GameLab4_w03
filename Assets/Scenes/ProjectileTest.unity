@@ -1726,7 +1726,7 @@ MonoBehaviour:
     _projectilePrefabs:
     - {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
   _shootTransform: {fileID: 2036164277}
-  _fireRatePerSecond: 20
+  _fireRatePerSecond: 102
   _projectileLifetime: 10
   _projectileSpeed: 20.2
   _effectAssets:

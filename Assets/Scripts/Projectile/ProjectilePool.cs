@@ -87,7 +87,7 @@ public class ProjectilePool
         if (pool.Count > 0)
         {
             IProjectile projectile = pool.Dequeue();
-            projectile.GameObject.SetActive(true);
+            //projectile.GameObject.SetActive(true);
             return projectile;
         }
 
@@ -115,7 +115,7 @@ public class ProjectilePool
         if (pool.Count > 0)
         {
             IProjectile projectile = pool.Dequeue();
-            projectile.GameObject.SetActive(true);
+            //projectile.GameObject.SetActive(true);
             return projectile;
         }
 
@@ -124,12 +124,16 @@ public class ProjectilePool
         if (recycledProjectile != null)
         {
             Debug.LogWarning($"[ProjectilePool] Pool empty for type: {projectileType}. Reuse new projectile.");
-            recycledProjectile.GameObject.SetActive(true);
+            //recycledProjectile.GameObject.SetActive(true);
             return recycledProjectile;
         }
+        else
+        {
+            Debug.LogWarning($"Reusing Oldest Failed");
+        }
 
-        Debug.LogWarning($"[ProjectilePool] Pool empty for type: {projectileType}. Instantiating new projectile.");
         // 회수할 발사체도 없으면 새로 생성
+        Debug.LogWarning($"[ProjectilePool] Pool empty for type: {projectileType}. Instantiating new projectile.");
         return CreateNewProjectile(projectileType);
     }
 
