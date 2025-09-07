@@ -62,6 +62,11 @@ public interface IProjectile
     /// 데미지 배율
     /// </summary>
     float DamageMultiplier { get; }
+
+    /// <summary>
+    /// 이동속도 배율
+    /// </summary>
+    float SpeedMultiplier { get; }
     #endregion
 
     #region Initialization
@@ -97,6 +102,18 @@ public interface IProjectile
     /// </summary>
     /// <param name="multiplier">곱할 배율</param>
     void ModifyDamageMultiplier(float multiplier);
+
+    /// <summary>
+    /// 이동속도 배율 설정
+    /// </summary>
+    /// <param name="multiplier">이동속도 배율</param>
+    void SetSpeedMultiplier(float multiplier);
+
+    /// <summary>
+    /// 이동속도 배율 수정
+    /// </summary>
+    /// <param name="multiplier">곱할 배율</param>
+    void ModifySpeedMultiplier(float multiplier);
     #endregion
 
     #region Lifecycle

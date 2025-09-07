@@ -41,8 +41,12 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     [TabGroup("Projectile")]
     [Header("Projectile Stats")]
     [SerializeField] private int _basePierceCount = 0;
+
     [TabGroup("Projectile")]
     [SerializeField] private float _baseDamageMultiplier = 1f;
+
+    [TabGroup("Projectile")]
+    [SerializeField] private float _baseSpeedMultiplier = 1f;
 
     [TabGroup("Components")]
     [Header("Attack Trigger")]
@@ -139,6 +143,17 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     public float ForwardSpeed => _forwardSpeedUnitsPerSecond;
     public int PierceCount => _currentPierceCount;
     public float DamageMultiplier => _currentDamageMultiplier;
+    public float SpeedMultiplier => _currentSpeedMultiplier;
+
+    public void SetSpeedMultiplier(float multiplier)
+    {
+        _currentSpeedMultiplier = Mathf.Max(0f, multiplier);
+    }
+
+    public void ModifySpeedMultiplier(float multiplier)
+    {
+        SetSpeedMultiplier(_currentSpeedMultiplier * multiplier);
+    }
 
     public void SetPierceCount(int pierceCount)
     {
@@ -185,6 +200,10 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
+    public float CurrentSpeedMultiplier => _currentSpeedMultiplier;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
     public float CurrentAttackStat => GetCurrentStat(BattleStatType.Attack);
     #endregion
 
@@ -192,6 +211,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     private float _remainingLifetime;
     private int _currentPierceCount;
     private float _currentDamageMultiplier;
+    private float _currentSpeedMultiplier;
     #endregion
 
     #region Unity Lifecycle
@@ -292,7 +312,8 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     #region Protected Virtual Methods
     protected virtual void GoForward()
     {
-        transform.Translate(Vector3.forward * _forwardSpeedUnitsPerSecond * Time.deltaTime);
+        float actualSpeed = _forwardSpeedUnitsPerSecond * _currentSpeedMultiplier;
+        transform.Translate(Vector3.forward * actualSpeed * Time.deltaTime);
     }
     #endregion
 
@@ -301,6 +322,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     {
         _currentPierceCount = _basePierceCount;
         _currentDamageMultiplier = _baseDamageMultiplier;
+        _currentSpeedMultiplier = _baseSpeedMultiplier;
         // BattleStat 완전 초기화
         if (_battleStat != null)
         {
