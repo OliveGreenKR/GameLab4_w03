@@ -304,7 +304,7 @@ public class ProjectileLauncher : MonoBehaviour
 
         if (projectile != null)
         {
-            // 투사체 초기화 (순수 투사체 속성만)
+            // 투사체 완전히 초기화 
             projectile.Initialize(_projectileLifetime, _projectileSpeed);
 
             // 투사체 소멸 이벤트 구독

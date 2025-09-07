@@ -295,6 +295,11 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     {
         _currentPierceCount = _basePierceCount;
         _currentDamageMultiplier = _baseDamageMultiplier;
+        // BattleStat 완전 초기화
+        if (_battleStat != null)
+        {
+            _battleStat.InitializeStats(); // BattleStatData로부터 완전 리셋
+        }
         SyncPierceCountToBattleStat();
     }
 
@@ -319,7 +324,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     private void ProcessBattleInteraction(Collider other)
     {
         IBattleEntity targetEntity = other.GetComponent<IBattleEntity>();
-        if (targetEntity != null)
+        if (targetEntity != null && targetEntity.TeamId != _teamId )
         {
             float damage = DealDamage(targetEntity, _baseDamage);
             _battleStat.ApplyDamage(1.0f);//투사체는 공격시도마다 체력 1 감소 (관통 방지)
