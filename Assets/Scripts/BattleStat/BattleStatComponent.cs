@@ -68,6 +68,13 @@ public class BattleStatComponent : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float HealthPercentage => MaxHealth > 0 ? CurrentHealth / MaxHealth : 0f;
+
+    [ButtonGroup("Debug")]
+    [Button(ButtonSizes.Large)]
+    public void ResetStats()
+    {
+        InitializeStats();
+    }
     #endregion
 
     #region Events
@@ -94,11 +101,13 @@ public class BattleStatComponent : MonoBehaviour
         {
             Debug.LogError("[BattleStatComponent] BattleStatData is required!", this);
         }
+
+        InitializeStats();
     }
 
     private void Start()
     {
-        InitializeStats();
+        
     }
     #endregion
 
@@ -159,6 +168,7 @@ public class BattleStatComponent : MonoBehaviour
         {
             case BattleStatType.Health:
                 CurrentHealth = value;
+                Debug.Log($"CurrentHealth : {value}");
                 ClampHealth();
                 break;
             case BattleStatType.MaxHealth:

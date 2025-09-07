@@ -1699,8 +1699,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2036164276}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.226, z: 0.573}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.22600001, z: 0.573}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1722,13 +1722,13 @@ MonoBehaviour:
   _ownerGameObject: {fileID: 1676449833}
   _defaultProjectileType: 0
   _projectilePool:
-    _defaultPoolSize: 50
+    _defaultPoolSize: 100
     _projectilePrefabs:
     - {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
   _shootTransform: {fileID: 2036164277}
-  _fireRatePerSecond: 50
-  _projectileLifetime: 5
-  _projectileSpeed: 80
+  _fireRatePerSecond: 20
+  _projectileLifetime: 10
+  _projectileSpeed: 20.2
   _effectAssets:
   - {fileID: 11400000, guid: 6f22a1f731e3eaf49830f35ea78d2f21, type: 2}
   - {fileID: 11400000, guid: 6f22a1f731e3eaf49830f35ea78d2f21, type: 2}
@@ -1879,15 +1879,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.08
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.36
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -49.9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
       propertyPath: m_LocalRotation.w

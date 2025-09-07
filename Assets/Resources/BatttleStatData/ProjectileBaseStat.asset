@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _baseHealth: 1
   _maxHealth: 5
-  _baseAttack: 50
+  _baseAttack: 10
   _baseAttackSpeed: 1
   _baseEffectRange: 1

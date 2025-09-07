@@ -143,14 +143,15 @@ public class ProjectileLauncher : MonoBehaviour
 
         // 투사체 생성 위치와 회전 계산
         Vector3 spawnPosition = _shootTransform.position;
-        Debug.Log($"[ProjectileLauncher] Firing from position {spawnPosition} towards direction {normalizedDirection}", this);
         Quaternion spawnRotation = Quaternion.LookRotation(normalizedDirection);
 
         // 투사체 생성
         IProjectile projectile = CreateProjectile(projectileType, spawnPosition, spawnRotation);
-        Debug.Log($"[ProjectileLauncher] Fired projectile of type {projectileType} from {spawnPosition} towards {normalizedDirection}", this);
         if (projectile == null)
+        {
+            Debug.LogWarning("[ProjectileLauncher] Failed to create projectile", this);
             return false;
+        }
 
         // 이펙트 적용
         ApplyEffectsToProjectile(projectile);

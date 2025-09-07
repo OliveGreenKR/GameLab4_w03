@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEditor.Rendering.CameraUI;
 
 /// <summary>
 /// 투사체 소멸 모드
@@ -74,6 +75,11 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     public event System.Action<IProjectile, Collider> OnProjectileHit;
 
     /// <summary>
+    /// 투사체가 충돌했을 때 발생하는 이벤트
+    /// </summary>
+    public event System.Action<IProjectile, Collider> AfterProjectileHit;
+
+    /// <summary>
     /// 투사체가 소멸될 때 발생하는 이벤트
     /// </summary>
     public event System.Action<IProjectile> OnProjectileDestroyed;
@@ -106,7 +112,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     public void OnDeath(IBattleEntity killer = null)
     {
-        Debug.Log("[ProjectileBase] Projectile has been destroyed.", this);
+        //Debug.Log("[ProjectileBase] Projectile has been destroyed.", this);
         HandleProjectileDeath(); // 통합 함수 호출
     }
 
@@ -198,9 +204,10 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"{gameObject.name} hit {other.gameObject.name}");
-        ProcessBattleInteraction(other);
         OnProjectileHit?.Invoke(this, other);
+        ProcessBattleInteraction(other);
+        AfterProjectileHit?.Invoke(this, other);
+
     }
 
     private void OnEnable()
@@ -209,6 +216,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         InitializeProjectileStats();
         OnProjectileActivated?.Invoke(this);
         InitializeBattleStatEvents();
+        Debug.Log($"[ProjectileBase] Projectile Activated. Lifetime: {_lifetimeSeconds}s, Speed: {_forwardSpeedUnitsPerSecond} units/sec", this);
     }
 
     private void OnDisable()
@@ -290,6 +298,11 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         if (_battleStat != null)
         {
             _battleStat.InitializeStats(); // BattleStatData로부터 완전 리셋
+            Debug.Log($"[ProjectileBase] Initialized BattleStat for Projectile.", this);
+            //현재 스탯 출력
+            Debug.Log($"[ProjectileBase] Current Attack Stat: {GetCurrentStat(BattleStatType.Attack)}", this);
+            Debug.Log($"[ProjectileBase] Current Health Stat: {GetCurrentStat(BattleStatType.Health)}", this);
+
         }
         SyncPierceCountToBattleStat();
     }
@@ -300,6 +313,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         if (_battleStat != null)
         {
             _battleStat.SetCurrentStat(BattleStatType.Health, _currentPierceCount + 1); // +1: 최소 1번 충돌 가능
+            Debug.Log($"[ProjectileBase] Synced PierceCount {_currentPierceCount} to BattleStat Health {_battleStat.GetCurrentStat(BattleStatType.Health)}", this);
         }
     }
 

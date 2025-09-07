@@ -71,7 +71,7 @@ public class PiercingEffectSO : ProjectileEffectSO
         // 충돌 이벤트 구독 (데미지 배수는 충돌할 때마다 적용)
         if (!Mathf.Approximately(_pierceCountDamageMultiplier, 1.0f))
         {
-            projectile.OnProjectileHit += OnProjectileHit;
+            projectile.AfterProjectileHit += AfterProjectileHit;
         }
     }
     /// <summary>
@@ -83,14 +83,14 @@ public class PiercingEffectSO : ProjectileEffectSO
     {
         if (ValidateProjectile(projectile))
         {
-            projectile.OnProjectileHit -= OnProjectileHit;
+            projectile.OnProjectileHit -= AfterProjectileHit;
         }
         LogEffect("Detached from projectile (no cleanup needed)", projectile);
     }
 
-    private void OnProjectileHit(IProjectile projectile, Collider hitCollider)
+    private void AfterProjectileHit(IProjectile projectile, Collider hitCollider)
     {
-        // 매 충돌마다 데미지 배수 적용
+        // 매 충돌이후 데미지 배수 적용
         projectile.ModifyDamageMultiplier(_pierceCountDamageMultiplier);
         LogEffect($"Applied pierce damage multiplier: {_pierceCountDamageMultiplier:F2}x. New total: {projectile.DamageMultiplier:F2}x", projectile);
     }

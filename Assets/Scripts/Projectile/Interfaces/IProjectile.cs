@@ -117,6 +117,11 @@ public interface IProjectile
     event Action<IProjectile, Collider> OnProjectileHit;
 
     /// <summary>
+    /// 투사체가 충돌후 발생하는 이벤트
+    /// </summary>
+    event Action<IProjectile, Collider> AfterProjectileHit;
+
+    /// <summary>
     /// 투사체가 소멸될 때 발생하는 이벤트
     /// </summary>
     event Action<IProjectile> OnProjectileDestroyed;
