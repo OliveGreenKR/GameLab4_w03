@@ -41,7 +41,7 @@ public class ProjectileLauncher : MonoBehaviour
 
     [TabGroup("Effects")]
     [Header("Projectile Effects")]
-    [SerializeField] private List<IProjectileEffect> _effects = new List<IProjectileEffect>();
+    [SerializeField] private List<ProjectileEffectSO> _effectAssets = new List<ProjectileEffectSO>();
     #endregion
 
     #region Properties
@@ -188,43 +188,41 @@ public class ProjectileLauncher : MonoBehaviour
     /// 이펙트 추가
     /// </summary>
     /// <param name="effect">추가할 이펙트</param>
-    public void AddEffect(IProjectileEffect effect)
+    public void AddEffect(ProjectileEffectSO effectAsset)
     {
-        if (effect == null)
+        if (effectAsset == null)
         {
-            Debug.LogWarning("[ProjectileLauncher] Cannot add null effect", this);
+            Debug.LogWarning("[ProjectileLauncher] Cannot add null effect asset", this);
             return;
         }
 
-        if (_effects == null)
+        if (_effectAssets == null)
         {
-            _effects = new List<IProjectileEffect>();
+            _effectAssets = new List<ProjectileEffectSO>();
         }
 
-        _effects.Add(effect);
+        _effectAssets.Add(effectAsset);
     }
-
     /// <summary>
-    /// 이펙트 제거
+    /// 이펙트 삭제
     /// </summary>
-    /// <param name="effect">제거할 이펙트</param>
-    /// <returns>제거 성공 여부</returns>
-    public bool RemoveEffect(IProjectileEffect effect)
+    /// <param name="effectAsset">삭제할 이펙트</param>
+    /// <returns>삭제 결과</returns>
+    public bool RemoveEffect(ProjectileEffectSO effectAsset)
     {
-        if (effect == null || _effects == null)
+        if (effectAsset == null || _effectAssets == null)
             return false;
 
-        return _effects.Remove(effect);
+        return _effectAssets.Remove(effectAsset);
     }
-
     /// <summary>
     /// 모든 이펙트 제거
     /// </summary>
     public void ClearAllEffects()
     {
-        if (_effects != null)
+        if (_effectAssets != null)
         {
-            _effects.Clear();
+            _effectAssets.Clear();
         }
     }
 
@@ -319,17 +317,16 @@ public class ProjectileLauncher : MonoBehaviour
 
     private void ApplyEffectsToProjectile(IProjectile projectile)
     {
-        if (projectile == null || _effects == null) return;
+        if (projectile == null || _effectAssets == null) return;
 
-        // 우선순위 순으로 이펙트 적용
-        var sortedEffects = new List<IProjectileEffect>(_effects);
+        var sortedEffects = new List<ProjectileEffectSO>(_effectAssets);
         sortedEffects.Sort((a, b) => a.Priority.CompareTo(b.Priority));
 
-        foreach (var effect in sortedEffects)
+        foreach (var effectAsset in sortedEffects)
         {
-            if (effect != null)
+            if (effectAsset != null)
             {
-                effect.AttachToProjectile(projectile);
+                effectAsset.AttachToProjectile(projectile);
             }
         }
     }
@@ -338,25 +335,19 @@ public class ProjectileLauncher : MonoBehaviour
     {
         if (projectile == null) return;
 
-        // 이펙트 정리
-        if (_effects != null)
+        if (_effectAssets != null)
         {
-            foreach (var effect in _effects)
+            foreach (var effectAsset in _effectAssets)
             {
-                if (effect != null)
+                if (effectAsset != null)
                 {
-                    effect.DetachFromProjectile(projectile);
+                    effectAsset.DetachFromProjectile(projectile);
                 }
             }
         }
 
-        // 이벤트 구독 해제
         projectile.OnProjectileDestroyed -= OnProjectileDestroyed;
-
-        // 활성 투사체 목록에서 제거
         _activeProjectiles.Remove(projectile);
-
-        // 풀로 반환
         _projectilePool?.ReturnProjectile(projectile);
     }
     #endregion

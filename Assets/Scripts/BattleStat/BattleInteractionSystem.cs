@@ -42,6 +42,10 @@ public static class BattleInteractionSystem
 
         float actualDamage = target.TakeDamage(attacker, finalDamage);
 
+        Debug.Log(IsSameTeam(attacker, target)
+            ? $"[BattleInteractionSystem] {attacker.GameObject.name} (Team {attacker.TeamId}) attempted to attack {target.GameObject.name} (Team {target.TeamId}) - Same Team, No Damage Applied."
+            : $"[BattleInteractionSystem] {attacker.GameObject.name} (Team {attacker.TeamId}) attacked {target.GameObject.name} (Team {target.TeamId}) for {actualDamage} damage.");
+
         TriggerBattleInteraction(attacker, target, actualDamage);
 
         if (!target.IsAlive)
