@@ -4,12 +4,25 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
+/// 투사체 소멸 모드
+/// </summary>
+public enum ProjectileDestroyMode
+{
+    Deactivate,  // 비활성화 (풀링용)
+    Destroy      // 실제 파괴
+}
+
+/// <summary>
 ///  Projectile Base, 이펙트 부착이 가능하며
 /// 생명 주기는 스스로 관리. 매니저를 통해 생명주기의 완료 프로세스를 위탁
 /// </summary>
 public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 {
     #region Serialized Fields
+    [TabGroup("Settings")]
+    [Header("Destroy Settings")]
+    [SerializeField] private ProjectileDestroyMode _destroyMode = ProjectileDestroyMode.Deactivate;
+
     [TabGroup("Projectile")]
     [Header("Projectile Type")]
     [SerializeField] private ProjectileType _projectileType = ProjectileType.BasicProjectile;
@@ -98,7 +111,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     public void OnDeath(IBattleEntity killer = null)
     {
         Debug.Log("[ProjectileBase] Projectile has been destroyed.", this);
-        DestroyProjectile();
+        HandleProjectileDeath(); // 통합 함수 호출
     }
 
     public float GetCurrentStat(BattleStatType statType)
@@ -148,6 +161,10 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     #endregion
 
     #region Properties
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public ProjectileDestroyMode CurrentDestroyMode => _destroyMode;
+
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public Collider AttackTrigger => _attackTrigger;
@@ -201,14 +218,14 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     private void OnDisable()
     {
         UnsubscribeBattleStatEvents();
-        OnProjectileDestroyed?.Invoke(this);
+        // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
     }
 
     private void OnDestroy()
     {
-        OnProjectileDestroyed?.Invoke(this);
         ClearAllEvents();
         UnsubscribeBattleStatEvents();
+        // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
     }
 
     #endregion
@@ -242,8 +259,27 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     public void DestroyProjectile()
     {
-        // 단순히 비활성화만 처리, 풀 반환은 외부에서 이벤트 구독으로 처리
-        gameObject.SetActive(false);
+        switch (_destroyMode)
+        {
+            case ProjectileDestroyMode.Deactivate:
+                // 비활성화 (풀링용) - 외부에서 이벤트 구독으로 풀 반환 처리
+                gameObject.SetActive(false);
+                break;
+
+            case ProjectileDestroyMode.Destroy:
+                // 실제 파괴
+                Destroy(gameObject);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 투사체 소멸 모드 설정
+    /// </summary>
+    /// <param name="destroyMode">소멸 모드</param>
+    public void SetDestroyMode(ProjectileDestroyMode destroyMode)
+    {
+        _destroyMode = destroyMode;
     }
     #endregion
 
@@ -277,7 +313,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
         if (_remainingLifetime <= 0f)
         {
-            DestroyProjectile();
+            HandleProjectileDeath(); // 통합 소멸 함수 호출
         }
     }
     private void ProcessBattleInteraction(Collider other)
@@ -296,6 +332,20 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         OnProjectileHit = null;
         OnProjectileDestroyed = null;
         OnProjectileUpdate = null;
+    }
+
+    /// <summary>
+    /// 투사체 소멸 처리 (모든 소멸 경로의 통합점)
+    /// </summary>
+    private void HandleProjectileDeath()
+    {
+        if (!gameObject.activeInHierarchy) return; // 중복 호출 방지
+
+        // 1. IProjectile 소멸 이벤트 호출
+        OnProjectileDestroyed?.Invoke(this);
+
+        // 2. DestroyProjectile 실행
+        DestroyProjectile();
     }
     #endregion
 
