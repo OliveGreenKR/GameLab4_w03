@@ -149,7 +149,7 @@ public class ProjectileLauncher : MonoBehaviour
         IProjectile projectile = CreateProjectile(projectileType, spawnPosition, spawnRotation);
         if (projectile == null)
         {
-            Debug.LogWarning("[ProjectileLauncher] Failed to create projectile", this);
+            Debug.LogWarning("[ProjectileLauncher] Pool empty. ReUse Oldest", this);
             return false;
         }
 
@@ -317,8 +317,10 @@ public class ProjectileLauncher : MonoBehaviour
         {
             // 투사체 완전히 초기화 
             projectile.Initialize(_projectileLifetime, _projectileSpeed);
+            Debug.Log($"[ProjectileLauncher] Spawned projectile of type {projectileType} at {worldPosition}", this);
 
             // 투사체 소멸 이벤트 구독
+            projectile.OnProjectileDestroyed -= OnProjectileDestroyed;
             projectile.OnProjectileDestroyed += OnProjectileDestroyed;
 
             // 활성 투사체 목록에 추가

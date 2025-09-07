@@ -33,6 +33,9 @@ public class ProjectilePool
     private Dictionary<ProjectileType, Queue<IProjectile>> _projectilePools;
     private Dictionary<ProjectileType, GameObject> _projectilePrefabMap;
     private Transform _poolParent;
+
+    // 활성 발사체 추적 
+    private Dictionary<IProjectile, float> _activeProjectiles = new Dictionary<IProjectile, float>();
     #endregion
 
     #region Public Methods
@@ -84,6 +87,43 @@ public class ProjectilePool
             return projectile;
         }
 
+        Debug.LogWarning($"[ProjectilePool] Pool empty for type: {projectileType}. Instantiating new projectile.");
+        return CreateNewProjectile(projectileType);
+    }
+
+    /// <summary>
+    /// 지정된 타입의 투사체를 풀에서 가져옵니다
+    /// 풀이 비어있으면 가장 오래된 활성 발사체를 회수합니다
+    /// </summary>
+    /// <param name="projectileType">투사체 타입</param>
+    /// <returns>활성화된 투사체 인스턴스</returns>
+    public IProjectile GetProjectileFocely(ProjectileType projectileType)
+    {
+        if (!IsInitialized)
+        {
+            Debug.LogError("[ProjectilePool] Pool not initialized");
+            return null;
+        }
+
+        Queue<IProjectile> pool = GetOrCreatePool(projectileType);
+
+        // 풀에 사용 가능한 발사체가 있으면 반환
+        if (pool.Count > 0)
+        {
+            IProjectile projectile = pool.Dequeue();
+            projectile.GameObject.SetActive(true);
+            return projectile;
+        }
+
+        // 풀이 비어있으면 가장 오래된 발사체 회수 시도
+        IProjectile recycledProjectile = RecycleOldestProjectile(projectileType);
+        if (recycledProjectile != null)
+        {
+            recycledProjectile.GameObject.SetActive(true);
+            return recycledProjectile;
+        }
+
+        // 회수할 발사체도 없으면 새로 생성
         return CreateNewProjectile(projectileType);
     }
 
@@ -94,6 +134,9 @@ public class ProjectilePool
     public void ReturnProjectile(IProjectile projectile)
     {
         if (projectile == null) return;
+
+        // 활성 발사체 추적에서 제거
+        _activeProjectiles.Remove(projectile);
 
         projectile.GameObject.SetActive(false);
 
@@ -122,6 +165,9 @@ public class ProjectilePool
             projectile.Transform.position = worldPosition;
             projectile.Transform.rotation = worldRotation;
             projectile.GameObject.SetActive(true);
+
+            // 활성 발사체로 등록
+            _activeProjectiles[projectile] = Time.time;
         }
         return projectile;
     }
@@ -178,7 +224,7 @@ public class ProjectilePool
     }
     #endregion
 
-    #region Private Methods
+    #region Private Methods - Initizialization & Pooling
     private void InitializeDictionaries()
     {
         _projectilePools = new Dictionary<ProjectileType, Queue<IProjectile>>();
@@ -262,6 +308,63 @@ public class ProjectilePool
             }
         }
         return counts;
+    }
+    #endregion
+
+    #region Private Methods - Pool Reuse
+    /// <summary>
+    /// 가장 오래된 활성 발사체를 강제 회수합니다
+    /// </summary>
+    /// <param name="projectileType">회수할 발사체 타입 (같은 타입 우선)</param>
+    /// <returns>회수된 발사체, 없으면 null</returns>
+    private IProjectile RecycleOldestProjectile(ProjectileType projectileType)
+    {
+        if (_activeProjectiles.Count == 0)
+            return null;
+
+        // 같은 타입 중 가장 오래된 것 우선 검색
+        IProjectile oldestSameType = null;
+        float oldestSameTypeTime = float.MaxValue;
+
+        // 전체 중 가장 오래된 것 (백업)
+        IProjectile oldestOverall = null;
+        float oldestOverallTime = float.MaxValue;
+
+        foreach (var kvp in _activeProjectiles)
+        {
+            IProjectile projectile = kvp.Key;
+            float spawnTime = kvp.Value;
+
+            if (projectile.ProjectileType == projectileType && spawnTime < oldestSameTypeTime)
+            {
+                oldestSameType = projectile;
+                oldestSameTypeTime = spawnTime;
+            }
+
+            if (spawnTime < oldestOverallTime)
+            {
+                oldestOverall = projectile;
+                oldestOverallTime = spawnTime;
+            }
+        }
+
+        // 같은 타입이 있으면 우선, 없으면 전체에서 가장 오래된 것
+        IProjectile targetProjectile = oldestSameType ?? oldestOverall;
+
+        if (targetProjectile != null)
+        {
+            // 강제 소멸 (풀로 자동 반환됨)
+            targetProjectile.DestroyProjectile();
+
+            // 풀에서 다시 가져오기
+            Queue<IProjectile> pool = GetOrCreatePool(targetProjectile.ProjectileType);
+            if (pool.Count > 0)
+            {
+                return pool.Dequeue();
+            }
+        }
+
+        return null;
     }
     #endregion
 }
