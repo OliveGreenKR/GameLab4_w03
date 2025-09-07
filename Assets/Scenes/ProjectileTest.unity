@@ -394,7 +394,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 603934798}
   _teamId: 1
-  _baseDamage: 0
   _invulnerabilityDuration: 1
 --- !u!114 &603934798
 MonoBehaviour:
@@ -731,7 +730,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 823887401}
   _teamId: 1
-  _baseDamage: 0
   _invulnerabilityDuration: 1
 --- !u!1 &866606502
 GameObject:
@@ -920,7 +918,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1008245303}
   _teamId: 1
-  _baseDamage: 0
   _invulnerabilityDuration: 1
 --- !u!114 &1008245303
 MonoBehaviour:
@@ -1060,7 +1057,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1311654097}
   _teamId: 1
-  _baseDamage: 0
   _invulnerabilityDuration: 1
 --- !u!114 &1311654097
 MonoBehaviour:
@@ -1501,7 +1497,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1707852743}
   _teamId: 1
-  _baseDamage: 0
   _invulnerabilityDuration: 1
 --- !u!114 &1707852743
 MonoBehaviour:
@@ -1729,16 +1724,14 @@ MonoBehaviour:
   _projectilePool:
     _defaultPoolSize: 50
     _projectilePrefabs:
-    - rid: -2
+    - {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
   _shootTransform: {fileID: 2036164277}
-  _fireRatePerSecond: 0.1
+  _fireRatePerSecond: 50
   _projectileLifetime: 5
-  _projectileSpeed: 50
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+  _projectileSpeed: 80
+  _effectAssets:
+  - {fileID: 11400000, guid: 6f22a1f731e3eaf49830f35ea78d2f21, type: 2}
+  - {fileID: 11400000, guid: 6f22a1f731e3eaf49830f35ea78d2f21, type: 2}
 --- !u!114 &2036164279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1767,7 +1760,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 2036164279}
   _teamId: 1
-  _baseDamage: 20
   _invulnerabilityDuration: 1
 --- !u!1 &2147367923
 GameObject:

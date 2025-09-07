@@ -60,10 +60,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     [TabGroup("Battle")]
     [SerializeField] private int _teamId = 0;
-
-    [TabGroup("Battle")]
-    [SuffixLabel("damage")]
-    [SerializeField] private float _baseDamage = 10f;
     #endregion
 
     #region Events - IProjectile
@@ -252,11 +248,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         _teamId = teamId;
     }
 
-    public void SetBaseDamage(float damage)
-    {
-        _baseDamage = Mathf.Max(0f, damage);
-    }
-
     public void DestroyProjectile()
     {
         switch (_destroyMode)
@@ -324,11 +315,11 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     private void ProcessBattleInteraction(Collider other)
     {
         IBattleEntity targetEntity = other.GetComponent<IBattleEntity>();
-        if (targetEntity != null && targetEntity.TeamId != _teamId )
+        if (targetEntity != null && targetEntity.TeamId != _teamId)
         {
-            float damage = DealDamage(targetEntity, _baseDamage);
-            _battleStat.ApplyDamage(1.0f);//투사체는 공격시도마다 체력 1 감소 (관통 방지)
-            //Debug.Log($"{gameObject.name} ({TeamId}) attacks {other.gameObject.name} ({targetEntity.TeamId}) for {_baseDamage} base damage.");
+            float attackStat = GetCurrentStat(BattleStatType.Attack);
+            float damage = DealDamage(targetEntity, attackStat);
+            _battleStat.ApplyDamage(1.0f);
         }
     }
     private void ClearAllEvents()

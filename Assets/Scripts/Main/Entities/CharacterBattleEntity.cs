@@ -15,11 +15,6 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     [SerializeField] private int _teamId = 1;
 
     [TabGroup("Combat")]
-    [Header("Combat Settings")]
-    [SuffixLabel("damage")]
-    [SerializeField] private float _baseDamage = 20f;
-
-    [TabGroup("Combat")]
     [SuffixLabel("seconds")]
     [SerializeField] private float _invulnerabilityDuration = 1f;
     #endregion
@@ -144,15 +139,6 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     }
 
     /// <summary>
-    /// 기본 데미지 설정
-    /// </summary>
-    /// <param name="damage">기본 데미지</param>
-    public void SetBaseDamage(float damage)
-    {
-        _baseDamage = Mathf.Max(0f, damage);
-    }
-
-    /// <summary>
     /// 무적 상태 수동 활성화
     /// </summary>
     /// <param name="duration">무적 지속 시간</param>
@@ -171,8 +157,8 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     {
         if (target == null || !IsAlive)
             return 0f;
-
-        return DealDamage(target, _baseDamage);
+        float attackStat = GetCurrentStat(BattleStatType.Attack);
+        return DealDamage(target, attackStat);
     }
     #endregion
 

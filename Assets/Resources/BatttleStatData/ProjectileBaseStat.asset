@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3a75a51bfe3b6844a91b03951aeba52, type: 3}
   m_Name: ProjectileBaseStat
   m_EditorClassIdentifier: 
-  _baseHealth: 5
+  _baseHealth: 1
   _maxHealth: 5
-  _baseAttack: 5
+  _baseAttack: 50
   _baseAttackSpeed: 1
   _baseEffectRange: 1

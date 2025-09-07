@@ -137,6 +137,7 @@ public class ProjectileLauncher : MonoBehaviour
 
         // 투사체 생성
         IProjectile projectile = CreateProjectile(projectileType, spawnPosition, spawnRotation);
+        Debug.Log($"[ProjectileLauncher] Fired projectile of type {projectileType} from {spawnPosition} towards {normalizedDirection}", this);
         if (projectile == null)
             return false;
 

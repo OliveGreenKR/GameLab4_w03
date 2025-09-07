@@ -53,6 +53,12 @@ public class ProjectilePool
         InitializeFromPrefabList();
         IsInitialized = true;
 
+
+        //PreWarm
+        foreach (var pair in _projectilePrefabMap)
+        {
+            PrewarmPool(pair.Key, _defaultPoolSize);
+        }
         Debug.Log("[ProjectilePool] Initialization completed");
     }
 
@@ -211,10 +217,7 @@ public class ProjectilePool
 
             _projectilePrefabMap[projectileType] = prefabGameObject;
 
-            // 기본 풀 생성
-            PrewarmPool(projectileType, _defaultPoolSize);
-
-            Debug.Log($"[ProjectilePool] Registered {projectileType} with {_defaultPoolSize} instances");
+            Debug.Log($"[ProjectilePool] Registered {projectileType}");
         }
     }
 
