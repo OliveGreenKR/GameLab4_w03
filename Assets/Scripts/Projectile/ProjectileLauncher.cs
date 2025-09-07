@@ -26,7 +26,7 @@ public class ProjectileLauncher : MonoBehaviour
     [TabGroup("Settings")]
     [Header("Launch Settings")]
     [SuffixLabel("projectiles/sec")]
-    [PropertyRange(0.1f, 50f)]
+    [PropertyRange(0.1f, 150f)]
     [SerializeField] private float _fireRatePerSecond = 1f;
 
     [TabGroup("Settings")]
@@ -64,6 +64,10 @@ public class ProjectileLauncher : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public bool IsPoolInitialized => _projectilePool?.IsInitialized ?? false;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public Vector3 ShootTransform => _shootTransform.position;
     #endregion
 
     [GUIColor("green")]
@@ -76,10 +80,16 @@ public class ProjectileLauncher : MonoBehaviour
 
     [GUIColor("cyan")]
     [Button(ButtonSizes.Medium)]
-    [ButtonGroup("Debug")]
-    public void InitializePool()
+    [ButtonGroup("DebugMaxFire")]
+    public void MaxFiring()
     {
-        InitializeProjectilePool();
+        InvokeRepeating(nameof(ShootForward), 0.0f, 1.0f / _fireRatePerSecond);
+    }
+    [GUIColor("magenta")]
+    [ButtonGroup("DebugMaxFire")]
+    public void StopMaxFiring()
+    {
+        CancelInvoke(nameof(ShootForward));
     }
 
     #region Private Fields
@@ -133,6 +143,7 @@ public class ProjectileLauncher : MonoBehaviour
 
         // 투사체 생성 위치와 회전 계산
         Vector3 spawnPosition = _shootTransform.position;
+        Debug.Log($"[ProjectileLauncher] Firing from position {spawnPosition} towards direction {normalizedDirection}", this);
         Quaternion spawnRotation = Quaternion.LookRotation(normalizedDirection);
 
         // 투사체 생성

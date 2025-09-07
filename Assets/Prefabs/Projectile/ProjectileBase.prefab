@@ -31,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 6510760826802340225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.08, y: 1.36, z: -49.9}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -150,13 +150,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecb752aaf75e34c4bae0599e05e9a873, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _destroyMode: 0
+  _projectileType: 0
   _forwardSpeedUnitsPerSecond: 100
   _lifetimeSeconds: 10
+  _basePierceCount: 0
+  _baseDamageMultiplier: 1
   _attackTrigger: {fileID: 4899914466480511714}
   _rigid: {fileID: 8447907966392869884}
   _battleStat: {fileID: 3720800618165384622}
   _teamId: 0
-  _baseDamage: 10
 --- !u!114 &3720800618165384622
 MonoBehaviour:
   m_ObjectHideFlags: 0
