@@ -102,13 +102,13 @@ public class ProjectilePool
     }
 
     /// <summary>
-    /// 투사체를 지정된 위치와 방향으로 발사합니다
+    /// 투사체를 지정된 위치와 방향으로 생성합니다.
     /// </summary>
     /// <param name="projectileType">투사체 타입</param>
     /// <param name="worldPosition">발사 위치</param>
     /// <param name="worldRotation">발사 방향</param>
-    /// <returns>발사된 투사체 인스턴스</returns>
-    public IProjectile LaunchProjectile(ProjectileType projectileType, Vector3 worldPosition, Quaternion worldRotation)
+    /// <returns>생성된 투사체 인스턴스</returns>
+    public IProjectile SpawnProjectile(ProjectileType projectileType, Vector3 worldPosition, Quaternion worldRotation)
     {
         IProjectile projectile = GetProjectile(projectileType);
         if (projectile != null)

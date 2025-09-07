@@ -300,7 +300,7 @@ public class ProjectileLauncher : MonoBehaviour
             return null;
         }
 
-        IProjectile projectile = _projectilePool.LaunchProjectile(projectileType, worldPosition, worldRotation);
+        IProjectile projectile = _projectilePool.SpawnProjectile(projectileType, worldPosition, worldRotation);
 
         if (projectile != null)
         {

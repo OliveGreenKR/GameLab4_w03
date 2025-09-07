@@ -13,7 +13,7 @@ public enum ProjectileType
 }
 
 /// <summary>
-/// 투사체 매니저와 소통하기 위한 순수 투사체 인터페이스
+/// 순수 투사체 인터페이스
 /// </summary>
 public interface IProjectile
 {
