@@ -1730,8 +1730,7 @@ MonoBehaviour:
   _projectileLifetime: 8
   _projectileSpeed: 60
   _effectAssets:
-  - {fileID: 11400000, guid: 6f22a1f731e3eaf49830f35ea78d2f21, type: 2}
-  - {fileID: 11400000, guid: 6f22a1f731e3eaf49830f35ea78d2f21, type: 2}
+  - {fileID: 11400000, guid: c6540b7774face34599de37487c77635, type: 2}
 --- !u!114 &2036164279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1877,6 +1876,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 435775317057005993, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
+      propertyPath: _baseSplitProjectileCount
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

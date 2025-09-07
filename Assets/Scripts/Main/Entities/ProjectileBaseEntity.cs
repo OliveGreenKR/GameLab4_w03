@@ -48,6 +48,15 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     [TabGroup("Projectile")]
     [SerializeField] private float _baseSpeedMultiplier = 1f;
 
+    [TabGroup("Projectile")]
+    [SerializeField] private int _baseSplitAvailableCount = 0;
+
+    [TabGroup("Projectile")]
+    [SerializeField] private int _baseSplitProjectileCount = 3;
+
+    [TabGroup("Projectile")]
+    [SerializeField] private float _baseSplitAngleRange = 120f;
+
     [TabGroup("Components")]
     [Header("Attack Trigger")]
     [Required]
@@ -82,6 +91,11 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     /// 투사체가 충돌했을 때 발생하는 이벤트
     /// </summary>
     public event System.Action<IProjectile, Collider> AfterProjectileHit;
+
+    /// <summary>
+    /// 투사체가 소멸되기 전에 발생하는 이벤트
+    /// </summary>
+    public event System.Action<IProjectile> BeforeProjectileDestroyed;
 
     /// <summary>
     /// 투사체가 소멸될 때 발생하는 이벤트
@@ -138,23 +152,22 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     #region IProjectile Implementation
     public ProjectileType ProjectileType => _projectileType;
+    public ProjectileLauncher Owner => _owner;
+
     public bool IsActive => gameObject.activeInHierarchy;
     public float RemainingLifetime => _remainingLifetime;
     public float ForwardSpeed => _forwardSpeedUnitsPerSecond;
     public int PierceCount => _currentPierceCount;
     public float DamageMultiplier => _currentDamageMultiplier;
-    public float SpeedMultiplier => _currentSpeedMultiplier;
 
-    public void SetSpeedMultiplier(float multiplier)
+    public int SplitCount => _currentSplitCount;
+    public int SplitAvailableCount => _currentSplitAvailableCount;
+    public int SplitProjectileCount => _currentSplitProjectileCount;
+    public float SplitAngleRange => _currentSplitAngleRange;
+    public void SetOwner(ProjectileLauncher owner)
     {
-        _currentSpeedMultiplier = Mathf.Max(0f, multiplier);
+        _owner = owner;
     }
-
-    public void ModifySpeedMultiplier(float multiplier)
-    {
-        SetSpeedMultiplier(_currentSpeedMultiplier * multiplier);
-    }
-
     public void SetPierceCount(int pierceCount)
     {
         _currentPierceCount = Mathf.Max(0, pierceCount);
@@ -174,6 +187,62 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     public void ModifyDamageMultiplier(float multiplier)
     {
         SetDamageMultiplier(_currentDamageMultiplier * multiplier);
+    }
+    public void SetSplitCount(int splitCount)
+    {
+        _currentSplitAvailableCount = Mathf.Max(0, splitCount);
+    }
+
+    public void ModifySplitCount(int delta)
+    {
+        SetSplitCount(_currentSplitAvailableCount + delta);
+    }
+
+    public void SetSplitAvailableCount(int availableCount)
+    {
+        _currentSplitAvailableCount = Mathf.Max(0, availableCount);
+    }
+
+    public void ModifySplitAvailableCount(int delta)
+    {
+        SetSplitAvailableCount(_currentSplitAvailableCount + delta);
+    }
+
+    public void SetSplitProjectileCount(int projectileCount)
+    {
+        _currentSplitProjectileCount = Mathf.Max(0, projectileCount);
+    }
+
+    public void ModifySplitProjectileCount(int delta)
+    {
+        SetSplitProjectileCount(_currentSplitProjectileCount + delta);
+    }
+
+    public void SetSplitAngleRange(float angleRange)
+    {
+        _currentSplitAngleRange = Mathf.Clamp(angleRange, 0f, 360f);
+    }
+
+    public void ModifySplitAngleRange(float delta)
+    {
+        SetSplitAngleRange(_currentSplitAngleRange + delta);
+    }
+
+    public IProjectile CreateClone(Vector3 worldPosition, Quaternion worldRotation)
+    {
+        if (_owner == null) return null;
+
+        IProjectile clone = _owner.CreateProjectile(_projectileType, worldPosition, worldRotation, true);
+        if (clone != null)
+        {
+            clone.Initialize(_remainingLifetime, _forwardSpeedUnitsPerSecond);
+            clone.SetDamageMultiplier(_currentDamageMultiplier);
+            clone.SetPierceCount(_currentPierceCount);
+            clone.SetSplitAvailableCount(_currentSplitAvailableCount);
+            clone.SetSplitProjectileCount(_currentSplitProjectileCount);
+            clone.SetSplitAngleRange(_currentSplitAngleRange);
+        }
+        return clone;
     }
     #endregion
 
@@ -200,18 +269,31 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public float CurrentSpeedMultiplier => _currentSpeedMultiplier;
+    public int CurrentSplitAvailableCount => _currentSplitAvailableCount;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public int CurrentSplitProjectileCount => _currentSplitProjectileCount;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentSplitAngleRange => _currentSplitAngleRange;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float CurrentAttackStat => GetCurrentStat(BattleStatType.Attack);
+
     #endregion
 
     #region Private Fields
     private float _remainingLifetime;
     private int _currentPierceCount;
     private float _currentDamageMultiplier;
-    private float _currentSpeedMultiplier;
+    private int _currentSplitCount;
+    private int _currentSplitAvailableCount;
+    private int _currentSplitProjectileCount;
+    private float _currentSplitAngleRange;
+    private ProjectileLauncher _owner;
     #endregion
 
     #region Unity Lifecycle
@@ -282,6 +364,8 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
 
     public void DestroyProjectile()
     {
+        ProcessSplit();
+
         switch (_destroyMode)
         {
             case ProjectileDestroyMode.Deactivate:
@@ -299,6 +383,33 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         OnProjectileDestroyed?.Invoke(this);
     }
 
+    public void ProcessSplit()
+    {
+        Debug.Log($"[ProjectileBase] Attempting to split. Available Splits: {_currentSplitAvailableCount}, Projectiles per Split: {_currentSplitProjectileCount}", this);
+
+        if (_currentSplitAvailableCount <= 0 || _owner == null || _currentSplitProjectileCount <= 0) return;
+
+        _currentSplitAvailableCount--;
+
+        Vector3 originalPosition = transform.position;
+        Vector3 originalDirection = transform.forward;
+
+        float angleStep = _currentSplitAngleRange / (_currentSplitProjectileCount - 1);
+        float startAngle = -_currentSplitAngleRange * 0.5f;
+
+        for (int i = 0; i < _currentSplitProjectileCount; i++)
+        {
+            float currentAngle = startAngle + (angleStep * i);
+            Quaternion yawRotation = Quaternion.AngleAxis(currentAngle, Vector3.up);
+            Vector3 splitDirection = yawRotation * originalDirection;
+            Quaternion splitRotation = Quaternion.LookRotation(splitDirection);
+
+            CreateClone(originalPosition, splitRotation);
+        }
+
+        Debug.Log($"[ProjectileBase] Split into {_currentSplitProjectileCount} cloned projectiles", this);
+    }
+
     /// <summary>
     /// 투사체 소멸 모드 설정
     /// </summary>
@@ -312,7 +423,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     #region Protected Virtual Methods
     protected virtual void GoForward()
     {
-        float actualSpeed = _forwardSpeedUnitsPerSecond * _currentSpeedMultiplier;
+        float actualSpeed = _forwardSpeedUnitsPerSecond;
         transform.Translate(Vector3.forward * actualSpeed * Time.deltaTime);
     }
     #endregion
@@ -322,7 +433,9 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     {
         _currentPierceCount = _basePierceCount;
         _currentDamageMultiplier = _baseDamageMultiplier;
-        _currentSpeedMultiplier = _baseSpeedMultiplier;
+        _currentSplitAvailableCount = _baseSplitAvailableCount;
+        _currentSplitProjectileCount = _baseSplitProjectileCount;
+        _currentSplitAngleRange = _baseSplitAngleRange;
         // BattleStat 완전 초기화
         if (_battleStat != null)
         {
@@ -380,6 +493,10 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     {
         if (!gameObject.activeInHierarchy) return; // 중복 호출 방지
 
+        // 1. 소멸 전 이벤트 호출 (분열 처리용)
+        BeforeProjectileDestroyed?.Invoke(this);
+
+        // 2. 실제 소멸 처리
         DestroyProjectile();
     }
     #endregion

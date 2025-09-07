@@ -21,7 +21,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2429705639421591400
 Transform:
   m_ObjectHideFlags: 0
@@ -156,6 +156,10 @@ MonoBehaviour:
   _lifetimeSeconds: 10
   _basePierceCount: 0
   _baseDamageMultiplier: 1
+  _baseSpeedMultiplier: 1
+  _baseSplitAvailableCount: 0
+  _baseSplitProjectileCount: 0
+  _baseSplitAngleRange: 120
   _attackTrigger: {fileID: 4899914466480511714}
   _rigid: {fileID: 8447907966392869884}
   _battleStat: {fileID: 3720800618165384622}

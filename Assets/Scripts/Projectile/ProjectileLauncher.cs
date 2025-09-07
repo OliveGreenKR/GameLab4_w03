@@ -196,41 +196,6 @@ public class ProjectileLauncher : MonoBehaviour
     }
 
     /// <summary>
-    /// 지정된 위치에 투사체 생성
-    /// </summary>
-    /// <param name="projectileType"> 투사체 타입</param>
-    /// <param name="worldPosition">생성될 위치</param>
-    /// <param name="worldRotation">생성될 회전</param>
-    /// <param name="isForcely"> ture시 풀링 재사용 강제. false시 부족하면 생성</param>
-    /// <returns></returns>
-    public IProjectile CreateProjectile(ProjectileType projectileType, Vector3 worldPosition, Quaternion worldRotation, bool isForcely = false)
-    {
-        if (_projectilePool == null || !_projectilePool.IsInitialized)
-        {
-            Debug.LogError("[ProjectileLauncher] ProjectilePool not initialized!", this);
-            return null;
-        }
-
-        IProjectile projectile = _projectilePool.SpawnProjectile(projectileType, worldPosition, worldRotation, isForcely);
-
-        if (projectile != null)
-        {
-            // 투사체 완전히 초기화 
-            projectile.Initialize(_projectileLifetime, _projectileSpeed);
-            Debug.Log($"[ProjectileLauncher] Spawned projectile of type {projectileType} at {worldPosition}", this);
-
-            // 투사체 소멸 이벤트 구독
-            projectile.OnProjectileDestroyed -= OnProjectileDestroyed;
-            projectile.OnProjectileDestroyed += OnProjectileDestroyed;
-
-            //// 활성 투사체 목록에 추가
-            //_activeProjectiles.Add(projectile);
-        }
-
-        return projectile;
-    }
-
-    /// <summary>
     /// 이펙트 추가
     /// </summary>
     /// <param name="effect">추가할 이펙트</param>
@@ -320,6 +285,44 @@ public class ProjectileLauncher : MonoBehaviour
             // 풀의 부모를 이 Launcher로 설정
             _projectilePool.Initialize(transform);
         }
+    }
+
+    /// <summary>
+    /// 지정된 위치에 투사체 생성
+    /// </summary>
+    /// <param name="projectileType"> 투사체 타입</param>
+    /// <param name="worldPosition">생성될 위치</param>
+    /// <param name="worldRotation">생성될 회전</param>
+    /// <param name="isForcely"> ture시 풀링 재사용 강제. false시 부족하면 생성</param>
+    /// <returns></returns>
+    public IProjectile CreateProjectile(ProjectileType projectileType, Vector3 worldPosition, Quaternion worldRotation, bool isForcely = false)
+    {
+        if (_projectilePool == null || !_projectilePool.IsInitialized)
+        {
+            Debug.LogError("[ProjectileLauncher] ProjectilePool not initialized!", this);
+            return null;
+        }
+
+        IProjectile projectile = _projectilePool.SpawnProjectile(projectileType, worldPosition, worldRotation, isForcely);
+
+        if (projectile != null)
+        {
+            // 투사체 완전히 초기화 
+            projectile.Initialize(_projectileLifetime, _projectileSpeed);
+            Debug.Log($"[ProjectileLauncher] Spawned projectile of type {projectileType} at {worldPosition}", this);
+
+            // Owner 자동 설정 추가
+            projectile.SetOwner(this);
+
+            // 투사체 소멸 이벤트 구독
+            projectile.OnProjectileDestroyed -= OnProjectileDestroyed;
+            projectile.OnProjectileDestroyed += OnProjectileDestroyed;
+
+            //// 활성 투사체 목록에 추가
+            //_activeProjectiles.Add(projectile);
+        }
+
+        return projectile;
     }
 
     private void UpdateCooldown()
