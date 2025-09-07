@@ -57,7 +57,6 @@ public class PiercingEffectSO : ProjectileEffectSO
 
         if (_pierceCount >= 0)
         {
-            projectile.ModifySplitAvailableCount(1);
             if (_applicationMode == PierceApplicationMode.SetAbsolute)
             {
                 projectile.SetPierceCount(_pierceCount);

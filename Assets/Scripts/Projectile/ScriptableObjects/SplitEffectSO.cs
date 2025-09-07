@@ -72,12 +72,12 @@ public class SplitEffectSO : ProjectileEffectSO
         projectile.ModifySplitProjectileCount(_splitCount);
         projectile.SetSplitAngleRange(_splitAngleRangeDegrees);
 
-        LogEffect($"Attached split effect. Available: {projectile.SplitAvailableCount}, Count: {projectile.SplitProjectileCount}, Angle: {projectile.SplitAngleRange}", projectile);
+        //LogEffect($"Attached split effect. Available: {projectile.SplitAvailableCount}, Count: {projectile.SplitProjectileCount}, Angle: {projectile.SplitAngleRange}", projectile);
     }
 
     public override void DetachFromProjectile(IProjectile projectile)
     {
-        LogEffect("Detached from projectile", projectile);
+        //LogEffect("Detached from projectile", projectile);
     }
     #endregion
 
