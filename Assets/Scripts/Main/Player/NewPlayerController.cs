@@ -288,8 +288,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
     public void Fire()
     {
         OnFire?.Invoke();
-        // 발사 로직 구현
-        Debug.Log("[NewPlayerController] Firing...");
+        //Debug.Log("[NewPlayerController] Firing...");
     }
     #endregion
 
