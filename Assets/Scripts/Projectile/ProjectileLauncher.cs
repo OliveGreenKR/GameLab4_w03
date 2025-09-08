@@ -316,7 +316,7 @@ public class ProjectileLauncher : MonoBehaviour
         {
             // 투사체 완전히 초기화 
             projectile.Initialize(_projectileLifetime, _projectileSpeed);
-            Debug.Log($"[ProjectileLauncher] Spawned projectile of type {projectileType} at {worldPosition}", this);
+            //Debug.Log($"[ProjectileLauncher] Spawned projectile of type {projectileType} at {worldPosition}", this);
 
             // Owner 자동 설정 추가
             projectile.SetOwner(this);

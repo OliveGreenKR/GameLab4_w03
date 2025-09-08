@@ -40,7 +40,7 @@ public class LauncherProjectileTeamSyncher : MonoBehaviour
     {
         if (projectile == null)
             return;
-        Debug.Log($"[LauncherSyncer] Setting projectile's TeamId: {_targetTeamId}", this);
+        //Debug.Log($"[LauncherSyncer] Setting projectile's TeamId: {_targetTeamId}", this);
         (projectile as IBattleEntity)?.SetCurrentStat(BattleStatType.TeamId, _targetTeamId);
     }
 }

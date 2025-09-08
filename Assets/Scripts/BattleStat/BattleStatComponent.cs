@@ -173,7 +173,6 @@ public class BattleStatComponent : MonoBehaviour
                 break;
             case BattleStatType.Health:
                 CurrentHealth = value;
-                Debug.Log($"CurrentHealth : {value}");
                 ClampHealth();
                 break;
             case BattleStatType.MaxHealth:

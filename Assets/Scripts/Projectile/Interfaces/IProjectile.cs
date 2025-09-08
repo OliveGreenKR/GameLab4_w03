@@ -210,4 +210,11 @@ public interface IProjectile
     /// </summary>
     event Action<IProjectile> OnProjectileUpdate;
     #endregion
+
+    #region Debug Methods
+    /// <summary>
+    /// 투사체의 모든 스탯 정보를 로그로 출력
+    /// </summary>
+    void LogAllStats();
+    #endregion
 }

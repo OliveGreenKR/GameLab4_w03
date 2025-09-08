@@ -300,7 +300,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         _remainingLifetime = _lifetimeSeconds;
         InitializeProjectileStats();
         OnProjectileActivated?.Invoke(this);
-        Debug.Log($"[ProjectileBase] Projectile Activated. Lifetime: {_lifetimeSeconds}s, Speed: {_forwardSpeedUnitsPerSecond} units/sec", this);
+        //Debug.Log($"[ProjectileBase] Projectile Activated. Lifetime: {_lifetimeSeconds}s, Speed: {_forwardSpeedUnitsPerSecond} units/sec", this);
     }
 
     private void OnDisable()
@@ -375,10 +375,12 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
             Vector3 splitDirection = yawRotation * originalDirection;
             Quaternion splitRotation = Quaternion.LookRotation(splitDirection);
 
-            CreateClone(originalPosition, splitRotation);
+            var splited = CreateClone(originalPosition, splitRotation);
+            splited.LogAllStats();
         }
 
         Debug.Log($"[ProjectileBase] Split into {_currentSplitProjectileCount} cloned projectiles", this);
+        
     }
 
     /// <summary>
@@ -426,7 +428,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         if (_battleStat != null)
         {
             _battleStat.SetCurrentStat(BattleStatType.Health, _currentPierceCount + 1); // +1: 최소 1번 충돌 가능
-            Debug.Log($"[ProjectileBase] Synced PierceCount {_currentPierceCount} to BattleStat Health {_battleStat.GetCurrentStat(BattleStatType.Health)}", this);
+            //Debug.Log($"[ProjectileBase] Synced PierceCount {_currentPierceCount} to BattleStat Health {_battleStat.GetCurrentStat(BattleStatType.Health)}", this);
         }
     }
 
@@ -460,6 +462,45 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
 
         // 2. 실제 소멸 처리
         DestroyProjectile();
+    }
+    #endregion
+
+    #region Debug Methods
+    /// <summary>
+    /// 투사체의 모든 스탯 정보를 로그로 출력
+    /// </summary>
+    public void LogAllStats()
+    {
+        string logMessage = $"\n=== Projectile Stats Debug [{gameObject.name}] ===\n";
+
+        // Basic Info
+        logMessage += $"Type: {_projectileType}, Active: {IsActive}\n";
+        logMessage += $"Remaining Lifetime: {_remainingLifetime:F2}s\n";
+        logMessage += $"Forward Speed: {_forwardSpeedUnitsPerSecond:F2} units/sec\n\n";
+
+        // Battle Stats
+        if (_battleStat != null)
+        {
+            logMessage += "=== Battle Stats ===\n";
+            logMessage += $"Team ID: {_battleStat.TeamId}\n";
+            logMessage += $"Health: {_battleStat.CurrentHealth:F2} / {_battleStat.MaxHealth:F2}\n";
+            logMessage += $"Attack: {_battleStat.CurrentAttack:F2}\n";
+            logMessage += $"Attack Speed: {_battleStat.CurrentAttackSpeed:F2}\n";
+            logMessage += $"Effect Range: {_battleStat.CurrentEffectRange:F2}\n\n";
+        }
+
+        // Projectile Specific Stats
+        logMessage += "=== Projectile Stats ===\n";
+        logMessage += $"Pierce Count: {_currentPierceCount}\n";
+        logMessage += $"Damage Multiplier: {_currentDamageMultiplier:F2}x\n";
+        logMessage += $"Split Available: {_currentSplitAvailableCount}\n";
+        logMessage += $"Split Projectile Count: {_currentSplitProjectileCount}\n";
+        logMessage += $"Split Angle Range: {_currentSplitAngleRange:F1}°\n";
+        logMessage += $"Final Damage: {GetCurrentStat(BattleStatType.Attack) * _currentDamageMultiplier:F2}\n";
+
+        logMessage += "=====================================";
+
+        Debug.Log(logMessage, this);
     }
     #endregion
 }
