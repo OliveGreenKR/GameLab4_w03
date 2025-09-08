@@ -22,6 +22,7 @@ MonoBehaviour:
     - 958c65ae820da304fb43b0c3deec1e77
     - 20291f9ba06235944b5d88bd8e43e718
     - 7f64bea93e93e714ab5f7739f54d7816
+    - 77ac6c011f583d2458ddacda94c54ea6
     values:
     - iconNameOrGuid: 
       colorIndex: 4
@@ -53,6 +54,10 @@ MonoBehaviour:
       isColorRecursive: 1
     - iconNameOrGuid: SceneAsset Icon
       colorIndex: 1
+      isIconRecursive: 0
+      isColorRecursive: 1
+    - iconNameOrGuid: 
+      colorIndex: 10
       isIconRecursive: 0
       isColorRecursive: 1
   bookmarks:

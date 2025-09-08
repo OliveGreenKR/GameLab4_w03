@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3a75a51bfe3b6844a91b03951aeba52, type: 3}
   m_Name: testWallStat
   m_EditorClassIdentifier: 
-  _baseHealth: 50
-  _maxHealth: 1
+  _baseHealth: 100000
+  _maxHealth: 100000
   _baseAttack: 0
   _baseAttackSpeed: 0.1
   _baseEffectRange: 0.1

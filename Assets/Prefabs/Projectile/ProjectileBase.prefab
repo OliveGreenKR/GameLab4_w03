@@ -32,8 +32,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 3720800618165384622}
-  _invulnerabilityDuration: 1
+  _invulnerabilityDuration: 0
   _destroyMode: 0
   _projectileType: 0
   _forwardSpeedUnitsPerSecond: 100
@@ -162,6 +162,7 @@ MonoBehaviour:
   _baseSplitAvailableCount: 0
   _baseSplitProjectileCount: 0
   _baseSplitAngleRange: 120
+  _maxSplitDelayedTime: 1
   _attackTrigger: {fileID: 4899914466480511714}
   _rigid: {fileID: 8447907966392869884}
 --- !u!114 &3720800618165384622

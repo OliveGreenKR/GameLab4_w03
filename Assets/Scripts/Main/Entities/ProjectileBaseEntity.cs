@@ -57,6 +57,10 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     [TabGroup("Projectile")]
     [SerializeField] private float _baseSplitAngleRange = 120f;
 
+    [TabGroup("Projectile")]
+    [SuffixLabel("secs")]
+    [SerializeField] private float _maxSplitDelayedTime = 1.0f;
+
     [TabGroup("Components")]
     [Header("Attack Trigger")]
     [Required]
@@ -124,6 +128,16 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         //Debug.Log("[ProjectileBase] Projectile has been destroyed.", this);
         HandleProjectileDeath(); // 통합 함수 호출
+    }
+
+    protected override void OnValidTriggerExited(IBattleEntity target)
+    {
+        //투사체 지연 상태 중 관통 종료 시 바로 분열
+        if (_isSplitDelayed)
+        {
+            Debug.LogWarning($"TriggerExit! try to Split!");
+            ExecuteDelayedSplit();
+        }
     }
     #endregion
 
@@ -212,6 +226,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         IProjectile clone = _owner.CreateProjectile(_projectileType, worldPosition, worldRotation, true);
         if (clone != null)
         {
+            // 현재 상태 그대로 복사
             clone.Initialize(_remainingLifetime, _forwardSpeedUnitsPerSecond);
             clone.SetDamageMultiplier(_currentDamageMultiplier);
             clone.SetPierceCount(_currentPierceCount);
@@ -224,48 +239,48 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     #endregion
 
     #region Properties
-    [TabGroup("Debug/State")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public ProjectileDestroyMode CurrentDestroyMode => _destroyMode;
 
-    [TabGroup("Debug/State")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float RemainingLifeTime => _remainingLifetime;
 
-    [TabGroup("Debug/State")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public Collider AttackTrigger => _attackTrigger;
 
-    [TabGroup("Debug/State")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float CurrentDamageMultiplier => _currentDamageMultiplier;
 
-    [TabGroup("Debug/State")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public int CurrentSplitProjectileCount => _currentSplitProjectileCount;
 
-    [TabGroup("Debug/State")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float CurrentAttackStat => GetCurrentStat(BattleStatType.Attack);
 
-    [TabGroup("Debug/Pierce")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public int CurrentPierceCount => _currentPierceCount;
 
-    [TabGroup("Debug/Split")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     [SuffixLabel("degrees")]
     public float CurrentSplitAngleRange => _currentSplitAngleRange;
 
-    [TabGroup("Debug/Split")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public int CurrentSplitAvailableCount => _currentSplitAvailableCount;
 
-    [TabGroup("Debug/Split")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public bool IsSplitDelayed => _isSplitDelayed;
 
-    [TabGroup("Debug/Split")]
+    [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float SplitDelayTimeRemaining => _splitDelayTimeRemaining;
 
@@ -289,7 +304,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     //Split Delay System
     private bool _isSplitDelayed = false;
     private float _splitDelayTimeRemaining = 0f;
-    private float _splitDelayedMoveDistance = 2f;
 
     #endregion
 
@@ -304,6 +318,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         base.Update();
 
         UpdateLifetime();
+        UpdateSplitDelay();
         GoForward();
         OnProjectileUpdate?.Invoke(this);
     }
@@ -353,25 +368,14 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         _remainingLifetime = _lifetimeSeconds;
         InitializeProjectileStats();
     }
+
+    /// <summary>
+    ///  투사체 파괴
+    /// </summary>
     public void DestroyProjectile()
     {
         ProcessSplit();
-
-        switch (_destroyMode)
-        {
-            case ProjectileDestroyMode.Deactivate:
-                // 비활성화 (풀링용) - 외부에서 이벤트 구독으로 풀 반환 처리
-                gameObject.SetActive(false);
-                break;
-
-            case ProjectileDestroyMode.Destroy:
-                // 실제 파괴
-                Destroy(gameObject);
-                break;
-        }
-
-        // IProjectile 소멸 이벤트 호출
-        OnProjectileDestroyed?.Invoke(this);
+        DestroyProjectileWithoutSplit();
     }
 
     public void ProcessSplit()
@@ -388,6 +392,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         float angleStep = _currentSplitAngleRange / (_currentSplitProjectileCount - 1);
         float startAngle = -_currentSplitAngleRange * 0.5f;
 
+        int splitedcloneCount = 0;
         for (int i = 0; i < _currentSplitProjectileCount; i++)
         {
             float currentAngle = startAngle + (angleStep * i);
@@ -395,12 +400,17 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
             Vector3 splitDirection = yawRotation * originalDirection;
             Quaternion splitRotation = Quaternion.LookRotation(splitDirection);
 
-            var splited = CreateClone(originalPosition, splitRotation);
-            splited.LogAllStats();
+            var clone = CreateClone(originalPosition, splitRotation);
+            if (clone != null)
+            {
+                clone.LogAllStats();
+                splitedcloneCount++;
+                //for debug
+                clone.GameObject.transform.SetParent(this.transform.parent);
+            }
         }
 
-        Debug.Log($"[ProjectileBase] Split into {_currentSplitProjectileCount} cloned projectiles", this);
-        
+        Debug.Log($"[ProjectileBase] Split into {splitedcloneCount} cloned projectiles", this);
     }
 
     /// <summary>
@@ -462,12 +472,56 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         }
     }
 
+    private void UpdateSplitDelay()
+    {
+        if (!_isSplitDelayed) return;
+
+        _splitDelayTimeRemaining -= Time.deltaTime;
+
+        if (_splitDelayTimeRemaining <= 0f)
+        {
+            Debug.LogWarning("SplitDelayTimeElapsed! Executing Split now.");
+            ExecuteDelayedSplit();
+        }
+    }
+
+    private void ExecuteDelayedSplit()
+    {
+        if (!_isSplitDelayed) return;
+
+        // 분열 실행
+
+        ProcessSplit();
+
+        // 분열 지연 상태 해제
+        _isSplitDelayed = false;
+        _splitDelayTimeRemaining = 0f;
+
+        // 소멸 처리
+        DestroyProjectileWithoutSplit();
+    }
+
     private void ClearAllEvents()
     {
         OnProjectileActivated = null;
         OnProjectileHit = null;
         OnProjectileDestroyed = null;
         OnProjectileUpdate = null;
+    }
+
+    private void DestroyProjectileWithoutSplit()
+    {
+        switch (_destroyMode)
+        {
+            case ProjectileDestroyMode.Deactivate:
+                gameObject.SetActive(false);
+                break;
+            case ProjectileDestroyMode.Destroy:
+                Destroy(gameObject);
+                break;
+        }
+
+        OnProjectileDestroyed?.Invoke(this);
     }
 
     /// <summary>
@@ -477,11 +531,22 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         if (!gameObject.activeInHierarchy) return; // 중복 호출 방지
 
-        // 1. 소멸 전 이벤트 호출 (분열 처리용)
+        // 분열 조건 체크
+        if (SplitAvailableCount > 0 && !_isSplitDelayed)
+        {
+            _isSplitDelayed = true;
+            _splitDelayTimeRemaining = _maxSplitDelayedTime;
+            Debug.Log($"[ProjectileBase] Split delayed started. Time remaining: {_splitDelayTimeRemaining:F2}s", this);
+            return; // 즉시 소멸하지 않음
+        }
+
+        // 1. 소멸 전 이벤트 호출
         BeforeProjectileDestroyed?.Invoke(this);
 
-        // 2. 실제 소멸 처리
-        DestroyProjectile();
+        //// 2. 실제 소멸 처리
+        //DestroyProjectile();
+        //2.실제 소멸 처리(분열 없음)
+        DestroyProjectileWithoutSplit();
     }
     #endregion
 

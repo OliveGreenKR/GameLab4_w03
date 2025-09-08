@@ -68,6 +68,7 @@ MonoBehaviour:
         keys:
         - globalObjectIdString: GlobalObjectId_V1-2-f0230b2f773680e49a4b12c68398d409-120238662-0
         - globalObjectIdString: GlobalObjectId_V1-2-f0230b2f773680e49a4b12c68398d409-1676449833-0
+        - globalObjectIdString: GlobalObjectId_V1-2-f0230b2f773680e49a4b12c68398d409-2292962689582245965-8441707565246381950
         values:
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
@@ -77,5 +78,11 @@ MonoBehaviour:
           iconNameOrGuid: 
           isIconRecursive: 0
           isColorRecursive: 1
+        - colorIndex: 0
+          iconNameOrGuid: AimConstraint Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
   bookmarks: []
-  bookmarkedScenePaths: []
+  bookmarkedScenePaths:
+  - Assets/Scenes/NewControlTest.unity
+  - Assets/Scenes/ProjectileTest.unity
