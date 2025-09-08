@@ -281,6 +281,8 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
 
     private void Update()
     {
+        base.Update();
+
         UpdateLifetime();
         GoForward();
         OnProjectileUpdate?.Invoke(this);
@@ -409,10 +411,10 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         if (_battleStat != null)
         {
             _battleStat.InitializeStats(); // BattleStatData로부터 완전 리셋
-            Debug.Log($"[ProjectileBase] Initialized BattleStat for Projectile.", this);
-            //현재 스탯 출력
-            Debug.Log($"[ProjectileBase] Current Attack Stat: {GetCurrentStat(BattleStatType.Attack)}", this);
-            Debug.Log($"[ProjectileBase] Current Health Stat: {GetCurrentStat(BattleStatType.Health)}", this);
+            //Debug.Log($"[ProjectileBase] Initialized BattleStat for Projectile.", this);
+            ////현재 스탯 출력
+            //Debug.Log($"[ProjectileBase] Current Attack Stat: {GetCurrentStat(BattleStatType.Attack)}", this);
+            //Debug.Log($"[ProjectileBase] Current Health Stat: {GetCurrentStat(BattleStatType.Health)}", this);
 
         }
         SyncPierceCountToBattleStat();
