@@ -49,6 +49,11 @@ public interface IProjectile
     /// 전진 속도
     /// </summary>
     float ForwardSpeed { get; }
+
+    /// <summary>
+    /// 속도 배율
+    /// </summary>
+    float SpeedMultiplier { get; }
     #endregion
 
     #region Projectile Specific Properties
@@ -70,7 +75,7 @@ public interface IProjectile
     /// <summary>
     /// 분열 가능 횟수
     /// </summary>
-    int SplitAvailableCount { get; }      
+    int SplitAvailableCount { get; }
 
     /// <summary>
     /// 분열 투사체 개수
@@ -79,7 +84,7 @@ public interface IProjectile
     /// <summary>
     /// 분열 각도 범위
     /// </summary>
-    float SplitAngleRange { get; }        
+    float SplitAngleRange { get; }
 
     /// <summary>
     /// 투사체 소유자 (Pool 접근용)
@@ -120,6 +125,30 @@ public interface IProjectile
     /// </summary>
     /// <param name="multiplier">곱할 배율</param>
     void ModifyDamageMultiplier(float multiplier);
+
+    /// <summary>
+    /// 속도 배율 설정
+    /// </summary>
+    /// <param name="multiplier">속도 배율</param>
+    void SetSpeedMultiplier(float multiplier);
+
+    /// <summary>
+    /// 속도 배율 수정
+    /// </summary>
+    /// <param name="multiplier">곱할 배율</param>
+    void ModifySpeedMultiplier(float multiplier);
+
+    /// <summary>
+    /// 생명 시간 설정
+    /// </summary>
+    /// <param name="lifetimeSeconds">생명 시간 (초)</param>
+    void SetLifetime(float lifetimeSeconds);
+
+    /// <summary>
+    /// 생명 시간 수정
+    /// </summary>
+    /// <param name="delta">변화량 (초)</param>
+    void ModifyLifetime(float delta);
 
     /// <summary>
     /// 분열 가능 횟수 설정

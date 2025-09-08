@@ -148,6 +148,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     public bool IsActive => gameObject.activeInHierarchy;
     public float RemainingLifetime => _remainingLifetime;
     public float ForwardSpeed => _forwardSpeedUnitsPerSecond;
+    public float SpeedMultiplier => _currentSpeedMultiplier;
     public int PierceCount => _currentPierceCount;
     public float DamageMultiplier => _currentDamageMultiplier;
 
@@ -155,10 +156,12 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     public int SplitAvailableCount => _currentSplitAvailableCount;
     public int SplitProjectileCount => _currentSplitProjectileCount;
     public float SplitAngleRange => _currentSplitAngleRange;
+
     public void SetOwner(ProjectileLauncher owner)
     {
         _owner = owner;
     }
+
     public void SetPierceCount(int pierceCount)
     {
         _currentPierceCount = Mathf.Max(0, pierceCount);
@@ -179,6 +182,27 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         SetDamageMultiplier(_currentDamageMultiplier * multiplier);
     }
+
+    public void SetSpeedMultiplier(float multiplier)
+    {
+        _currentSpeedMultiplier = Mathf.Max(0f, multiplier);
+    }
+
+    public void ModifySpeedMultiplier(float multiplier)
+    {
+        SetSpeedMultiplier(_currentSpeedMultiplier * multiplier);
+    }
+
+    public void SetLifetime(float lifetimeSeconds)
+    {
+        _remainingLifetime = Mathf.Max(0f, lifetimeSeconds);
+    }
+
+    public void ModifyLifetime(float delta)
+    {
+        SetLifetime(_remainingLifetime + delta);
+    }
+
     public void SetSplitCount(int splitCount)
     {
         _currentSplitAvailableCount = Mathf.Max(0, splitCount);
@@ -229,6 +253,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
             // 현재 상태 그대로 복사
             clone.Initialize(_remainingLifetime, _forwardSpeedUnitsPerSecond);
             clone.SetDamageMultiplier(_currentDamageMultiplier);
+            clone.SetSpeedMultiplier(_currentSpeedMultiplier);
             clone.SetPierceCount(_currentPierceCount);
             clone.SetSplitAvailableCount(_currentSplitAvailableCount);
             clone.SetSplitProjectileCount(_currentSplitProjectileCount);
@@ -254,6 +279,10 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float CurrentDamageMultiplier => _currentDamageMultiplier;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentSpeedMultiplier => _currentSpeedMultiplier;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -291,6 +320,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     private float _remainingLifetime;
     private int _currentPierceCount;
     private float _currentDamageMultiplier;
+    private float _currentSpeedMultiplier;
 
     //Split
     private int _currentSplitCount;
@@ -426,7 +456,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     #region Protected Virtual Methods
     protected virtual void GoForward()
     {
-        float actualSpeed = _forwardSpeedUnitsPerSecond;
+        float actualSpeed = _forwardSpeedUnitsPerSecond * _currentSpeedMultiplier;
         transform.Translate(Vector3.forward * actualSpeed * Time.deltaTime);
     }
     #endregion
@@ -436,6 +466,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         _currentPierceCount = _basePierceCount;
         _currentDamageMultiplier = _baseDamageMultiplier;
+        _currentSpeedMultiplier = _baseSpeedMultiplier;
         _currentSplitAvailableCount = _baseSplitAvailableCount;
         _currentSplitProjectileCount = _baseSplitProjectileCount;
         _currentSplitAngleRange = _baseSplitAngleRange;

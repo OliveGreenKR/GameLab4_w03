@@ -1850,6 +1850,10 @@ PrefabInstance:
       propertyPath: '_effectAssets.Array.data[1]'
       value: 
       objectReference: {fileID: 11400000, guid: c6540b7774face34599de37487c77635, type: 2}
+    - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
+      propertyPath: _projectilePool._defaultPoolSize
+      value: 500
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

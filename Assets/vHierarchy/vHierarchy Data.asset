@@ -31,6 +31,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-1706992993-0
         - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-582958704-0
         - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-1624371177-0
+        - globalObjectIdString: GlobalObjectId_V1-2-674dac6e05f8d5b4fa7307ee0be52d4d-282901906-0
         values:
         - colorIndex: 0
           iconNameOrGuid: CapsuleCollider Icon
@@ -62,6 +63,10 @@ MonoBehaviour:
           isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: AvatarMask On Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Settings Icon
           isIconRecursive: 0
           isColorRecursive: 0
     - goDatas_byGlobalId:
