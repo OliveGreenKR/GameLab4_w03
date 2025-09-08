@@ -54,8 +54,8 @@ MonoBehaviour:
     - {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
   _shootTransform: {fileID: 2441022364053703845}
   _fireRatePerSecond: 100
-  _projectileLifetime: 8
-  _projectileSpeed: 22.1
+  _projectileLifetime: 5
+  _projectileSpeed: 50
   _effectAssets: []
 --- !u!114 &9048291988229795870
 MonoBehaviour:
@@ -71,7 +71,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetTeamId: 0
   _launcher: {fileID: 4324545142038273385}
-  _launcherOwnerObject: {fileID: 0}
 --- !u!1 &8061087168923853731
 GameObject:
   m_ObjectHideFlags: 0

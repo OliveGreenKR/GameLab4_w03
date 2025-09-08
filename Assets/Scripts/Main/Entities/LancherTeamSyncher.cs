@@ -2,45 +2,25 @@
 using System.Xml.Serialization;
 using UnityEngine;
 
-public class LauncherTeamSyncer : MonoBehaviour
+public class LauncherProjectileTeamSyncher : MonoBehaviour
 {
     [SerializeField] int _targetTeamId = 0;
     [Required][SerializeField] ProjectileLauncher _launcher = null;
-    [Required][SerializeField] GameObject _launcherOwnerObject = null;
-
-    IBattleEntity _launcherOwner = null;
-
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if(_launcherOwnerObject == null)
-        {
-           _launcherOwnerObject = gameObject;
-        }
-
         if (_launcher == null)
         {
             _launcher = GetComponent<ProjectileLauncher>();
 
-            if(_launcher == null)
+            if (_launcher == null)
             {
                 Debug.LogError("[LauncherSyncer] ProjectileLauncher component not found on the GameObject!", this);
                 enabled = false;
                 return;
             }
-            
-        }
-        if(_launcherOwner == null)
-        {
-            _launcherOwner = _launcherOwnerObject.GetComponentInParent<IBattleEntity>();
 
-            if (_launcherOwner == null)
-            {
-                Debug.LogError("[LauncherSyncer] Launcher Owner (IBattleEntity) is not assigned!", this);
-                enabled = false;
-                return;
-            }
         }
 
     }
@@ -60,11 +40,8 @@ public class LauncherTeamSyncer : MonoBehaviour
     {
         if (projectile == null)
             return;
-        if (_launcherOwner != null)
-        {
-            Debug.Log($"[LauncherSyncer] Setting projectile's owner and team. Owner: {_launcherOwner.GameObject.name}, TeamId: {_launcherOwner.TeamId}", this);
-            (projectile as IBattleEntity)?.SetCurrentStat(BattleStatType.TeamId, _launcherOwner.TeamId);
-        }
+        Debug.Log($"[LauncherSyncer] Setting projectile's TeamId: {_targetTeamId}", this);
+        (projectile as IBattleEntity)?.SetCurrentStat(BattleStatType.TeamId, _targetTeamId);
     }
 }
 
