@@ -1,6 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -37,17 +38,37 @@ public class EnemySpawner : MonoBehaviour
 
     [TabGroup("Difficulty")]
     [Header("Difficulty Progression")]
+    [InfoBox("매 주기마다 반드시 적용되는 최소값 증가량입니다.")]
     [SerializeField] private DifficultyProgression _difficultyProgression;
 
     [TabGroup("Difficulty")]
-    [Header("Max Value Upgrades")]
-    [SerializeField] private WeightedMaxUpgrade[] _maxUpgrades;
+    [Header("Weight-Based Max Value Upgrades")]
+    [InfoBox("가중치에 따라 매 주기마다 하나의 최대값 업그레이드가 선택됩니다.")]
+    [SerializeField] private WeightBasedUpgradeCollection _maxUpgradeCollection;
 
     [TabGroup("Difficulty")]
     [Header("Difficulty Timing")]
     [SuffixLabel("spawns")]
     [PropertyRange(1, 50)]
     [SerializeField] private int _difficultyUpdateInterval = 5;
+    #endregion
+
+    #region Serialized Funcitons for Debug
+
+    [ButtonGroup("DebugSpawns")]
+    [Button(ButtonSizes.Large)]
+    [GUIColor(0.4f, 0.4f, 1f)]
+    private void SpawnImmediateButton() => SpawnImmediate();
+
+    [ButtonGroup("DebugDifficulty")]
+    [Button(ButtonSizes.Large)]
+    [GUIColor(0.4f, 1f, 0.4f)]
+    private void DifficultyUpgrade() => UpgradeDifficulty();
+
+    [ButtonGroup("DebugDifficulty")]
+    [GUIColor(0.4f, 1f, 0.4f)]
+    private void ResetDiffy() => ResetDifficulty();
+
     #endregion
 
     #region Events
@@ -103,6 +124,26 @@ public class EnemySpawner : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public int ActiveSpawnPointCount => _spawnPoints?.Length ?? 0;
+
+    [TabGroup("Weight System Debug")]
+    [ShowInInspector, ReadOnly]
+    [InfoBox("현재 주기의 총 가중치 합계")]
+    public float CurrentTotalWeight => _maxUpgradeCollection?.GetTotalWeight(CurrentCycle) ?? 0f;
+
+    [TabGroup("Weight System Debug")]
+    [ShowInInspector, ReadOnly]
+    [InfoBox("각 업그레이드별 현재 선택 확률 (%)")]
+    public Dictionary<MaxUpgradeTarget, float> CurrentUpgradeProbabilities =>
+        _maxUpgradeCollection?.GetSelectionProbabilities(CurrentCycle) ?? new Dictionary<MaxUpgradeTarget, float>();
+
+    [TabGroup("Weight System Debug")]
+    [ShowInInspector, ReadOnly]
+    [InfoBox("가중치 시스템 설정 검증 결과")]
+    public string WeightSystemValidation => _maxUpgradeCollection?.ValidateConfiguration() ?? "설정되지 않음";
+
+    [TabGroup("Weight System Debug")]
+    [ShowInInspector, ReadOnly]
+    public WeightBasedUpgrade? LastSelectedUpgrade { get; private set; }
     #endregion
 
     #region Private Fields
@@ -110,7 +151,6 @@ public class EnemySpawner : MonoBehaviour
     private int _currentMinPackSize;
     private int _currentMaxPackSize;
     private float _nextSpawnTime;
-    private Dictionary<MaxUpgradeTarget, float> _currentWeights;
     #endregion
 
     #region Unity Lifecycle
@@ -137,7 +177,6 @@ public class EnemySpawner : MonoBehaviour
 
         // 초기 상태 설정
         InitializeStatRanges();
-        InitializeWeights();
 
         CurrentCycle = 1;
         SpawnCount = 0;
@@ -252,30 +291,31 @@ public class EnemySpawner : MonoBehaviour
         CurrentCycle = 1;
         SpawnCount = 0;
 
-        // 가중치 초기화
-        InitializeWeights();
+        // 가중치 시스템 상태 초기화
+        LastSelectedUpgrade = null;
+
+        // 가중치 시스템 검증
+        if (_maxUpgradeCollection != null)
+        {
+            string validationResult = _maxUpgradeCollection.ValidateConfiguration();
+            if (validationResult != "설정이 올바릅니다.")
+            {
+                Debug.LogWarning($"[EnemySpawner] Weight system validation after reset: {validationResult}", this);
+            }
+            else
+            {
+                var initialProbabilities = _maxUpgradeCollection.GetSelectionProbabilities(CurrentCycle);
+                string probabilityInfo = string.Join(", ",
+                    initialProbabilities.Select(kvp => $"{kvp.Key.GetDisplayName()}: {kvp.Value:F1}%"));
+                Debug.Log($"[EnemySpawner] Reset complete - Initial upgrade probabilities: {probabilityInfo}", this);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[EnemySpawner] Max upgrade collection is null after reset", this);
+        }
 
         Debug.Log("[EnemySpawner] Difficulty reset to initial values", this);
-        OnDifficultyUpgraded?.Invoke(CurrentCycle);
-    }
-
-    /// <summary>
-    /// 수동 난이도 업그레이드
-    /// </summary>
-    public void UpgradeDifficulty()
-    {
-        CurrentCycle++;
-
-        // 필수 업그레이드 적용
-        ApplyMandatoryUpgrades();
-
-        // 확률적 최대값 업그레이드 처리
-        ProcessWeightedMaxUpgrades();
-
-        // 가중치 업데이트
-        UpdateUpgradeWeights();
-
-        Debug.Log($"[EnemySpawner] Manual difficulty upgrade to cycle {CurrentCycle}", this);
         OnDifficultyUpgraded?.Invoke(CurrentCycle);
     }
 
@@ -296,6 +336,23 @@ public class EnemySpawner : MonoBehaviour
         _currentStatRange.SetMaxValue(statType, maxValue);
 
         Debug.Log($"[EnemySpawner] {statType} range set to [{minValue:F1}, {maxValue:F1}]", this);
+    }
+
+    /// <summary>
+    /// 수동 난이도 업그레이드
+    /// </summary>
+    public void UpgradeDifficulty()
+    {
+        CurrentCycle++;
+
+        // 필수 업그레이드 적용
+        ApplyMandatoryUpgrades();
+
+        // 가중치 기반 최대값 업그레이드 처리
+        ProcessWeightBasedMaxUpgrade();
+
+        Debug.Log($"[EnemySpawner] Manual difficulty upgrade to cycle {CurrentCycle}", this);
+        OnDifficultyUpgraded?.Invoke(CurrentCycle);
     }
     #endregion
 
@@ -406,6 +463,37 @@ public class EnemySpawner : MonoBehaviour
     #endregion
 
     #region Private Methods - Difficulty Logic
+    private void ProcessWeightBasedMaxUpgrade()
+    {
+        if (_maxUpgradeCollection == null)
+        {
+            Debug.LogWarning("[EnemySpawner] Max upgrade collection is null", this);
+            return;
+        }
+
+        // 가중치 시스템 검증
+        string validationResult = _maxUpgradeCollection.ValidateConfiguration();
+        if (validationResult != "설정이 올바릅니다.")
+        {
+            Debug.LogError($"[EnemySpawner] Weight system validation failed: {validationResult}", this);
+            return;
+        }
+
+        // 가중치 기반으로 하나의 업그레이드 선택
+        WeightBasedUpgrade? selectedUpgrade = _maxUpgradeCollection.SelectUpgrade(CurrentCycle);
+
+        if (selectedUpgrade.HasValue)
+        {
+            ApplyWeightBasedUpgrade(selectedUpgrade.Value);
+            LastSelectedUpgrade = selectedUpgrade.Value;
+        }
+        else
+        {
+            Debug.LogWarning("[EnemySpawner] No upgrade selected from weight system", this);
+            LastSelectedUpgrade = null;
+        }
+    }
+
     private void CheckDifficultyUpgrade()
     {
         if (SpawnCount % _difficultyUpdateInterval == 0)
@@ -415,11 +503,8 @@ public class EnemySpawner : MonoBehaviour
             // 필수 업그레이드 적용
             ApplyMandatoryUpgrades();
 
-            // 확률적 최대값 업그레이드 처리
-            ProcessWeightedMaxUpgrades();
-
-            // 가중치 업데이트
-            UpdateUpgradeWeights();
+            // 가중치 기반 최대값 업그레이드 처리
+            ProcessWeightBasedMaxUpgrade();
 
             Debug.Log($"[EnemySpawner] Auto difficulty upgrade to cycle {CurrentCycle}", this);
             OnDifficultyUpgraded?.Invoke(CurrentCycle);
@@ -452,66 +537,40 @@ public class EnemySpawner : MonoBehaviour
                 _currentStatRange.SetMaxValue(statType, currentMin);
             }
         }
+
+        Debug.Log($"[EnemySpawner] Mandatory upgrades applied - Min Pack Size: {_currentMinPackSize}", this);
     }
 
-    private void ProcessWeightedMaxUpgrades()
+    private void ApplyWeightBasedUpgrade(WeightBasedUpgrade upgrade)
     {
-        if (_maxUpgrades == null || _maxUpgrades.Length == 0) return;
-
-        foreach (WeightedMaxUpgrade upgrade in _maxUpgrades)
-        {
-            if (ShouldApplyMaxUpgrade(upgrade))
-            {
-                ApplyMaxUpgrade(upgrade);
-            }
-        }
-    }
-
-    private bool ShouldApplyMaxUpgrade(WeightedMaxUpgrade upgrade)
-    {
-        if (!_currentWeights.ContainsKey(upgrade.target))
-            return false;
-
-        float currentWeight = _currentWeights[upgrade.target];
-        float randomValue = UnityEngine.Random.Range(0f, 100f);
-
-        return randomValue < currentWeight;
-    }
-
-    private void ApplyMaxUpgrade(WeightedMaxUpgrade upgrade)
-    {
-        if (upgrade.target.IsPackSizeUpgrade())
+        if (upgrade.IsPackSizeUpgrade)
         {
             // 팩 사이즈 최대값 업그레이드
             _currentMaxPackSize += Mathf.RoundToInt(upgrade.upgradeAmount);
-            Debug.Log($"[EnemySpawner] Pack size max upgraded by {upgrade.upgradeAmount:F1} to {_currentMaxPackSize}", this);
+
+            Debug.Log($"[EnemySpawner] Pack size max upgraded by {upgrade.upgradeAmount:F1} to {_currentMaxPackSize} " +
+                     $"(Weight: {upgrade.GetCurrentWeight(CurrentCycle):F1})", this);
         }
         else
         {
             // 스탯 최대값 업그레이드
-            SpawnStatType statType = upgrade.target.ToSpawnStatType();
+            SpawnStatType statType = upgrade.GetStatType();
             float currentMax = _currentStatRange.GetMaxValue(statType);
             float newMax = currentMax + upgrade.upgradeAmount;
             _currentStatRange.SetMaxValue(statType, newMax);
 
-            Debug.Log($"[EnemySpawner] {statType} max upgraded by {upgrade.upgradeAmount:F1} to {newMax:F1}", this);
+            Debug.Log($"[EnemySpawner] {statType} max upgraded by {upgrade.upgradeAmount:F1} to {newMax:F1} " +
+                     $"(Weight: {upgrade.GetCurrentWeight(CurrentCycle):F1})", this);
+
             OnMaxValueUpgraded?.Invoke(upgrade.target, newMax);
         }
-    }
 
-    private void UpdateUpgradeWeights()
-    {
-        if (_maxUpgrades == null) return;
+        // 선택 확률 정보 로깅
+        var probabilities = _maxUpgradeCollection.GetSelectionProbabilities(CurrentCycle);
+        string probabilityInfo = string.Join(", ",
+            probabilities.Select(kvp => $"{kvp.Key.GetDisplayName()}: {kvp.Value:F1}%"));
 
-        foreach (WeightedMaxUpgrade upgrade in _maxUpgrades)
-        {
-            if (_currentWeights.ContainsKey(upgrade.target))
-            {
-                float currentWeight = _currentWeights[upgrade.target];
-                float newWeight = Mathf.Min(currentWeight + upgrade.weightIncrease, upgrade.maxWeight);
-                _currentWeights[upgrade.target] = newWeight;
-            }
-        }
+        Debug.Log($"[EnemySpawner] Upgrade selection probabilities - {probabilityInfo}", this);
     }
     #endregion
 
@@ -545,25 +604,6 @@ public class EnemySpawner : MonoBehaviour
         _currentMaxPackSize = _maxPackSize;
 
         Debug.Log($"[EnemySpawner] Stat ranges initialized - Health: [{_currentStatRange.GetMinValue(SpawnStatType.Health):F1}, {_currentStatRange.GetMaxValue(SpawnStatType.Health):F1}]", this);
-    }
-
-    private void InitializeWeights()
-    {
-        _currentWeights = new Dictionary<MaxUpgradeTarget, float>();
-
-        if (_maxUpgrades == null || _maxUpgrades.Length == 0)
-        {
-            Debug.LogWarning("[EnemySpawner] No max upgrades configured", this);
-            return;
-        }
-
-        // 각 업그레이드의 초기 가중치 설정
-        foreach (WeightedMaxUpgrade upgrade in _maxUpgrades)
-        {
-            _currentWeights[upgrade.target] = upgrade.initialWeight;
-        }
-
-        Debug.Log($"[EnemySpawner] Initialized {_currentWeights.Count} upgrade weights", this);
     }
     #endregion
 

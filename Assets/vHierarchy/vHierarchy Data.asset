@@ -99,6 +99,15 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-582958704-0
         - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1624371177-0
         - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-282901906-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1164740415036539961-1725366896
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-5844669746643537085-1725366896
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-8827062219219739129-1725366896
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-4168657398544295942-1725366896
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-6511929137126615534-1725366896
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1248872770137538437-1725366896
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1362817463299294582-1725366896
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1359909113-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-997947768-0
         values:
         - colorIndex: 0
           iconNameOrGuid: CapsuleCollider Icon
@@ -134,6 +143,42 @@ MonoBehaviour:
           isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: CapsuleCollider Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Camera Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: CapsuleCollider Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Mesh Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Mesh Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: PreMatCube
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Mesh Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Favorite
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: BuildSettings.WebGL On
           isIconRecursive: 0
           isColorRecursive: 0
   bookmarks: []

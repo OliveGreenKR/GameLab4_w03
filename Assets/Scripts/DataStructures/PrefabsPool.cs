@@ -18,6 +18,13 @@ public enum PrefabType
 [System.Serializable]
 public class PrefabsPool
 {
+    [System.Serializable]
+    public struct PrefabMapEntry
+    {
+        public PrefabType type;
+        public GameObject prefab;
+    }
+
     #region Serialized Fields
     [Header("Pool Settings")]
     [SerializeField] private int _defaultPoolSize = 50;
@@ -25,8 +32,8 @@ public class PrefabsPool
     [Header("Prefab Mapping")]
     [Required]
     [InfoBox("각 PrefabType에 해당하는 프리팹을 직접 할당하세요")]
-    [SerializeField]
-    private Dictionary<PrefabType, GameObject> _prefabMap = new Dictionary<PrefabType, GameObject>();
+    [SerializeField] private PrefabMapEntry[] _prefabEntries;
+
     #endregion
 
     #region Properties
@@ -47,6 +54,7 @@ public class PrefabsPool
     #endregion
 
     #region Private Fields
+    private Dictionary<PrefabType, GameObject> _prefabMap; // 런타임용
     private Dictionary<PrefabType, Queue<GameObject>> _prefabPools;
     private Transform _poolParentTransform;
     private Dictionary<PrefabType, int> _poolCreations = new Dictionary<PrefabType, int>();
@@ -310,24 +318,38 @@ public class PrefabsPool
 
     private void InitializeFromPrefabMap()
     {
-        if (_prefabMap == null)
+        if (_prefabEntries == null)
         {
-            Debug.LogWarning("[PrefabsPool] Prefab map is null");
+            Debug.LogWarning("[PrefabsPool] Prefab entries array is null");
             return;
         }
 
-        foreach (var kvp in _prefabMap)
+        if(_prefabMap !=null)
         {
-            PrefabType prefabType = kvp.Key;
-            GameObject prefabGameObject = kvp.Value;
+            // 기존 Dictionary 초기화
+            _prefabMap.Clear();
+        }
+        else
+        {
+            _prefabMap = new Dictionary<PrefabType, GameObject>();
+        }
 
-            if (prefabGameObject == null)
+        // List에서 Dictionary로 변환
+        foreach (var entry in _prefabEntries)
+        {
+            if (entry.prefab == null)
             {
-                Debug.LogWarning($"[PrefabsPool] Null prefab found for type: {prefabType}");
+                Debug.LogWarning($"[PrefabsPool] Null prefab found for type: {entry.type}");
                 continue;
             }
 
-            Debug.Log($"[PrefabsPool] Registered {prefabType}: {prefabGameObject.name}");
+            if (_prefabMap.ContainsKey(entry.type))
+            {
+                Debug.LogWarning($"[PrefabsPool] Duplicate prefab type: {entry.type}. Overwriting.");
+            }
+
+            _prefabMap[entry.type] = entry.prefab;
+            Debug.Log($"[PrefabsPool] Registered {entry.type}: {entry.prefab.name}");
         }
     }
 

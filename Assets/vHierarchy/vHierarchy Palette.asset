@@ -65,6 +65,9 @@ MonoBehaviour:
   - builtinIcons: []
     customIcons:
     - CharacterController Icon
+    - PointEffector2D Icon
+    - TerrainCollider Icon
+    - Locked-Selected-Focused
     enabled: 1
   - builtinIcons:
     - AudioSource Icon
@@ -101,6 +104,54 @@ MonoBehaviour:
   - builtinIcons: []
     customIcons:
     - AimConstraint Icon
+    enabled: 1
+  - builtinIcons: []
+    customIcons:
+    - Mesh Icon
+    - Prefab Icon
+    - AvatarSelector
+    - Avatar Icon
+    enabled: 1
+  - builtinIcons: []
+    customIcons:
+    - Folder Icon
+    - Folder On Icon
+    - FolderEmpty Icon
+    - FolderFavorite On Icon
+    - FolderOpened Icon
+    - FolderOpened On Icon
+    - ListView On
+    - GridView On
+    - GridView
+    - BuildSettings.WebGL On
+    enabled: 1
+  - builtinIcons: []
+    customIcons:
+    - scenepicking_pickable_hover
+    - scenepicking_pickable-mixed
+    - scenepicking_pickable-mixed_hover
+    - scenepicking_notpickable
+    - scenepicking_notpickable_hover
+    - scenepicking_notpickable-mixed
+    - scenepicking_notpickable-mixed_hover
+    enabled: 1
+  - builtinIcons: []
+    customIcons:
+    - Scene
+    enabled: 1
+  - builtinIcons: []
+    customIcons:
+    - Locked
+    - Asset Store
+    - AssetStore Icon
+    - Customized
+    enabled: 1
+  - builtinIcons: []
+    customIcons:
+    - Package
+    - Package Manager
+    - package_installed
+    - PackageManagerDefault
     enabled: 1
   - builtinIcons: []
     customIcons: []
