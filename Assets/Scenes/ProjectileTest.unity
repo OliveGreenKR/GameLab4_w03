@@ -393,8 +393,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 603934798}
-  _teamId: 1
   _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &603934798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -723,14 +723,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 823887396}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 099471cc0fbdc1940a80ffca63d62b50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 823887401}
-  _teamId: 1
   _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!1 &866606502
 GameObject:
   m_ObjectHideFlags: 0
@@ -917,8 +917,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1008245303}
-  _teamId: 1
   _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &1008245303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1056,8 +1056,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1311654097}
-  _teamId: 1
   _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &1311654097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1496,8 +1496,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1707852743}
-  _teamId: 1
   _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &1707852743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1684,6 +1684,7 @@ GameObject:
   - component: {fileID: 2036164278}
   - component: {fileID: 2036164280}
   - component: {fileID: 2036164279}
+  - component: {fileID: 2036164281}
   m_Layer: 0
   m_Name: Shooter
   m_TagString: Untagged
@@ -1728,9 +1729,8 @@ MonoBehaviour:
   _shootTransform: {fileID: 2036164277}
   _fireRatePerSecond: 100
   _projectileLifetime: 8
-  _projectileSpeed: 60
-  _effectAssets:
-  - {fileID: 11400000, guid: c6540b7774face34599de37487c77635, type: 2}
+  _projectileSpeed: 22.1
+  _effectAssets: []
 --- !u!114 &2036164279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1743,7 +1743,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _teamId: 0
+  _teamId: 1
   _statData: {fileID: 11400000, guid: bde5c934bd0e9aa4a9d77850234a8cb3, type: 2}
 --- !u!114 &2036164280
 MonoBehaviour:
@@ -1758,8 +1758,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 2036164279}
-  _teamId: 1
   _invulnerabilityDuration: 1
+  _hasContactDamage: 1
+--- !u!114 &2036164281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2036164276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f92e7aa6bd071d14fac083de8240abf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _launcher: {fileID: 2036164278}
+  _launcherOwnerObject: {fileID: 0}
 --- !u!1 &2147367923
 GameObject:
   m_ObjectHideFlags: 0
