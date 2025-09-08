@@ -1,8 +1,7 @@
 ﻿using Sirenix.OdinInspector;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
-
 public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvider
 {
     #region Serialized Fields
@@ -77,6 +76,10 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
+    public Vector3 LastGroundNormal => _groundNormal;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
     public Vector3 LastSpawnPosition => _lastSpawnPosition;
     #endregion
 
@@ -84,6 +87,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     private Vector3 _currentVelocity = Vector3.zero;
     private Vector2 _currentMoveInput = Vector2.zero;
     private Vector3 _lastSpawnPosition = Vector3.zero;
+    private Vector3 _groundNormal = Vector3.up;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -270,7 +274,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
                 _currentVelocity.y -= _gravityScale * Time.deltaTime;
             }
         }
-        else if (_currentVelocity.y < 0)
+        else if (_currentVelocity.y < 0) //지면인데 아래로 속도가 있을 때
         {
             _currentVelocity.y = 0f;
         }
@@ -323,6 +327,16 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
 
     }
 
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        // 캐릭터가 지면에 닿아 있고, 부딪힌 객체가 지면일 경우
+        if (_characterController.isGrounded)
+        {
+            // 충돌한 면의 법선 벡터를 가져옴
+            _groundNormal = hit.normal;
+        }
+    }
+
     private void UpdateGroundedState()
     {
         bool previousGrounded = _isGrounded;
@@ -347,7 +361,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     {
         if (_characterController == null) 
             return;
-
+        
         Vector3 movement = _currentVelocity * Time.deltaTime;
         _characterController.Move(movement);
     }
