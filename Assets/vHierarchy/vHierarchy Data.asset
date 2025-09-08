@@ -17,6 +17,7 @@ MonoBehaviour:
     - 27c54805f7c521b4ba84ae89797e2ee6
     - 674dac6e05f8d5b4fa7307ee0be52d4d
     - f0230b2f773680e49a4b12c68398d409
+    - dfda7dfd3e6f02746be5c87e2d77671c
     values:
     - goDatas_byGlobalId:
         keys: []
@@ -85,6 +86,54 @@ MonoBehaviour:
           isColorRecursive: 1
         - colorIndex: 0
           iconNameOrGuid: AimConstraint Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+    - goDatas_byGlobalId:
+        keys:
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1802387322-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1605510715-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-2126545936-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1683555926-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-112232674-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1706992993-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-582958704-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1624371177-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-282901906-0
+        values:
+        - colorIndex: 0
+          iconNameOrGuid: CapsuleCollider Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Camera Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: DirectionalLight Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: CharacterController Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: OffMeshLink Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: AvatarMask On Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Settings Icon
           isIconRecursive: 0
           isColorRecursive: 0
   bookmarks: []

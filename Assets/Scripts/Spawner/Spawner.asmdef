@@ -1,0 +1,16 @@
+{
+    "name": "Spawner",
+    "rootNamespace": "",
+    "references": [
+        "GUID:b24b9eef4a42a204f92e40a705df1dcf"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
