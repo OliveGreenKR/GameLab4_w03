@@ -1,22 +1,20 @@
-﻿using UnityEngine;
-
-using Sirenix.OdinInspector;
+﻿using Sirenix.OdinInspector;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
     #region Serialized Fields
-    [TabGroup("References")]
-    [Header("Pool and Spawn Points")]
+    [TabGroup("Pool")]
+    [Header("Enemy Pool")]
     [Required]
-    [SerializeField] private PrefabsPool _prefabPool;
+    [SerializeField] private PrefabsPool _enemyPool;
 
-    [TabGroup("References")]
+    [TabGroup("Spawn Points")]
+    [Header("Spawn Locations")]
     [Required]
-    [InfoBox("스폰 포인트들의 Transform 리스트")]
-    [SerializeField] private List<Transform> _spawnPointTransforms = new List<Transform>();
+    [SerializeField] private Transform[] _spawnPoints;
 
     [TabGroup("Spawn Settings")]
     [Header("Spawn Timing")]
@@ -26,53 +24,47 @@ public class EnemySpawner : MonoBehaviour
 
     [TabGroup("Spawn Settings")]
     [Header("Pack Size Range")]
-    [InfoBox("한 번의 스폰 주기에 생성되는 총 적의 수")]
-    [SerializeField]
-    private SpawnStatRange _currentPackSizeRange = new SpawnStatRange
-    {
-        minHealth = 1f,
-        maxHealth = 5f,
-        minMoveSpeed = 0f,
-        maxMoveSpeed = 0f,
-        minAttack = 0f,
-        maxAttack = 0f
-    };
+    [SuffixLabel("enemies")]
+    [SerializeField] private int _minPackSize = 3;
 
     [TabGroup("Spawn Settings")]
-    [Header("Enemy Stats Range")]
-    [InfoBox("스폰되는 적들의 스탯 범위")]
-    [SerializeField]
-    private SpawnStatRange _currentEnemyStatsRange = new SpawnStatRange
-    {
-        minHealth = 50f,
-        maxHealth = 100f,
-        minMoveSpeed = 3f,
-        maxMoveSpeed = 8f,
-        minAttack = 10f,
-        maxAttack = 20f
-    };
+    [SuffixLabel("enemies")]
+    [SerializeField] private int _maxPackSize = 10;
+
+    [TabGroup("Stats")]
+    [Header("Initial Stat Ranges")]
+    [SerializeField] private SpawnStatRange _initialStatRange;
 
     [TabGroup("Difficulty")]
-    [Header("Progression Settings")]
-    [InfoBox("주기마다 반드시 증가하는 최소값들")]
+    [Header("Difficulty Progression")]
     [SerializeField] private DifficultyProgression _difficultyProgression;
 
     [TabGroup("Difficulty")]
-    [Header("Weighted Max Value Upgrades")]
-    [InfoBox("가중치 기반 확률적 최대값 증가 설정")]
-    [SerializeField] private List<WeightedMaxUpgrade> _maxValueUpgrades = new List<WeightedMaxUpgrade>();
+    [Header("Max Value Upgrades")]
+    [SerializeField] private WeightedMaxUpgrade[] _maxUpgrades;
 
     [TabGroup("Difficulty")]
-    [SuffixLabel("per cycle")]
-    [PropertyRange(0.1f, 10f)]
-    [SerializeField] private float _weightIncreasePerCycle = 1f;
+    [Header("Difficulty Timing")]
+    [SuffixLabel("spawns")]
+    [PropertyRange(1, 50)]
+    [SerializeField] private int _difficultyUpdateInterval = 5;
+    #endregion
 
-    [TabGroup("Settings")]
-    [Header("Spawn Control")]
-    [SerializeField] private bool _autoStartSpawning = true;
+    #region Events
+    /// <summary>
+    /// 스폰 완료 시 발생하는 이벤트
+    /// </summary>
+    public event Action<int, int> OnSpawnCompleted; // (totalSpawned, currentCycle)
 
-    [TabGroup("Settings")]
-    [SerializeField] private bool _enableDifficultyProgression = true;
+    /// <summary>
+    /// 난이도 업그레이드 시 발생하는 이벤트
+    /// </summary>
+    public event Action<int> OnDifficultyUpgraded; // (newCycle)
+
+    /// <summary>
+    /// 최대값 업그레이드 시 발생하는 이벤트
+    /// </summary>
+    public event Action<MaxUpgradeTarget, float> OnMaxValueUpgraded; // (target, newValue)
     #endregion
 
     #region Properties
@@ -86,169 +78,551 @@ public class EnemySpawner : MonoBehaviour
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public float NextSpawnTime { get; private set; }
+    public int SpawnCount { get; private set; }
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public int TotalSpawnedEnemies { get; private set; }
+    public float TimeUntilNextSpawn { get; private set; }
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public SpawnStatRange CurrentPackSizeRange => _currentPackSizeRange;
+    public SpawnStatRange CurrentStatRange => _currentStatRange;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public SpawnStatRange CurrentEnemyStatsRange => _currentEnemyStatsRange;
+    public int CurrentMinPackSize => _currentMinPackSize;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public List<float> CurrentMaxUpgradeWeights { get; private set; } = new List<float>();
+    public int CurrentMaxPackSize => _currentMaxPackSize;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public bool HasValidSpawnPoints => _spawnPointTransforms != null && _spawnPointTransforms.Count > 0;
+    public bool IsPoolInitialized => _enemyPool?.IsInitialized ?? false;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public bool HasValidPool => _prefabPool != null && _prefabPool.IsInitialized;
-    #endregion
-
-    #region Events
-    /// <summary>
-    /// 스폰 주기 시작 시 발생하는 이벤트
-    /// </summary>
-    public event Action<int> OnSpawnCycleStarted;
-
-    /// <summary>
-    /// 적이 스폰될 때 발생하는 이벤트
-    /// </summary>
-    public event Action<ISpawnable, int> OnEnemySpawned;
-
-    /// <summary>
-    /// 스폰 주기 완료 시 발생하는 이벤트
-    /// </summary>
-    public event Action<int, int> OnSpawnCycleCompleted;
-
-    /// <summary>
-    /// 난이도 증가 시 발생하는 이벤트
-    /// </summary>
-    public event Action<int> OnDifficultyIncreased;
+    public int ActiveSpawnPointCount => _spawnPoints?.Length ?? 0;
     #endregion
 
     #region Private Fields
-    private Coroutine _spawnCoroutine;
-    private SpawnStatRange _basePackSizeRange;
-    private SpawnStatRange _baseEnemyStatsRange;
-    private List<float> _baseMaxUpgradeWeights = new List<float>();
-    private Dictionary<SpawnStatType, float> _generatedEnemyStats = new Dictionary<SpawnStatType, float>();
-    private List<ISpawnable> _activeEnemies = new List<ISpawnable>();
+    private SpawnStatRange _currentStatRange;
+    private int _currentMinPackSize;
+    private int _currentMaxPackSize;
+    private float _nextSpawnTime;
+    private Dictionary<MaxUpgradeTarget, float> _currentWeights;
     #endregion
 
     #region Unity Lifecycle
-    private void Awake() { }
+    private void Start()
+    {
+        // 풀 초기화
+        if (!ValidatePool())
+        {
+            Debug.LogError("[EnemySpawner] Pool validation failed!", this);
+            return;
+        }
 
-    private void Start() { }
+        if (!_enemyPool.IsInitialized)
+        {
+            _enemyPool.Initialize();
+        }
 
-    private void Update() { }
+        // 스폰 포인트 검증
+        if (!ValidateSpawnPoints())
+        {
+            Debug.LogError("[EnemySpawner] Spawn points validation failed!", this);
+            return;
+        }
 
-    private void OnDestroy() { }
+        // 초기 상태 설정
+        InitializeStatRanges();
+        InitializeWeights();
 
-    private void OnValidate() { }
+        CurrentCycle = 1;
+        SpawnCount = 0;
+        _nextSpawnTime = Time.time + _spawnIntervalSeconds;
+
+        Debug.Log($"[EnemySpawner] Initialized with {_spawnPoints.Length} spawn points", this);
+    }
+
+    private void Update()
+    {
+        if (!IsSpawning) return;
+
+        UpdateSpawnTimer();
+    }
+
+    private void OnValidate()
+    {
+        // 스폰 간격 검증
+        _spawnIntervalSeconds = Mathf.Clamp(_spawnIntervalSeconds, 0.1f, 60f);
+
+        // 팩 사이즈 검증
+        _minPackSize = Mathf.Max(1, _minPackSize);
+        _maxPackSize = Mathf.Max(_minPackSize, _maxPackSize);
+
+        // 난이도 업데이트 간격 검증
+        _difficultyUpdateInterval = Mathf.Max(1, _difficultyUpdateInterval);
+
+        // 현재 값들도 업데이트 (런타임 중이면)
+        if (Application.isPlaying)
+        {
+            _currentMinPackSize = Mathf.Max(_minPackSize, _currentMinPackSize);
+            _currentMaxPackSize = Mathf.Max(_currentMinPackSize, _currentMaxPackSize);
+        }
+    }
     #endregion
 
-    #region Public Methods - Spawn Management
+    #region Public Methods - Spawning
     /// <summary>
     /// 스폰 시작
     /// </summary>
-    public void StartSpawning() { }
+    public void StartSpawning()
+    {
+        if (!ValidatePool() || !ValidateSpawnPoints())
+        {
+            Debug.LogWarning("[EnemySpawner] Cannot start spawning: validation failed", this);
+            return;
+        }
+
+        IsSpawning = true;
+        _nextSpawnTime = Time.time + _spawnIntervalSeconds;
+
+        Debug.Log("[EnemySpawner] Spawning started", this);
+    }
 
     /// <summary>
     /// 스폰 중지
     /// </summary>
-    public void StopSpawning() { }
+    public void StopSpawning()
+    {
+        IsSpawning = false;
+        Debug.Log("[EnemySpawner] Spawning stopped", this);
+    }
 
     /// <summary>
     /// 즉시 스폰 실행
     /// </summary>
-    public void SpawnImmediately() { }
+    public void SpawnImmediate()
+    {
+        if (!ValidatePool() || !ValidateSpawnPoints())
+        {
+            Debug.LogWarning("[EnemySpawner] Cannot spawn immediately: validation failed", this);
+            return;
+        }
 
-    /// <summary>
-    /// 모든 활성 적 제거
-    /// </summary>
-    public void ClearAllEnemies() { }
+        ExecuteSpawn();
+        _nextSpawnTime = Time.time + _spawnIntervalSeconds;
+    }
 
     /// <summary>
     /// 스폰 간격 설정
     /// </summary>
     /// <param name="intervalSeconds">스폰 간격 (초)</param>
-    public void SetSpawnInterval(float intervalSeconds) { }
+    public void SetSpawnInterval(float intervalSeconds)
+    {
+        _spawnIntervalSeconds = Mathf.Clamp(intervalSeconds, 0.1f, 60f);
+
+        // 현재 스폰 중이면 다음 스폰 시간 조정
+        if (IsSpawning)
+        {
+            float timeElapsed = Time.time - (_nextSpawnTime - _spawnIntervalSeconds);
+            _nextSpawnTime = Time.time + Mathf.Max(0.1f, _spawnIntervalSeconds - timeElapsed);
+        }
+
+        Debug.Log($"[EnemySpawner] Spawn interval set to {_spawnIntervalSeconds:F1} seconds", this);
+    }
     #endregion
 
-    #region Public Methods - Difficulty Control
-    /// <summary>
-    /// 난이도 진행 활성화/비활성화
-    /// </summary>
-    /// <param name="enabled">활성화 여부</param>
-    public void SetDifficultyProgressionEnabled(bool enabled) { }
-
-    /// <summary>
-    /// 현재 사이클 설정
-    /// </summary>
-    /// <param name="cycle">사이클 번호</param>
-    public void SetCurrentCycle(int cycle) { }
-
+    #region Public Methods - Difficulty
     /// <summary>
     /// 난이도 리셋
     /// </summary>
-    public void ResetDifficulty() { }
+    public void ResetDifficulty()
+    {
+        // 스탯 범위 초기화
+        InitializeStatRanges();
+
+        // 팩 사이즈 초기화
+        _currentMinPackSize = _minPackSize;
+        _currentMaxPackSize = _maxPackSize;
+
+        // 주기 및 카운터 리셋
+        CurrentCycle = 1;
+        SpawnCount = 0;
+
+        // 가중치 초기화
+        InitializeWeights();
+
+        Debug.Log("[EnemySpawner] Difficulty reset to initial values", this);
+        OnDifficultyUpgraded?.Invoke(CurrentCycle);
+    }
 
     /// <summary>
-    /// 수동 난이도 증가
+    /// 수동 난이도 업그레이드
     /// </summary>
-    public void IncreaseDifficultyManually() { }
+    public void UpgradeDifficulty()
+    {
+        CurrentCycle++;
+
+        // 필수 업그레이드 적용
+        ApplyMandatoryUpgrades();
+
+        // 확률적 최대값 업그레이드 처리
+        ProcessWeightedMaxUpgrades();
+
+        // 가중치 업데이트
+        UpdateUpgradeWeights();
+
+        Debug.Log($"[EnemySpawner] Manual difficulty upgrade to cycle {CurrentCycle}", this);
+        OnDifficultyUpgraded?.Invoke(CurrentCycle);
+    }
+
+    /// <summary>
+    /// 특정 스탯 범위 설정
+    /// </summary>
+    /// <param name="statType">스탯 타입</param>
+    /// <param name="minValue">최소값</param>
+    /// <param name="maxValue">최대값</param>
+    public void SetStatRange(SpawnStatType statType, float minValue, float maxValue)
+    {
+        // 값 검증
+        minValue = Mathf.Max(0f, minValue);
+        maxValue = Mathf.Max(minValue, maxValue);
+
+        // 현재 스탯 범위 업데이트
+        _currentStatRange.SetMinValue(statType, minValue);
+        _currentStatRange.SetMaxValue(statType, maxValue);
+
+        Debug.Log($"[EnemySpawner] {statType} range set to [{minValue:F1}, {maxValue:F1}]", this);
+    }
     #endregion
 
     #region Private Methods - Spawn Logic
-    private void InitializeSpawner() { }
+    private void UpdateSpawnTimer()
+    {
+        TimeUntilNextSpawn = _nextSpawnTime - Time.time;
 
-    private IEnumerator SpawnRoutine() { }
+        if (Time.time >= _nextSpawnTime)
+        {
+            ExecuteSpawn();
+            _nextSpawnTime = Time.time + _spawnIntervalSeconds;
+        }
+    }
 
-    private void ExecuteSpawnCycle() { }
+    private void ExecuteSpawn()
+    {
+        // 팩 사이즈 결정
+        int totalEnemies = GenerateRandomPackSize();
 
-    private void SpawnEnemyPack() { }
+        // 스폰 포인트에 랜덤 분배
+        int[] distribution = DistributeEnemiesRandomly(totalEnemies, _spawnPoints.Length);
 
-    private void DistributeEnemiesRandomly(int totalEnemyCount) { }
+        // 각 스폰 포인트에서 적 생성
+        int actualSpawned = 0;
+        for (int i = 0; i < _spawnPoints.Length; i++)
+        {
+            if (distribution[i] > 0)
+            {
+                SpawnEnemiesAtPoint(_spawnPoints[i], distribution[i]);
+                actualSpawned += distribution[i];
+            }
+        }
 
-    private ISpawnable SpawnSingleEnemy(Vector3 spawnPosition) { }
+        // 스폰 카운트 업데이트
+        SpawnCount++;
 
-    private void ApplyRandomStatsToEnemy(ISpawnable enemy) { }
+        // 로그 및 이벤트 호출
+        LogSpawnInfo(actualSpawned, distribution);
+        OnSpawnCompleted?.Invoke(actualSpawned, CurrentCycle);
+
+        // 난이도 업그레이드 체크
+        CheckDifficultyUpgrade();
+    }
+
+    private int[] DistributeEnemiesRandomly(int totalEnemies, int spawnPointCount)
+    {
+        int[] distribution = new int[spawnPointCount];
+
+        // 완전 랜덤 분배 - 각 적을 랜덤한 스폰 포인트에 할당
+        for (int i = 0; i < totalEnemies; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, spawnPointCount);
+            distribution[randomIndex]++;
+        }
+
+        return distribution;
+    }
+
+    private void SpawnEnemiesAtPoint(Transform spawnPoint, int enemyCount)
+    {
+        for (int i = 0; i < enemyCount; i++)
+        {
+            // 약간의 위치 오프셋 적용 (겹침 방지)
+            Vector3 offset = new Vector3(
+                UnityEngine.Random.Range(-1f, 1f),
+                0f,
+                UnityEngine.Random.Range(-1f, 1f)
+            );
+
+            Vector3 spawnPosition = spawnPoint.position + offset;
+            Quaternion spawnRotation = spawnPoint.rotation;
+
+            ISpawnable enemy = CreateEnemyFromPool(spawnPosition, spawnRotation);
+            if (enemy != null)
+            {
+                // 랜덤 스탯 생성 및 적용
+                Dictionary<SpawnStatType, float> randomStats = GenerateRandomStats();
+                enemy.ApplySpawnStats(randomStats);
+
+                // 스폰 완료 처리
+                enemy.OnSpawned(this);
+            }
+        }
+    }
+
+    private ISpawnable CreateEnemyFromPool(Vector3 worldPosition, Quaternion worldRotation)
+    {
+        GameObject enemyObject = _enemyPool.SpawnObject(PrefabType.Enemy, worldPosition, worldRotation, true);
+
+        if (enemyObject == null)
+        {
+            Debug.LogWarning("[EnemySpawner] Failed to spawn enemy from pool", this);
+            return null;
+        }
+
+        // ISpawnable 컴포넌트만 확인
+        ISpawnable spawnable = enemyObject.GetComponent<ISpawnable>();
+        if (spawnable == null)
+        {
+            Debug.LogError($"[EnemySpawner] Enemy {enemyObject.name} does not implement ISpawnable!", this);
+            _enemyPool.ReturnObject(enemyObject);
+            return null;
+        }
+
+        return spawnable;
+    }
     #endregion
 
-    #region Private Methods - Difficulty Progression
-    private void ProcessDifficultyIncrease() { }
+    #region Private Methods - Difficulty Logic
+    private void CheckDifficultyUpgrade()
+    {
+        if (SpawnCount % _difficultyUpdateInterval == 0)
+        {
+            CurrentCycle++;
 
-    private void ApplyMandatoryStatIncrease() { }
+            // 필수 업그레이드 적용
+            ApplyMandatoryUpgrades();
 
-    private void ProcessWeightedMaxValueUpgrades() { }
+            // 확률적 최대값 업그레이드 처리
+            ProcessWeightedMaxUpgrades();
 
-    private void IncreaseUpgradeWeights() { }
+            // 가중치 업데이트
+            UpdateUpgradeWeights();
 
-    private bool ShouldUpgradeMaxValue(WeightedMaxUpgrade upgrade, float currentWeight) { }
+            Debug.Log($"[EnemySpawner] Auto difficulty upgrade to cycle {CurrentCycle}", this);
+            OnDifficultyUpgraded?.Invoke(CurrentCycle);
+        }
+    }
 
-    private void ApplyMaxValueUpgrade(WeightedMaxUpgrade upgrade) { }
+    private void ApplyMandatoryUpgrades()
+    {
+        // 팩 사이즈 최소값 증가
+        _currentMinPackSize += Mathf.RoundToInt(_difficultyProgression.GetPackSizeMinIncrease());
+        _currentMinPackSize = Mathf.Max(_minPackSize, _currentMinPackSize);
+
+        // 스탯 최소값들 증가
+        foreach (SpawnStatType statType in System.Enum.GetValues(typeof(SpawnStatType)))
+        {
+            float currentMin = _currentStatRange.GetMinValue(statType);
+            float increase = _difficultyProgression.GetMinIncrease(statType);
+            _currentStatRange.SetMinValue(statType, currentMin + increase);
+        }
+
+        // 최대값이 최소값보다 작아지지 않도록 보정
+        _currentMaxPackSize = Mathf.Max(_currentMinPackSize, _currentMaxPackSize);
+
+        foreach (SpawnStatType statType in System.Enum.GetValues(typeof(SpawnStatType)))
+        {
+            float currentMin = _currentStatRange.GetMinValue(statType);
+            float currentMax = _currentStatRange.GetMaxValue(statType);
+            if (currentMax < currentMin)
+            {
+                _currentStatRange.SetMaxValue(statType, currentMin);
+            }
+        }
+    }
+
+    private void ProcessWeightedMaxUpgrades()
+    {
+        if (_maxUpgrades == null || _maxUpgrades.Length == 0) return;
+
+        foreach (WeightedMaxUpgrade upgrade in _maxUpgrades)
+        {
+            if (ShouldApplyMaxUpgrade(upgrade))
+            {
+                ApplyMaxUpgrade(upgrade);
+            }
+        }
+    }
+
+    private bool ShouldApplyMaxUpgrade(WeightedMaxUpgrade upgrade)
+    {
+        if (!_currentWeights.ContainsKey(upgrade.target))
+            return false;
+
+        float currentWeight = _currentWeights[upgrade.target];
+        float randomValue = UnityEngine.Random.Range(0f, 100f);
+
+        return randomValue < currentWeight;
+    }
+
+    private void ApplyMaxUpgrade(WeightedMaxUpgrade upgrade)
+    {
+        if (upgrade.target.IsPackSizeUpgrade())
+        {
+            // 팩 사이즈 최대값 업그레이드
+            _currentMaxPackSize += Mathf.RoundToInt(upgrade.upgradeAmount);
+            Debug.Log($"[EnemySpawner] Pack size max upgraded by {upgrade.upgradeAmount:F1} to {_currentMaxPackSize}", this);
+        }
+        else
+        {
+            // 스탯 최대값 업그레이드
+            SpawnStatType statType = upgrade.target.ToSpawnStatType();
+            float currentMax = _currentStatRange.GetMaxValue(statType);
+            float newMax = currentMax + upgrade.upgradeAmount;
+            _currentStatRange.SetMaxValue(statType, newMax);
+
+            Debug.Log($"[EnemySpawner] {statType} max upgraded by {upgrade.upgradeAmount:F1} to {newMax:F1}", this);
+            OnMaxValueUpgraded?.Invoke(upgrade.target, newMax);
+        }
+    }
+
+    private void UpdateUpgradeWeights()
+    {
+        if (_maxUpgrades == null) return;
+
+        foreach (WeightedMaxUpgrade upgrade in _maxUpgrades)
+        {
+            if (_currentWeights.ContainsKey(upgrade.target))
+            {
+                float currentWeight = _currentWeights[upgrade.target];
+                float newWeight = Mathf.Min(currentWeight + upgrade.weightIncrease, upgrade.maxWeight);
+                _currentWeights[upgrade.target] = newWeight;
+            }
+        }
+    }
     #endregion
 
-    #region Private Methods - Utility
-    private void ValidateSpawnerSetup() { }
+    #region Private Methods - Stat Generation
+    private Dictionary<SpawnStatType, float> GenerateRandomStats()
+    {
+        Dictionary<SpawnStatType, float> randomStats = new Dictionary<SpawnStatType, float>();
 
-    private void CacheBaseValues() { }
+        // 각 스탯 타입별로 랜덤 값 생성
+        foreach (SpawnStatType statType in System.Enum.GetValues(typeof(SpawnStatType)))
+        {
+            float randomValue = _currentStatRange.GetRandomValue(statType);
+            randomStats[statType] = randomValue;
+        }
 
-    private void UpdateNextSpawnTime() { }
+        return randomStats;
+    }
 
-    private Vector3 GetRandomSpawnPosition() { }
+    private int GenerateRandomPackSize()
+    {
+        return UnityEngine.Random.Range(_currentMinPackSize, _currentMaxPackSize + 1);
+    }
 
-    private void OnEnemyDespawned(ISpawnable enemy) { }
+    private void InitializeStatRanges()
+    {
+        // 초기 스탯 범위를 현재 스탯 범위에 복사
+        _currentStatRange = _initialStatRange;
 
-    private void LogSpawnInfo(string message) { }
+        // 현재 팩 사이즈 범위 초기화
+        _currentMinPackSize = _minPackSize;
+        _currentMaxPackSize = _maxPackSize;
+
+        Debug.Log($"[EnemySpawner] Stat ranges initialized - Health: [{_currentStatRange.GetMinValue(SpawnStatType.Health):F1}, {_currentStatRange.GetMaxValue(SpawnStatType.Health):F1}]", this);
+    }
+
+    private void InitializeWeights()
+    {
+        _currentWeights = new Dictionary<MaxUpgradeTarget, float>();
+
+        if (_maxUpgrades == null || _maxUpgrades.Length == 0)
+        {
+            Debug.LogWarning("[EnemySpawner] No max upgrades configured", this);
+            return;
+        }
+
+        // 각 업그레이드의 초기 가중치 설정
+        foreach (WeightedMaxUpgrade upgrade in _maxUpgrades)
+        {
+            _currentWeights[upgrade.target] = upgrade.initialWeight;
+        }
+
+        Debug.Log($"[EnemySpawner] Initialized {_currentWeights.Count} upgrade weights", this);
+    }
+    #endregion
+
+    #region Private Methods - Validation
+    private bool ValidateSpawnPoints()
+    {
+        if (_spawnPoints == null)
+        {
+            Debug.LogError("[EnemySpawner] Spawn points array is null!", this);
+            return false;
+        }
+
+        if (_spawnPoints.Length == 0)
+        {
+            Debug.LogError("[EnemySpawner] No spawn points assigned!", this);
+            return false;
+        }
+
+        // 각 스폰 포인트가 유효한지 확인
+        for (int i = 0; i < _spawnPoints.Length; i++)
+        {
+            if (_spawnPoints[i] == null)
+            {
+                Debug.LogError($"[EnemySpawner] Spawn point at index {i} is null!", this);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool ValidatePool()
+    {
+        if (_enemyPool == null)
+        {
+            Debug.LogError("[EnemySpawner] Enemy pool is null!", this);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void LogSpawnInfo(int totalSpawned, int[] distribution)
+    {
+        string distributionInfo = "";
+        for (int i = 0; i < distribution.Length; i++)
+        {
+            if (distribution[i] > 0)
+            {
+                distributionInfo += $"Point{i}:{distribution[i]} ";
+            }
+        }
+
+        if (string.IsNullOrEmpty(distributionInfo))
+        {
+            distributionInfo = "None";
+        }
+
+        Debug.Log($"[EnemySpawner] Spawn #{SpawnCount} - Total: {totalSpawned}, Distribution: {distributionInfo.Trim()}, Cycle: {CurrentCycle}", this);
+    }
     #endregion
 }

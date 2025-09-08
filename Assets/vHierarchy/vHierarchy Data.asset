@@ -140,3 +140,4 @@ MonoBehaviour:
   bookmarkedScenePaths:
   - Assets/Scenes/NewControlTest.unity
   - Assets/Scenes/ProjectileTest.unity
+  - Assets/Scenes/EnemySpawnerTest.unity
