@@ -44,6 +44,13 @@ public class ProjectileLauncher : MonoBehaviour
     [SerializeField] private List<ProjectileEffectSO> _effectAssets = new List<ProjectileEffectSO>();
     #endregion
 
+    #region Events
+    /// <summary>
+    /// 투사체가 발사(생성) 시
+    /// </summary>
+    public event System.Action<IProjectile> OnProjectileCreated;
+    #endregion
+
     #region Properties
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -322,6 +329,7 @@ public class ProjectileLauncher : MonoBehaviour
             //_activeProjectiles.Add(projectile);
         }
 
+        OnProjectileCreated?.Invoke(projectile);
         return projectile;
     }
 
