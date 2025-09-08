@@ -1,9 +1,6 @@
 ﻿using Sirenix.OdinInspector;
 using System;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Splines;
 
 public class ThirdPersonCameraController : MonoBehaviour
 {
@@ -20,10 +17,6 @@ public class ThirdPersonCameraController : MonoBehaviour
     [Header("Follow Target")]
     [Required]
     [SerializeField] private Transform _targetTransform;
-
-    [TabGroup("Target")]
-    [Header("Input Event Provider GameObject")]
-    [SerializeField] private GameObject _inputEventProviderGameObject;
 
     [TabGroup("Target")]
     [Header("Tracking Options")]
@@ -162,9 +155,6 @@ public class ThirdPersonCameraController : MonoBehaviour
     private Camera _camera;
     private bool _isTransitioningSettings = false;
 
-    // Input Event Provider
-    private IInputEventProvider _inputEventProvider = null;
-
     #endregion
 
     #region Unity Lifecycle
@@ -189,12 +179,6 @@ public class ThirdPersonCameraController : MonoBehaviour
         {
             ApplySettingsImmediately(_defaultSettings);
         }
-
-        if (InitializeInputEventProvider())
-        {
-            SubscribeToInputEvents();
-        }
-
     }
 
     private void Update()
@@ -219,7 +203,6 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     private void OnDestroy()
     {
-        UnsubscribeFromInputEvents();
     }
     #endregion
 
@@ -298,6 +281,17 @@ public class ThirdPersonCameraController : MonoBehaviour
             ApplySettingsImmediately(settings);
         }
     }
+
+    public void AimModeStart()
+    {
+        ApplyAimSettings();
+    }
+
+    public void AImModeEnd()
+    {
+        ApplyDefaultSettings();
+    }
+
     #endregion
 
     #region Private Methods
@@ -520,47 +514,6 @@ public class ThirdPersonCameraController : MonoBehaviour
 
         _currentSettings = settings;
         _isTransitioningSettings = false;
-    }
-    #endregion
-
-    #region Private Methods - InputProvider Events  
-    private bool InitializeInputEventProvider()
-    {
-        if (_inputEventProviderGameObject == null)
-        {
-            Debug.LogWarning("[ThirdPersonCameraController] Input Event Provider GameObject not assigned.");
-            return false;
-        }
-        _inputEventProvider = _inputEventProviderGameObject.GetComponent<IInputEventProvider>();
-        if (_inputEventProvider == null)
-        {
-            Debug.LogWarning("[ThirdPersonCameraController] IInputEventProvider component not found on the assigned GameObject.");
-            return false;
-        }
-        return true;
-    }
-    private void SubscribeToInputEvents()
-    {
-        _inputEventProvider.OnAimModeEnded -= OnAimModeEnded;
-        _inputEventProvider.OnAimModeEnded += OnAimModeEnded;
-        _inputEventProvider.OnAimModeStarted -= OnAimModeStarted;
-        _inputEventProvider.OnAimModeStarted += OnAimModeStarted;
-    }
-
-    private void UnsubscribeFromInputEvents()
-    {
-        _inputEventProvider.OnAimModeEnded -= OnAimModeEnded;
-        _inputEventProvider.OnAimModeStarted -= OnAimModeStarted;
-    }
-
-    private void OnAimModeStarted()
-    {
-        ApplyAimSettings();
-    }
-
-    private void OnAimModeEnded()
-    {
-        ApplyDefaultSettings();
     }
     #endregion
 }

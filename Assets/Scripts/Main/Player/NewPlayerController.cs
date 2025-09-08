@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
 
-public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvider
+public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProvider
 {
     #region Serialized Fields
     [TabGroup("References")]
@@ -82,6 +82,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public Vector3 LastGroudnNormal => _lastGroundNormal;
+
     #endregion
 
     #region Private Fields
@@ -157,6 +158,11 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     /// 조준 모드 종료 이벤트
     /// </summary>
     public event Action OnAimModeEnded;
+
+    /// <summary>
+    /// 발사 이벤트
+    /// </summary>
+    public event Action OnFire;
     #endregion
 
     #region IReSpawnable Implementation
@@ -247,6 +253,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     #region Public Methods - Battle
     public void Fire()
     {
+        OnFire?.Invoke();
         // 발사 로직 구현
         Debug.Log("[NewPlayerController] Firing...");
     }
