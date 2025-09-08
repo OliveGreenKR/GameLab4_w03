@@ -414,8 +414,8 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
 
     private void OnMouseClicked(InputAction.CallbackContext context)
     {
-        Debug.Log("[NewPlayerController] Mouse Clicked");
         _isFiring = true;
+        Debug.Log("[NewPlayerController] Mouse Clicked");
         //Fire();
     }
 
