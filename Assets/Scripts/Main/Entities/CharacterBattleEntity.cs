@@ -202,6 +202,11 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
 
     private void ProcessContactDamage(Collider other)
     {
+        if(!_hasContactDamage || _isInvulnerable)
+        {
+            return;
+        }
+
         IBattleEntity otherEntity = other.GetComponent<IBattleEntity>();
         if (otherEntity == null) return;
 
@@ -220,7 +225,7 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
         float contactDamage = otherEntity.GetCurrentStat(BattleStatType.Attack);
         if (contactDamage > 0f)
         {
-            otherEntity.DealDamage(this, contactDamage);
+            otherEntity.TakeDamage(this,contactDamage);
         }
     }
     #endregion
