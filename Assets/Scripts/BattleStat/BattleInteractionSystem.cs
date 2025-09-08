@@ -78,7 +78,7 @@ public static class BattleInteractionSystem
     /// <returns>최종 데미지</returns>
     public static float CalculateDamage(float attackerAttack, float baseDamage)
     {
-        return baseDamage + (attackerAttack * 0.1f);
+        return baseDamage;
     }
 
     /// <summary>

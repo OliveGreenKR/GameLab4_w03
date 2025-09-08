@@ -315,7 +315,7 @@ public class ThirdPersonCameraController : MonoBehaviour
         Vector3 finalPosition = _targetTransform.position + offsetDirection;
 
 
-        Debug.Log($"Target moved: {_targetWorldPosition:F6}");
+        //Debug.Log($"Target moved: {_targetWorldPosition:F6}");
 
         // 타겟 값 설정
         _targetWorldPosition = finalPosition;

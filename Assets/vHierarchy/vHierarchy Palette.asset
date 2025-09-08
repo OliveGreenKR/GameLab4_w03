@@ -92,5 +92,12 @@ MonoBehaviour:
     - console.erroricon
     enabled: 1
   - builtinIcons: []
+    customIcons:
+    - NavMeshAgent Icon
+    - NavMeshData Icon
+    - NavMeshObstacle Icon
+    - OffMeshLink Icon
+    enabled: 1
+  - builtinIcons: []
     customIcons: []
     enabled: 1

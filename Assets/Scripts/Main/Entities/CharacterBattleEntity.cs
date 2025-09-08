@@ -1,5 +1,6 @@
 ﻿using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
@@ -17,6 +18,9 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     [TabGroup("Combat")]
     [SuffixLabel("seconds")]
     [SerializeField] private float _invulnerabilityDuration = 1f;
+
+    [TabGroup("Combat")]
+    [SerializeField] private bool _hasContactDamage = true;
     #endregion
 
     #region IBattleEntity Implementation
@@ -126,6 +130,7 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     {
         UnsubscribeFromBattleStatEvents();
     }
+
     #endregion
 
     #region Public Methods
@@ -221,6 +226,9 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
             return;
         }
 
+        
+        if(_hasContactDamage == false)
+            return;
         // 접촉 데미지 처리 (적 엔티티와 직접 접촉)
         float contactDamage = otherEntity.GetCurrentStat(BattleStatType.Attack);
         if (contactDamage > 0f)

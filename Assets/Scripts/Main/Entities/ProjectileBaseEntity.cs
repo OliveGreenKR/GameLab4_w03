@@ -123,6 +123,11 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     public float DealDamage(IBattleEntity target, float baseDamage)
     {
         // 투사체 데미지 배율 적용
+        if (target == null || !target.IsAlive)
+        {
+            Debug.Log("[ProjectileBase] Invalid target or target is already dead.", this);
+            return 0f;
+        }
         float finalDamage = baseDamage * _currentDamageMultiplier;
         float actualDamage = BattleInteractionSystem.ProcessDamageInteraction(this, target, finalDamage);
         return actualDamage;
