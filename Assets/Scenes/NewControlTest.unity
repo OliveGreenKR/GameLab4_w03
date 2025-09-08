@@ -807,6 +807,10 @@ PrefabInstance:
       propertyPath: _fireRatePerSecond
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
+      propertyPath: _projectilePool._defaultPoolSize
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 7324288805603194550, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: m_LocalScale.z
       value: 0.58970296
@@ -1310,6 +1314,7 @@ GameObject:
   - component: {fileID: 1605510717}
   - component: {fileID: 1605510722}
   - component: {fileID: 1605510723}
+  - component: {fileID: 1605510724}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -1441,7 +1446,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 1173287276}
-  _inputEventProviderGameObject: {fileID: 1802387322}
   _enablePositionTracking: 1
   _enableRotationTracking: 1
   _offsetRotationDegrees: {x: 0, y: 0, z: 0}
@@ -1475,6 +1479,23 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 17
   _aimCamera: {fileID: 1605510719}
+--- !u!114 &1605510724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1605510715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e4c5539ba3c4e844926de5ebee87b08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _aimPointManager: {fileID: 1605510723}
+  _targetTransforms:
+  - {fileID: 1184828800}
+  _enableLookAt: 1
+  _positionChangeThreshold: 0.1
 --- !u!1 &1624371177
 GameObject:
   m_ObjectHideFlags: 0
@@ -2148,6 +2169,7 @@ GameObject:
   - component: {fileID: 1802387330}
   - component: {fileID: 1802387329}
   - component: {fileID: 1802387331}
+  - component: {fileID: 1802387332}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2262,6 +2284,20 @@ MonoBehaviour:
   _player: {fileID: 1802387327}
   _playerLauncher: {fileID: 2098497013}
   _projectileType: 0
+--- !u!114 &1802387332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802387322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4237f3fd980f834c8dc8be3b6f2c620, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _camera: {fileID: 1605510722}
+  _player: {fileID: 1802387327}
 --- !u!1 &1890204769
 GameObject:
   m_ObjectHideFlags: 0
