@@ -2,8 +2,9 @@
 using System.Xml.Serialization;
 using UnityEngine;
 
-public class LauncherSyncer : MonoBehaviour
+public class LauncherTeamSyncer : MonoBehaviour
 {
+    [SerializeField] int _targetTeamId = 0;
     [Required][SerializeField] ProjectileLauncher _launcher = null;
     [Required][SerializeField] GameObject _launcherOwnerObject = null;
 

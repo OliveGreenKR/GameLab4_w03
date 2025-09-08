@@ -10,8 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2441022364053703845}
   - component: {fileID: 4324545142038273385}
-  - component: {fileID: 5589502923384425464}
-  - component: {fileID: 8755009255904964228}
   - component: {fileID: 9048291988229795870}
   m_Layer: 0
   m_Name: Shooter
@@ -28,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2292962689582245965}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.22600001, z: 0.573}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -59,35 +57,6 @@ MonoBehaviour:
   _projectileLifetime: 8
   _projectileSpeed: 22.1
   _effectAssets: []
---- !u!114 &5589502923384425464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2292962689582245965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 099471cc0fbdc1940a80ffca63d62b50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _battleStat: {fileID: 8755009255904964228}
-  _invulnerabilityDuration: 1
-  _hasContactDamage: 1
---- !u!114 &8755009255904964228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2292962689582245965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _teamId: 0
-  _statData: {fileID: 11400000, guid: bde5c934bd0e9aa4a9d77850234a8cb3, type: 2}
 --- !u!114 &9048291988229795870
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,6 +69,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f92e7aa6bd071d14fac083de8240abf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _targetTeamId: 0
   _launcher: {fileID: 4324545142038273385}
   _launcherOwnerObject: {fileID: 0}
 --- !u!1 &8061087168923853731

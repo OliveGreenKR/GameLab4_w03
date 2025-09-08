@@ -692,7 +692,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 823887396}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 099471cc0fbdc1940a80ffca63d62b50, type: 3}
   m_Name: 
@@ -1697,6 +1697,10 @@ PrefabInstance:
     - target: {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
       propertyPath: m_Name
       value: ProjectileBase
+      objectReference: {fileID: 0}
+    - target: {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

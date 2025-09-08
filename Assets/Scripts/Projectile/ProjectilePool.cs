@@ -37,6 +37,7 @@ public class ProjectilePool
     private Dictionary<ProjectileType, Queue<IProjectile>> _projectilePools;
     private Dictionary<ProjectileType, GameObject> _projectilePrefabMap;
     private Transform _poolParent;
+    private Dictionary<ProjectileType, int> _poolCreations = new Dictionary<ProjectileType, int>();
 
     // 활성 발사체 추적 [투사체][사용시간]
     private Dictionary<IProjectile, float> _activeProjectiles = new Dictionary<IProjectile, float>();
@@ -64,6 +65,7 @@ public class ProjectilePool
         //PreWarm
         foreach (var pair in _projectilePrefabMap)
         {
+            _poolCreations.Add(pair.Key, 0);
             PrewarmPool(pair.Key, _defaultPoolSize);
         }
         Debug.Log("[ProjectilePool] Initialization completed");
@@ -328,6 +330,8 @@ public class ProjectilePool
 
         GameObject prefab = _projectilePrefabMap[projectileType];
         GameObject newProjectile = Object.Instantiate(prefab);
+
+        newProjectile.name = prefab.name + ":" + (++_poolCreations[projectileType]).ToString();
 
         if (_poolParent != null)
         {
