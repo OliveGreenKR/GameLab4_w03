@@ -78,13 +78,17 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public Vector3 LastSpawnPosition => _lastSpawnPosition;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public Vector3 LastGroudnNormal => _lastGroundNormal;
     #endregion
 
     #region Private Fields
     private Vector3 _currentVelocity = Vector3.zero;
     private Vector2 _currentMoveInput = Vector2.zero;
     private Vector3 _lastSpawnPosition = Vector3.zero;
-
+    private Vector3 _lastGroundNormal = Vector3.up;
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     private float _coyoteTimeRemaining = 0f;
@@ -123,6 +127,14 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     private void OnDisable()
     {
         DisableInput();
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if(_characterController.isGrounded)
+        {
+            _lastGroundNormal = hit.normal;
+        }
     }
     #endregion
 
