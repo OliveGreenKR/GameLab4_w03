@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: 6797019105292523378}
   - component: {fileID: 7663295947113335173}
   - component: {fileID: 3342975155027581448}
+  - component: {fileID: 5289648399551077228}
   m_Layer: 0
   m_Name: enemy
   m_TagString: Untagged
@@ -203,6 +204,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _teamId: 99
   _statData: {fileID: 11400000, guid: 0e8149dfc671a1d41949fb2180ed945a, type: 2}
+--- !u!114 &5289648399551077228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5175902631662209742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee11fecb39a0eb5478b811126588ee06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyBattleEntity: {fileID: 7663295947113335173}
+  _navMeshAgent: {fileID: 9194659079445390000}
+  _baseMoveSpeed: 3.5
 --- !u!1 &6469273310690769977
 GameObject:
   m_ObjectHideFlags: 0
