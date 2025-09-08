@@ -52,6 +52,11 @@ public class GameManager : MonoBehaviour
     /// 레벨업했을 때 발생하는 이벤트
     /// </summary>
     public event Action<int> OnPlayerLevelUp; // (newLevel)
+
+    /// <summary>
+    /// 게임오버 시 발생하는 이벤트
+    /// </summary>
+    public event Action OnGameOver;
     #endregion
 
     #region Properties
@@ -75,6 +80,10 @@ public class GameManager : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public bool IsGameActive { get; private set; }
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public bool IsGameOver { get; private set; }
     #endregion
 
     #region Unity Lifecycle
@@ -124,6 +133,22 @@ public class GameManager : MonoBehaviour
         OnGameStarted?.Invoke();
 
         Debug.Log("[GameManager] Game started - difficulty reset and spawning initiated", this);
+    }
+
+    /// <summary>
+    /// 게임오버 처리
+    /// </summary>
+    public void TriggerGameOver()
+    {
+        if (IsGameOver) return; // 중복 호출 방지
+
+        IsGameOver = true;
+        IsGameActive = false;
+
+        EndGame();
+
+        OnGameOver?.Invoke();
+        Debug.Log($"[GameManager] GAME OVER! Final Level: {CurrentLevel}, Total Kills: {EnemyKillCount}", this);
     }
 
     /// <summary>
@@ -188,7 +213,7 @@ public class GameManager : MonoBehaviour
     {
         if (killer == null || victim == null) return;
 
-        // 플레이어가 적을 죽인 경우만 카운트
+        // 플레이어가 적을 죽인 경우 - 킬 카운트
         bool isPlayerKill = killer.TeamId == _playerTeamId;
         bool isEnemyVictim = victim.TeamId == _enemyTeamId;
 
@@ -201,6 +226,14 @@ public class GameManager : MonoBehaviour
             CheckForLevelUp();
 
             Debug.Log($"[GameManager] Enemy killed! Total: {EnemyKillCount}", this);
+        }
+
+        // 플레이어가 죽은 경우 - 게임오버
+        bool isPlayerVictim = victim.TeamId == _playerTeamId && victim as NewPlayerController != null;
+
+        if (isPlayerVictim && IsGameActive)
+        {
+            TriggerGameOver();
         }
     }
     #endregion
@@ -232,6 +265,7 @@ public class GameManager : MonoBehaviour
         EnemyKillCount = 0;
         CurrentLevel = 1;
         KillsForNextLevel = _baseLevelUpKills;
+        IsGameOver = false;
     }
 
     private void CheckForLevelUp()

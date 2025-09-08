@@ -23,7 +23,7 @@ public class SplitEffectSO : ProjectileEffectSO
     [TabGroup("Split Settings")]
     [Header("Split Count")]
     [InfoBox("분열할 투사체 개수")]
-    [PropertyRange(2, 8)]
+    [PropertyRange(1, 8)]
     [SuffixLabel("projectiles")]
     [SerializeField] private int _splitCount = 3;
 
@@ -103,7 +103,11 @@ public class SplitEffectSO : ProjectileEffectSO
 
         // 분열 속성 설정
         projectile.ModifySplitProjectileCount(_splitCount);
-        projectile.SetSplitAngleRange(_splitAngleRangeDegrees);
+
+        if(projectile.SplitAngleRange < _splitAngleRangeDegrees)
+        {
+            projectile.SetSplitAngleRange(_splitAngleRangeDegrees);
+        }
 
         // 투사체 속성 배율 적용 (부착 시 즉시 적용)
         if (!Mathf.Approximately(_speedMultiplier, 1.0f))
@@ -136,7 +140,7 @@ public class SplitEffectSO : ProjectileEffectSO
     {
         base.OnValidate();
 
-        _splitCount = Mathf.Clamp(_splitCount, 2, 8);
+        _splitCount = Mathf.Clamp(_splitCount, 1, 8);
         _splitAngleRangeDegrees = Mathf.Clamp(_splitAngleRangeDegrees, 30f, 360f);
         _speedMultiplier = Mathf.Clamp(_speedMultiplier, 0.1f, 3.0f);
         _damageMultiplier = Mathf.Clamp(_damageMultiplier, 0.1f, 3.0f);

@@ -962,6 +962,17 @@ MonoBehaviour:
   m_MinRegionArea: 0.1
   m_NavMeshData: {fileID: 23800000, guid: a2dcfd662bccf7d438016d227c05490e, type: 2}
   m_BuildHeightMesh: 0
+--- !u!114 &1018567545 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8518456500233649237, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+  m_PrefabInstance: {fileID: 1725366896}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1029679105
 GameObject:
   m_ObjectHideFlags: 0
@@ -1556,6 +1567,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4698610890077387708, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: _fireRatePerSecond
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698610890077387708, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: _projectileLifetime
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1566,6 +1585,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5175902631662209742, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
   m_PrefabInstance: {fileID: 3815285920313187579}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1872166484 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4698610890077387708, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+  m_PrefabInstance: {fileID: 1725366896}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0f9c0f3b3eb2d342a7dac5ae6fd68d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1890204769
 GameObject:
   m_ObjectHideFlags: 0
@@ -1790,6 +1820,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 318737617611799272, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+      propertyPath: m_text
+      value: rewards
+      objectReference: {fileID: 0}
+    - target: {fileID: 1155107499525257828, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+      propertyPath: m_Name
+      value: Rewards
+      objectReference: {fileID: 0}
+    - target: {fileID: 1155107499525257828, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2393623432892400796, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
       propertyPath: m_Name
       value: HUD
@@ -1878,6 +1920,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3971813038858447885, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 183
+      objectReference: {fileID: 0}
+    - target: {fileID: 3971813038858447885, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -113
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1908,6 +1958,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8025519875995617548}
   - component: {fileID: 6603441336385802245}
+  - component: {fileID: 8365692449583824061}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1915,6 +1966,44 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &8365692449583824061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8365692449583824060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fed398e406aba14b9a3b024a5f889b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileLauncher: {fileID: 1872166484}
+  _playerBattleStat: {fileID: 1018567545}
+  _statRewards:
+  - rewardName: Normal_attack
+    statData: {fileID: 11400000, guid: 6684fe04d1d8b3f49833489ba5412665, type: 2}
+  - rewardName: Normal_Health
+    statData: {fileID: 11400000, guid: d555ba51cf3ff584784cc1ff53f49969, type: 2}
+  _projectileEffectRewards:
+  - rewardName: Normal_pierce
+    effectAsset: {fileID: 11400000, guid: 0b7023912b1a8fd419c4f5fd38841d3d, type: 2}
+  - rewardName: Normal_split
+    effectAsset: {fileID: 11400000, guid: 055ba47aea7c9304cbdb373a56b1734d, type: 2}
+  _rareProjectileEffectRewards:
+  - rewardName: Rare_pierce
+    effectAsset: {fileID: 11400000, guid: 0b7023912b1a8fd419c4f5fd38841d3d, type: 2}
+  - rewardName: Rare_split
+    effectAsset: {fileID: 11400000, guid: 055ba47aea7c9304cbdb373a56b1734d, type: 2}
+  _rareStatRewards:
+  - rewardName: Rare_attack
+    statData: {fileID: 11400000, guid: 71e417e76411ec0439878a608c6eb3e2, type: 2}
+  - rewardName: Rare_Health
+    statData: {fileID: 11400000, guid: 87e466438d0ceb24f8280058511cbda5, type: 2}
+  _statIncreaseWeight: 50
+  _projectileEffectWeight: 30
+  _rareProjectileEffectWeight: 10
+  _rareStatIncreaseWeight: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
