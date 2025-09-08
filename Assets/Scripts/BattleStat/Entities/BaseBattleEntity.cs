@@ -101,6 +101,11 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
         ProcessTriggerEnter(other);
     }
 
+    protected virtual void OnTriggerExit(Collider other)
+    {
+        ProcessTriggerExit(other);
+    }
+
     protected virtual void OnDestroy()
     {
         UnsubscribeFromBattleStatEvents();
@@ -149,6 +154,12 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
     /// <param name="target">트리거된 배틀 엔티티</param>
     /// <param name="actualDamage">실제 가해진 데미지</param>
     protected virtual void OnValidTriggered(IBattleEntity target, float actualDamage) { }
+
+    /// <summary>
+    /// 유효한 트리거 종료 시 호출
+    /// </summary>
+    /// <param name="target">트리거 종료된 배틀 엔티티</param>
+    protected virtual void OnValidTriggerExited(IBattleEntity target) { }
 
     /// <summary>
     /// 나가는 데미지 계산
@@ -236,6 +247,16 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
         float actualDamage = BattleInteractionSystem.ProcessDamageInteraction(this, otherEntity, outgoingDamage);
 
         OnValidTriggered(otherEntity, actualDamage);
+    }
+
+    private void ProcessTriggerExit(Collider other)
+    {
+        IBattleEntity otherEntity = other.GetComponent<IBattleEntity>();
+        if (otherEntity == null) return;
+
+        if (BattleInteractionSystem.IsSameTeam(this, otherEntity)) return;
+
+        OnValidTriggerExited(otherEntity);
     }
     #endregion
 }
