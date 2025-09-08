@@ -13,7 +13,7 @@ public class SurviveTimeTMP : MonoBehaviour
     {
         if (_survivalTimeText != null && GameManager.Instance != null)
         {
-            _survivalTimeText.text = GameManager.Instance.GetFormattedSurvivalTime();
+            //_survivalTimeText.text = GameManager.Instance.GetFormattedSurvivalTime();
         }
     }
     #endregion

@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using Sirenix.OdinInspector;
+using System;
+using UnityEngine;
 
-/// <summary>
-/// 싱글톤 게임 매니저 - 게임 시작/종료 및 생존 시간 관리
-/// </summary>
 public class GameManager : MonoBehaviour
 {
     #region Singleton
@@ -11,102 +9,163 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Serialized Fields
-    [Header("Scene Names")]
-    [SerializeField] private string _gamePlayingSceneName = "GameScene";
-    [SerializeField] private string _gameStartSceneName = "GameScene";
-    [SerializeField] private string _gameOverSceneName = "GameOverScene";
+    [TabGroup("References")]
+    [Header("Game Systems")]
+    [Required]
+    [SerializeField] private EnemySpawner _enemySpawner;
+
+    [TabGroup("Settings")]
+    [Header("Team Settings")]
+    [InfoBox("플레이어 팀 ID")]
+    [SerializeField] private int _playerTeamId = 0;
+
+    [TabGroup("Settings")]
+    [InfoBox("적 팀 ID")]
+    [SerializeField] private int _enemyTeamId = 99;
     #endregion
 
-    #region Private Fields
-    private bool _isGamePlaying = false;
-    private float _survivalTimeSeconds = 0f;
+    #region Events
+    /// <summary>
+    /// 게임이 시작될 때 발생하는 이벤트
+    /// </summary>
+    public event Action OnGameStarted;
+
+    /// <summary>
+    /// 적을 처치했을 때 발생하는 이벤트
+    /// </summary>
+    public event Action<int> OnEnemyKilled; // (totalKillCount)
+    #endregion
+
+    #region Properties
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public int EnemyKillCount { get; private set; }
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public bool IsGameActive { get; private set; }
     #endregion
 
     #region Unity Lifecycle
     private void Awake()
+    {
+        InitializeSingleton();
+    }
+
+    private void Start()
+    {
+        SubscribeToBattleEvents();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromBattleEvents();
+    }
+    #endregion
+
+    #region Public Methods - Game Control
+    /// <summary>
+    /// 게임 시작 (난이도 초기화 및 스폰 시작)
+    /// </summary>
+    public void StartGame()
+    {
+        if (_enemySpawner == null)
+        {
+            Debug.LogError("[GameManager] EnemySpawner is not assigned!", this);
+            return;
+        }
+
+        // 킬 카운트 리셋
+        ResetKillCount();
+
+        // EnemySpawner 난이도 초기화 및 스폰 시작
+        _enemySpawner.ResetDifficulty();
+        _enemySpawner.StartSpawning();
+
+        // 게임 상태 업데이트
+        IsGameActive = true;
+
+        // 이벤트 발생
+        OnGameStarted?.Invoke();
+
+        Debug.Log("[GameManager] Game started - difficulty reset and spawning initiated", this);
+    }
+
+    /// <summary>
+    /// 게임 종료
+    /// </summary>
+    public void EndGame()
+    {
+        if (_enemySpawner != null)
+        {
+            _enemySpawner.StopSpawning();
+        }
+
+        // 게임 상태 업데이트
+        IsGameActive = false;
+
+        Debug.Log($"[GameManager] Game ended - Total enemies killed: {EnemyKillCount}", this);
+    }
+    #endregion
+
+    #region Public Methods - Query
+    /// <summary>
+    /// 현재 적 처치 수 조회
+    /// </summary>
+    /// <returns>적 처치 수</returns>
+    public int GetEnemyKillCount()
+    {
+        return EnemyKillCount;
+    }
+    #endregion
+
+    #region Private Methods - Event Handling
+    private void SubscribeToBattleEvents()
+    {
+        BattleInteractionSystem.OnEntityKilled -= OnEntityKilled;
+        BattleInteractionSystem.OnEntityKilled += OnEntityKilled;
+    }
+
+    private void UnsubscribeFromBattleEvents()
+    {
+        BattleInteractionSystem.OnEntityKilled -= OnEntityKilled;
+    }
+
+    private void OnEntityKilled(IBattleEntity killer, IBattleEntity victim)
+    {
+        if (killer == null || victim == null) return;
+
+        // 플레이어가 적을 죽인 경우만 카운트
+        bool isPlayerKill = killer.TeamId == _playerTeamId;
+        bool isEnemyVictim = victim.TeamId == _enemyTeamId;
+
+        if (isPlayerKill && isEnemyVictim)
+        {
+            EnemyKillCount++;
+            OnEnemyKilled?.Invoke(EnemyKillCount);
+            Debug.Log($"[GameManager] Enemy killed! Total: {EnemyKillCount}", this);
+        }
+    }
+    #endregion
+
+    #region Private Methods - Core Logic
+    private void InitializeSingleton()
     {
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (Instance != this)
         {
+            Debug.LogWarning("[GameManager] Multiple GameManager instances detected. Destroying duplicate.", this);
             Destroy(gameObject);
         }
     }
 
-    private void Update()
+    private void ResetKillCount()
     {
-        if (_isGamePlaying)
-        {
-            _survivalTimeSeconds += Time.deltaTime;
-        }
+        EnemyKillCount = 0;
     }
-    #endregion
-
-    #region Public Methods
-    /// <summary>
-    /// 게임 시작 - 게임 씬으로 전환
-    /// </summary>
-    public void StartGame()
-    {
-        _isGamePlaying = false;
-        _survivalTimeSeconds = 0f;
-        Debug.Log("[GameManager] Starting Game - Loading Game Scene");
-        SceneManager.LoadScene(_gameStartSceneName);
-    }
-
-    /// <summary>
-    /// 게임 종료 - 게임 종료 씬으로 전환
-    /// </summary>
-    public void EndGame()
-    {
-        _isGamePlaying = false;
-        string formattedTime = FormatSurvivalTime(_survivalTimeSeconds);
-        Debug.Log($"[GameManager] Game Ended - Survival Time: {formattedTime}");
-        SceneManager.LoadScene(_gameOverSceneName);
-    }
-
-    public void LoadPlayingScene()
-    {
-        _isGamePlaying = true;
-        Debug.Log("[GameManager] Loading Playing Scene");
-        SceneManager.LoadScene(_gamePlayingSceneName);
-    }
-
-    /// <summary>
-    /// 현재 생존 시간 조회
-    /// </summary>
-    /// <returns>생존 시간 (초)</returns>
-    public float GetSurvivalTime()
-    {
-        return _survivalTimeSeconds;
-    }
-
-    /// <summary>
-    /// 포맷팅된 생존 시간 조회
-    /// </summary>
-    /// <returns>MM:SS 형태의 시간 문자열</returns>
-    public string GetFormattedSurvivalTime()
-    {
-        return FormatSurvivalTime(_survivalTimeSeconds);
-    }
-    #endregion
-
-    #region Private Methods
-    /// <summary>
-    /// 생존 시간을 MM:SS 형태로 포맷팅
-    /// </summary>
-    /// <param name="seconds">총 초</param>
-    /// <returns>포맷팅된 시간 문자열</returns>
-    private string FormatSurvivalTime(float seconds)
-    {
-        int minutes = Mathf.FloorToInt(seconds / 60f);
-        int remainingSeconds = Mathf.FloorToInt(seconds % 60f);
-        return string.Format("{0:00}:{1:00}", minutes, remainingSeconds);
-    }
-
-
     #endregion
 }

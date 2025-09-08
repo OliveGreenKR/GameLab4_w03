@@ -188,19 +188,10 @@ public class EnemySpawner : MonoBehaviour
         _nextSpawnTime = Time.time + _spawnIntervalSeconds;
 
         Debug.Log($"[EnemySpawner] Initialized with {_spawnPoints.Length} spawn points", this);
-
-        // 난이도 초기화
-        ResetDifficulty();
-        // 스폰 시작
-        StartSpawning();
     }
 
     private void OnEnable()
     {
-        // 난이도 초기화
-        ResetDifficulty();
-        // 스폰 시작
-        StartSpawning();
     }
     private void Update()
     {
