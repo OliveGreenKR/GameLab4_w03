@@ -290,7 +290,7 @@ public class ProjectileLauncher : MonoBehaviour
         if (!_projectilePool.IsInitialized)
         {
             // 풀의 부모를 이 Launcher로 설정
-            _projectilePool.Initialize(transform);
+            _projectilePool.Initialize();
         }
     }
 

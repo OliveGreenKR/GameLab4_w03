@@ -36,7 +36,7 @@ public class ProjectilePool
     #region Private Fields
     private Dictionary<ProjectileType, Queue<IProjectile>> _projectilePools;
     private Dictionary<ProjectileType, GameObject> _projectilePrefabMap;
-    private Transform _poolParent;
+    private Transform _poolParentTransform;
     private Dictionary<ProjectileType, int> _poolCreations = new Dictionary<ProjectileType, int>();
 
     // 활성 발사체 추적 [투사체][사용시간]
@@ -56,7 +56,12 @@ public class ProjectilePool
             return;
         }
 
-        _poolParent = poolParent;
+        if (poolParent == null)
+        {
+            GameObject rootObject = new GameObject($"PooledProjectiles");
+            _poolParentTransform = rootObject?.transform;
+        }
+
         InitializeDictionaries();
         InitializeFromPrefabList();
         IsInitialized = true;
@@ -152,9 +157,9 @@ public class ProjectilePool
 
         projectile.GameObject.SetActive(false);
 
-        if (_poolParent != null && projectile.Transform.parent != _poolParent)
+        if (_poolParentTransform != null && projectile.Transform.parent != _poolParentTransform)
         {
-            projectile.Transform.SetParent(_poolParent);
+            projectile.Transform.SetParent(_poolParentTransform);
         }
 
         ProjectileType projectileType = projectile.ProjectileType;
@@ -333,9 +338,10 @@ public class ProjectilePool
 
         newProjectile.name = prefab.name + ":" + (++_poolCreations[projectileType]).ToString();
 
-        if (_poolParent != null)
+        if (_poolParentTransform != null)
         {
-            newProjectile.transform.SetParent(_poolParent);
+            //풀링 위치 설정
+            newProjectile.transform.SetParent(_poolParentTransform);
         }
 
         newProjectile.SetActive(false);
