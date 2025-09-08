@@ -224,53 +224,73 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     #endregion
 
     #region Properties
-    [TabGroup("Debug")]
+    [TabGroup("Debug/State")]
     [ShowInInspector, ReadOnly]
     public ProjectileDestroyMode CurrentDestroyMode => _destroyMode;
 
-    [TabGroup("Debug")]
+    [TabGroup("Debug/State")]
     [ShowInInspector, ReadOnly]
     public float RemainingLifeTime => _remainingLifetime;
 
-    [TabGroup("Debug")]
+    [TabGroup("Debug/State")]
     [ShowInInspector, ReadOnly]
     public Collider AttackTrigger => _attackTrigger;
 
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public int CurrentPierceCount => _currentPierceCount;
-
-    [TabGroup("Debug")]
+    [TabGroup("Debug/State")]
     [ShowInInspector, ReadOnly]
     public float CurrentDamageMultiplier => _currentDamageMultiplier;
 
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public int CurrentSplitAvailableCount => _currentSplitAvailableCount;
-
-    [TabGroup("Debug")]
+    [TabGroup("Debug/State")]
     [ShowInInspector, ReadOnly]
     public int CurrentSplitProjectileCount => _currentSplitProjectileCount;
 
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float CurrentSplitAngleRange => _currentSplitAngleRange;
-
-    [TabGroup("Debug")]
+    [TabGroup("Debug/State")]
     [ShowInInspector, ReadOnly]
     public float CurrentAttackStat => GetCurrentStat(BattleStatType.Attack);
+
+    [TabGroup("Debug/Pierce")]
+    [ShowInInspector, ReadOnly]
+    public int CurrentPierceCount => _currentPierceCount;
+
+    [TabGroup("Debug/Split")]
+    [ShowInInspector, ReadOnly]
+    [SuffixLabel("degrees")]
+    public float CurrentSplitAngleRange => _currentSplitAngleRange;
+
+    [TabGroup("Debug/Split")]
+    [ShowInInspector, ReadOnly]
+    public int CurrentSplitAvailableCount => _currentSplitAvailableCount;
+
+    [TabGroup("Debug/Split")]
+    [ShowInInspector, ReadOnly]
+    public bool IsSplitDelayed => _isSplitDelayed;
+
+    [TabGroup("Debug/Split")]
+    [ShowInInspector, ReadOnly]
+    public float SplitDelayTimeRemaining => _splitDelayTimeRemaining;
 
     #endregion
 
     #region Private Fields
+    //Basic Projectiles State
     private float _remainingLifetime;
     private int _currentPierceCount;
     private float _currentDamageMultiplier;
+
+    //Split
     private int _currentSplitCount;
     private int _currentSplitAvailableCount;
     private int _currentSplitProjectileCount;
     private float _currentSplitAngleRange;
+
+    //Owner Launcher
     private ProjectileLauncher _owner;
+
+    //Split Delay System
+    private bool _isSplitDelayed = false;
+    private float _splitDelayTimeRemaining = 0f;
+    private float _splitDelayedMoveDistance = 2f;
+
     #endregion
 
     #region Unity Lifecycle
