@@ -165,7 +165,7 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
     /// </summary>
     /// <param name="damage"></param>
     /// <param name="attacker"></param>
-    private void OnDamageTaken(float damage, IBattleEntity attacker)
+    protected virtual void OnDamageTakenFromBattleStat(float damage, IBattleEntity attacker)
     {
         // 하위 클래스에서 오버라이드하여 추가 처리
     }
@@ -197,8 +197,8 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
     {
         if (_battleStat == null) return;
 
-        _battleStat.OnDamageTaken -= OnDamageTaken;
-        _battleStat.OnDamageTaken += OnDamageTaken;
+        _battleStat.OnDamageTaken -= OnDamageTakenFromBattleStat;
+        _battleStat.OnDamageTaken += OnDamageTakenFromBattleStat;
         _battleStat.OnDeath -= OnBattleStatDeath;
         _battleStat.OnDeath += OnBattleStatDeath;
     }
@@ -207,7 +207,7 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
     {
         if (_battleStat == null) return;
 
-        _battleStat.OnDamageTaken -= OnDamageTaken;
+        _battleStat.OnDamageTaken -= OnDamageTakenFromBattleStat;
         _battleStat.OnDeath -= OnBattleStatDeath;
     }
 
