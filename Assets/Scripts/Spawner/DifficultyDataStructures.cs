@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sirenix.OdinInspector;
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -66,7 +67,7 @@ public struct WeightedMaxUpgrade
     [Tooltip("업그레이드 적용 시 증가량")]
     public float upgradeAmount;
 
-    [Tooltip("초기 가중치")]
+    [Tooltip("초기 가중치(%)")]
     public float initialWeight;
 
     [Header("Weight Settings")]
@@ -74,6 +75,7 @@ public struct WeightedMaxUpgrade
     public float weightIncrease;
 
     [Tooltip("최대 가중치 한계")]
+    [SuffixLabel("%")]
     public float maxWeight;
 }
 
