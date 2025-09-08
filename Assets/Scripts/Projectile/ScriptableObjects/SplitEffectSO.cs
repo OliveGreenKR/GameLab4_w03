@@ -33,6 +33,27 @@ public class SplitEffectSO : ProjectileEffectSO
     [PropertyRange(30f, 360f)]
     [SuffixLabel("degrees")]
     [SerializeField] private float _splitAngleRangeDegrees = 120f;
+
+    [TabGroup("Projectile Modifiers")]
+    [Header("Speed Multiplier")]
+    [InfoBox("분열 부착 시 투사체 속도 배율\n1.0 = 변화없음, 0.5 = 50% 감소, 1.5 = 50% 증가")]
+    [PropertyRange(0.1f, 3.0f)]
+    [SuffixLabel("x")]
+    [SerializeField] private float _speedMultiplier = 1.0f;
+
+    [TabGroup("Projectile Modifiers")]
+    [Header("Damage Multiplier")]
+    [InfoBox("분열 시 데미지 배율\n1.0 = 변화없음, 0.5 = 50% 감소, 1.5 = 50% 증가")]
+    [PropertyRange(0.1f, 3.0f)]
+    [SuffixLabel("x")]
+    [SerializeField] private float _damageMultiplier = 1.0f;
+
+    [TabGroup("Projectile Modifiers")]
+    [Header("Lifetime Multiplier")]
+    [InfoBox("분열 부착 시 생명시간 배율\n1.0 = 변화없음, 0.5 = 50% 감소, 1.5 = 50% 증가")]
+    [PropertyRange(0.1f, 3.0f)]
+    [SuffixLabel("x")]
+    [SerializeField] private float _lifetimeMultiplier = 1.0f;
     #endregion
 
     #region Properties
@@ -47,6 +68,18 @@ public class SplitEffectSO : ProjectileEffectSO
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public SplitApplicationMode ApplicationMode => _applicationMode;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float SpeedMultiplier => _speedMultiplier;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float DamageMultiplier => _damageMultiplier;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float LifetimeMultiplier => _lifetimeMultiplier;
     #endregion
 
     #region ProjectileEffectSO Implementation
@@ -72,6 +105,23 @@ public class SplitEffectSO : ProjectileEffectSO
         projectile.ModifySplitProjectileCount(_splitCount);
         projectile.SetSplitAngleRange(_splitAngleRangeDegrees);
 
+        // 투사체 속성 배율 적용 (부착 시 즉시 적용)
+        if (!Mathf.Approximately(_speedMultiplier, 1.0f))
+        {
+            projectile.ModifySpeedMultiplier(_speedMultiplier);
+        }
+
+        if (!Mathf.Approximately(_damageMultiplier, 1.0f))
+        {
+            projectile.ModifyDamageMultiplier(_damageMultiplier);
+        }
+
+        if (!Mathf.Approximately(_lifetimeMultiplier, 1.0f))
+        {
+            float currentLifetime = projectile.RemainingLifetime;
+            projectile.SetLifetime(currentLifetime * _lifetimeMultiplier);
+        }
+
         //LogEffect($"Attached split effect. Available: {projectile.SplitAvailableCount}, Count: {projectile.SplitProjectileCount}, Angle: {projectile.SplitAngleRange}", projectile);
     }
 
@@ -88,13 +138,35 @@ public class SplitEffectSO : ProjectileEffectSO
 
         _splitCount = Mathf.Clamp(_splitCount, 2, 8);
         _splitAngleRangeDegrees = Mathf.Clamp(_splitAngleRangeDegrees, 30f, 360f);
+        _speedMultiplier = Mathf.Clamp(_speedMultiplier, 0.1f, 3.0f);
+        _damageMultiplier = Mathf.Clamp(_damageMultiplier, 0.1f, 3.0f);
+        _lifetimeMultiplier = Mathf.Clamp(_lifetimeMultiplier, 0.1f, 3.0f);
         UpdateDescription();
     }
 
     private void UpdateDescription()
     {
         string modeText = _applicationMode == SplitApplicationMode.SetAbsolute ? "절대" : "추가";
-        _description = $"{modeText} {_splitCount}분열, 각도 {_splitAngleRangeDegrees:F0}°";
+        string baseText = $"{modeText} {_splitCount}분열, 각도 {_splitAngleRangeDegrees:F0}°";
+
+        string modifierText = "";
+
+        if (!Mathf.Approximately(_speedMultiplier, 1.0f))
+        {
+            modifierText += $", 속도 {_speedMultiplier:F1}x";
+        }
+
+        if (!Mathf.Approximately(_damageMultiplier, 1.0f))
+        {
+            modifierText += $", 데미지 {_damageMultiplier:F1}x";
+        }
+
+        if (!Mathf.Approximately(_lifetimeMultiplier, 1.0f))
+        {
+            modifierText += $", 생명시간 {_lifetimeMultiplier:F1}x";
+        }
+
+        _description = baseText + modifierText;
     }
     #endregion
 }
