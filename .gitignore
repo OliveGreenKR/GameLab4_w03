@@ -13,7 +13,8 @@
 *.log
 
 # Unity Package Samples
-/Packages/*/Samples~
+/Packages/*/[Ss]amples~
+/[Aa]ssets/[Ss]amples~
 
 # By default unity supports Blender asset imports, *.blend1 blender files do not need to be commited to version control.
 *.blend1
