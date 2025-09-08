@@ -125,6 +125,29 @@ public interface ISpawnable
     object GetSpawner();
     #endregion
 
+    #region Pool Synchronization
+    /// <summary>
+    /// 풀로 반환될 때 호출되는 정리 작업
+    /// </summary>
+    void OnReturnToPool();
+
+    /// <summary>
+    /// 풀에서 가져올 때 호출되는 초기화 작업
+    /// </summary>
+    void OnRetrievedFromPool();
+
+    /// <summary>
+    /// 풀 반환 콜백 등록
+    /// </summary>
+    /// <param name="returnCallback">풀 반환 시 호출될 콜백</param>
+    void RegisterPoolReturnCallback(Action<ISpawnable> returnCallback);
+
+    /// <summary>
+    /// 풀로 반환되어야 하는 상태인지 여부
+    /// </summary>
+    bool ShouldReturnToPool { get; }
+    #endregion
+
     #region Events
     /// <summary>
     /// 스폰 완료 시 발생하는 이벤트
