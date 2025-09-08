@@ -267,8 +267,8 @@ Camera:
   m_GameObject: {fileID: 5844669746643537085}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.10083661, g: 0.14233516, b: 0.20754719, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -517,6 +517,7 @@ GameObject:
   - component: {fileID: 8518456500233649237}
   - component: {fileID: 3958529434543869523}
   - component: {fileID: 6993720546414153256}
+  - component: {fileID: 2489569754048336098}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -600,7 +601,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 8518456500233649237}
-  _invulnerabilityDuration: 1
+  _invulnerabilityDuration: 0.5
   _hasContactDamage: 0
 --- !u!114 &8518456500233649237
 MonoBehaviour:
@@ -645,6 +646,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 4471660500654166704}
   _player: {fileID: 5597853729675806886}
+--- !u!114 &2489569754048336098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8827062219219739129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d755a0505c208f94096952e39692d330, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetCharacterController: {fileID: 1491510812263301288}
+  _playerController: {fileID: 5597853729675806886}
+  _characterBattleEntity: {fileID: 8508553879287985222}
+  _knockbackMagnitude: 3
+  _inputPreventionTime: 0.2
 --- !u!1001 &9022697220076283605
 PrefabInstance:
   m_ObjectHideFlags: 0

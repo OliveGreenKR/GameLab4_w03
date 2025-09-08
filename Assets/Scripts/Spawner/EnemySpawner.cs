@@ -458,6 +458,12 @@ public class EnemySpawner : MonoBehaviour
             return null;
         }
 
+        // 풀 반환 콜백 등록
+        spawnable.RegisterPoolReturnCallback(returnedSpawnable =>
+        {
+            _enemyPool.ReturnObject(returnedSpawnable.GameObject);
+        });
+
         return spawnable;
     }
     #endregion

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3a75a51bfe3b6844a91b03951aeba52, type: 3}
   m_Name: Enemy
   m_EditorClassIdentifier: 
-  _baseHealth: 100
+  _baseHealth: 10
   _maxHealth: 100
   _baseAttack: 10
   _baseAttackSpeed: 1

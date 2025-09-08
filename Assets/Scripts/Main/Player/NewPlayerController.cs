@@ -231,6 +231,8 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
         _currentMoveInput = Vector2.zero;
     }
 
+
+
     /// <summary>
     /// 이동 속도 설정
     /// </summary>
@@ -247,6 +249,38 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
     public void SetJumpHeight(float jumpHeight)
     {
         _jumpHeight = jumpHeight;
+    }
+    #endregion
+
+    #region Public Methods - Movement Input Control
+    /// <summary>
+    /// 움직임 입력 활성화 (이동, 점프)
+    /// </summary>
+    public void EnableMovementInput()
+    {
+        if (_inputs == null) return;
+
+        _inputs.Player.Move.performed -= OnMovePerformed;
+        _inputs.Player.Move.performed += OnMovePerformed;
+        _inputs.Player.Move.canceled -= OnMoveCanceled;
+        _inputs.Player.Move.canceled += OnMoveCanceled;
+        _inputs.Player.Jump.performed -= OnJumpPerformed;
+        _inputs.Player.Jump.performed += OnJumpPerformed;
+    }
+
+    /// <summary>
+    /// 움직임 입력 비활성화 (이동, 점프)
+    /// </summary>
+    public void DisableMovementInput()
+    {
+        if (_inputs == null) return;
+
+        _inputs.Player.Move.performed -= OnMovePerformed;
+        _inputs.Player.Move.canceled -= OnMoveCanceled;
+        _inputs.Player.Jump.performed -= OnJumpPerformed;
+
+        // 현재 입력 상태 초기화
+        _currentMoveInput = Vector2.zero;
     }
     #endregion
 

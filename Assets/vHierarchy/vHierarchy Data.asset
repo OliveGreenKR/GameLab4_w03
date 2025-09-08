@@ -108,6 +108,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1362817463299294582-1725366896
         - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-1359909113-0
         - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-997947768-0
+        - globalObjectIdString: GlobalObjectId_V1-2-dfda7dfd3e6f02746be5c87e2d77671c-5175902631662209742-3815285920313187579
         values:
         - colorIndex: 0
           iconNameOrGuid: CapsuleCollider Icon
@@ -179,6 +180,10 @@ MonoBehaviour:
           isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: BuildSettings.WebGL On
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: CollabConflict
           isIconRecursive: 0
           isColorRecursive: 0
   bookmarks: []

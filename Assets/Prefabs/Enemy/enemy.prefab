@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6048373311875892055}
   - component: {fileID: 4314417203857407587}
+  - component: {fileID: 3697572285334103287}
   - component: {fileID: 4825674051734668680}
   - component: {fileID: 4895559731593841048}
   m_Layer: 0
@@ -57,6 +58,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9999998, y: 0.9999998, z: 1.6673375}
   m_Center: {x: 0, y: 0, z: 0.33366936}
+--- !u!114 &3697572285334103287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4578190446144943985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a92cac13d4dbee24391181e22e4fac1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _battleStat: {fileID: 4825674051734668680}
+  _invulnerabilityDuration: 1
+  _enemyTeamId: 99
 --- !u!114 &4825674051734668680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97,7 +113,7 @@ GameObject:
   - component: {fileID: 1773419499822682767}
   - component: {fileID: 9194659079445390000}
   - component: {fileID: 6797019105292523378}
-  - component: {fileID: 451802867445083658}
+  - component: {fileID: 7663295947113335173}
   - component: {fileID: 3342975155027581448}
   m_Layer: 0
   m_Name: enemy
@@ -105,7 +121,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1773419499822682767
 Transform:
   m_ObjectHideFlags: 0
@@ -116,7 +132,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 15.65, y: 1.63, z: 1.49}
-  m_LocalScale: {x: 0.81709236, y: 0.81709236, z: 0.81709236}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6048373311875892055}
@@ -158,7 +174,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 0}
   _agent: {fileID: 9194659079445390000}
---- !u!114 &451802867445083658
+--- !u!114 &7663295947113335173
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -167,12 +183,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5175902631662209742}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 099471cc0fbdc1940a80ffca63d62b50, type: 3}
+  m_Script: {fileID: 11500000, guid: a92cac13d4dbee24391181e22e4fac1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 3342975155027581448}
-  _invulnerabilityDuration: 0.1
-  _hasContactDamage: 1
+  _invulnerabilityDuration: 0
+  _enemyTeamId: 99
 --- !u!114 &3342975155027581448
 MonoBehaviour:
   m_ObjectHideFlags: 0
