@@ -71,9 +71,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     [Header("Battle System")]
     [Required]
     [SerializeField] private BattleStatComponent _battleStat;
-
-    [TabGroup("Battle")]
-    [SerializeField] private int _teamId = 0;
     #endregion
 
     #region Events - IProjectile
@@ -112,7 +109,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     public Transform Transform => transform;
     public GameObject GameObject => gameObject;
     public bool IsAlive => gameObject.activeInHierarchy && _battleStat != null && _battleStat.IsAlive;
-    public int TeamId => _teamId;
+    public int TeamId => (int)_battleStat.GetCurrentStat(BattleStatType.TeamId);
 
     public float TakeDamage(IBattleEntity attacker, float damage)
     {
@@ -361,12 +358,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         _remainingLifetime = _lifetimeSeconds;
         InitializeProjectileStats();
     }
-
-    public void SetTeamId(int teamId)
-    {
-        _teamId = teamId;
-    }
-
     public void DestroyProjectile()
     {
         ProcessSplit();
@@ -476,7 +467,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     private void ProcessBattleInteraction(Collider other)
     {
         IBattleEntity targetEntity = other.GetComponent<IBattleEntity>();
-        if (targetEntity != null && targetEntity.TeamId != _teamId)
+        if (targetEntity != null && targetEntity.TeamId != TeamId)
         {
             float attackStat = GetCurrentStat(BattleStatType.Attack);
             float damage = DealDamage(targetEntity, attackStat);

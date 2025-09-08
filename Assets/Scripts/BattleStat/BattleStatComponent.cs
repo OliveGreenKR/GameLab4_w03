@@ -1,5 +1,6 @@
 ﻿using Sirenix.OdinInspector;
 using System;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
 
 public class BattleStatComponent : MonoBehaviour
@@ -139,6 +140,8 @@ public class BattleStatComponent : MonoBehaviour
     {
         switch (statType)
         {
+            case BattleStatType.TeamId:
+                return (float)TeamId;
             case BattleStatType.Health:
                 return CurrentHealth;
             case BattleStatType.MaxHealth:
@@ -166,6 +169,9 @@ public class BattleStatComponent : MonoBehaviour
 
         switch (statType)
         {
+            case BattleStatType.TeamId:
+                _teamId = (int)value;
+                break;
             case BattleStatType.Health:
                 CurrentHealth = value;
                 Debug.Log($"CurrentHealth : {value}");

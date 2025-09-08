@@ -79,6 +79,7 @@ public interface IBattleEntity
 /// </summary>
 public enum BattleStatType
 {
+    TeamId,         // 팀 식별자 (ID)
     Health,         // 체력 (수치)
     MaxHealth,      // 최대 체력 (수치)
     Attack,         // 공격력 (수치)

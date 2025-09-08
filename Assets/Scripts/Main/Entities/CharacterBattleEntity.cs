@@ -11,10 +11,6 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     [Required]
     [SerializeField] private BattleStatComponent _battleStat;
 
-    [TabGroup("Battle")]
-    [Header("Team Settings")]
-    [SerializeField] private int _teamId = 1;
-
     [TabGroup("Combat")]
     [SuffixLabel("seconds")]
     [SerializeField] private float _invulnerabilityDuration = 1f;
@@ -27,7 +23,7 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     public Transform Transform => transform;
     public GameObject GameObject => gameObject;
     public bool IsAlive => _battleStat != null && _battleStat.IsAlive;
-    public int TeamId => _teamId;
+    public int TeamId => (int)_battleStat.GetCurrentStat(BattleStatType.TeamId);
 
     public float TakeDamage(IBattleEntity attacker, float damage)
     {
@@ -134,15 +130,6 @@ public class CharacterBattleEntity : MonoBehaviour, IBattleEntity
     #endregion
 
     #region Public Methods
-    /// <summary>
-    /// 팀 ID 설정
-    /// </summary>
-    /// <param name="teamId">팀 식별자</param>
-    public void SetTeamId(int teamId)
-    {
-        _teamId = teamId;
-    }
-
     /// <summary>
     /// 무적 상태 수동 활성화
     /// </summary>
