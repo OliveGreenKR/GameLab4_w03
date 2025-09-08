@@ -21,7 +21,20 @@ public class GameManager : MonoBehaviour
 
     [TabGroup("Settings")]
     [InfoBox("적 팀 ID")]
-    [SerializeField] private int _enemyTeamId = 99;
+    [SerializeField] private int _enemyTeamId = 1;
+
+    [TabGroup("Settings")]
+    [Header("Level Up Settings")]
+    [InfoBox("첫 번째 레벨업에 필요한 기본 킬 수")]
+    [PropertyRange(1, 100)]
+    [SuffixLabel("kills")]
+    [SerializeField] private int _baseLevelUpKills = 10;
+
+    [TabGroup("Settings")]
+    [InfoBox("레벨업 요구 킬 수 증가 배율 (1.2 = 20% 증가)")]
+    [PropertyRange(1.1f, 2.0f)]
+    [SuffixLabel("multiplier")]
+    [SerializeField] private float _levelUpMultiplier = 1.2f;
     #endregion
 
     #region Events
@@ -34,12 +47,30 @@ public class GameManager : MonoBehaviour
     /// 적을 처치했을 때 발생하는 이벤트
     /// </summary>
     public event Action<int> OnEnemyKilled; // (totalKillCount)
+
+    /// <summary>
+    /// 레벨업했을 때 발생하는 이벤트
+    /// </summary>
+    public event Action<int> OnPlayerLevelUp; // (newLevel)
     #endregion
 
     #region Properties
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public int EnemyKillCount { get; private set; }
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public int CurrentLevel { get; private set; } = 1;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public int KillsForNextLevel { get; private set; }
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    [ProgressBar(0, "KillsForNextLevel")]
+    public int KillsTowardsNextLevel => EnemyKillCount;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -55,6 +86,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         SubscribeToBattleEvents();
+        InitializeLevelSystem();
+        StartGame();
     }
 
     private void OnDestroy()
@@ -69,14 +102,16 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void StartGame()
     {
+        Debug.Log("[GameManager] Starting game...", this);  
+
         if (_enemySpawner == null)
         {
             Debug.LogError("[GameManager] EnemySpawner is not assigned!", this);
             return;
         }
 
-        // 킬 카운트 리셋
-        ResetKillCount();
+        // 킬 카운트 및 레벨 리셋
+        ResetGameProgress();
 
         // EnemySpawner 난이도 초기화 및 스폰 시작
         _enemySpawner.ResetDifficulty();
@@ -104,7 +139,7 @@ public class GameManager : MonoBehaviour
         // 게임 상태 업데이트
         IsGameActive = false;
 
-        Debug.Log($"[GameManager] Game ended - Total enemies killed: {EnemyKillCount}", this);
+        Debug.Log($"[GameManager] Game ended - Level: {CurrentLevel}, Total enemies killed: {EnemyKillCount}", this);
     }
     #endregion
 
@@ -116,6 +151,24 @@ public class GameManager : MonoBehaviour
     public int GetEnemyKillCount()
     {
         return EnemyKillCount;
+    }
+
+    /// <summary>
+    /// 현재 레벨 조회
+    /// </summary>
+    /// <returns>현재 레벨</returns>
+    public int GetCurrentLevel()
+    {
+        return CurrentLevel;
+    }
+
+    /// <summary>
+    /// 다음 레벨업까지 필요한 킬 수 조회
+    /// </summary>
+    /// <returns>다음 레벨업까지 필요한 킬 수</returns>
+    public int GetKillsForNextLevel()
+    {
+        return KillsForNextLevel;
     }
     #endregion
 
@@ -143,6 +196,10 @@ public class GameManager : MonoBehaviour
         {
             EnemyKillCount++;
             OnEnemyKilled?.Invoke(EnemyKillCount);
+
+            // 레벨업 체크
+            CheckForLevelUp();
+
             Debug.Log($"[GameManager] Enemy killed! Total: {EnemyKillCount}", this);
         }
     }
@@ -163,9 +220,37 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void ResetKillCount()
+    private void InitializeLevelSystem()
+    {
+        CurrentLevel = 1;
+        KillsForNextLevel = _baseLevelUpKills;
+        Debug.Log($"[GameManager] Level system initialized - Level {CurrentLevel}, Next level at {KillsForNextLevel} kills", this);
+    }
+
+    private void ResetGameProgress()
     {
         EnemyKillCount = 0;
+        CurrentLevel = 1;
+        KillsForNextLevel = _baseLevelUpKills;
+    }
+
+    private void CheckForLevelUp()
+    {
+        if (EnemyKillCount >= KillsForNextLevel)
+        {
+            CurrentLevel++;
+            CalculateNextLevelRequirement();
+
+            OnPlayerLevelUp?.Invoke(CurrentLevel);
+            Debug.Log($"[GameManager] LEVEL UP! Level {CurrentLevel} reached! Next level at {KillsForNextLevel} kills", this);
+        }
+    }
+
+    private void CalculateNextLevelRequirement()
+    {
+        // 이전 요구 킬 수에 배율 적용
+        float nextRequirement = KillsForNextLevel * _levelUpMultiplier;
+        KillsForNextLevel = Mathf.RoundToInt(nextRequirement);
     }
     #endregion
 }

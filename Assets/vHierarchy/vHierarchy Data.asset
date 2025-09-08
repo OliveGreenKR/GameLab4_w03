@@ -209,6 +209,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-279568727a1ffcd49bae247c289ddf7a-1359909113-0
         - globalObjectIdString: GlobalObjectId_V1-2-279568727a1ffcd49bae247c289ddf7a-997947768-0
         - globalObjectIdString: GlobalObjectId_V1-2-279568727a1ffcd49bae247c289ddf7a-5175902631662209742-3815285920313187579
+        - globalObjectIdString: GlobalObjectId_V1-2-279568727a1ffcd49bae247c289ddf7a-8365692449583824060-0
         values:
         - colorIndex: 0
           iconNameOrGuid: CapsuleCollider Icon
@@ -284,6 +285,10 @@ MonoBehaviour:
           isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: CollabConflict
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Settings Icon
           isIconRecursive: 0
           isColorRecursive: 0
     - goDatas_byGlobalId:
