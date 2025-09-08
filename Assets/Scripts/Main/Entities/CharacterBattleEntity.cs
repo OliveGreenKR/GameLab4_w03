@@ -31,6 +31,7 @@ public class CharacterBattleEntity : BaseBattleEntity
     public override void OnDeath(IBattleEntity killer = null)
     {
         base.OnDeath(killer);
+        gameObject.SetActive(false);
         OnCharacterDeath?.Invoke(killer);
     }
 

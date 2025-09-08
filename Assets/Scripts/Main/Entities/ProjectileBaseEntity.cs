@@ -17,7 +17,7 @@ public enum ProjectileDestroyMode
 ///  Projectile Base, 이펙트 부착이 가능하며
 /// 생명 주기는 스스로 관리. 매니저를 통해 생명주기의 완료 프로세스를 위탁
 /// </summary>
-public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
+public class ProjectileBase : BaseBattleEntity, IProjectile
 {
     #region Serialized Fields
     [TabGroup("Settings")]
@@ -66,11 +66,6 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     [Header("RigidBody")]
     [Required]
     [SerializeField] protected Rigidbody _rigid;
-
-    [TabGroup("Battle")]
-    [Header("Battle System")]
-    [Required]
-    [SerializeField] private BattleStatComponent _battleStat;
     #endregion
 
     #region Events - IProjectile
@@ -105,50 +100,30 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     public event System.Action<IProjectile> OnProjectileUpdate;
     #endregion
 
-    #region IBattleEntity Implementation
-    public Transform Transform => transform;
-    public GameObject GameObject => gameObject;
-    public bool IsAlive => gameObject.activeInHierarchy && _battleStat != null && _battleStat.IsAlive;
-    public int TeamId => (int)_battleStat.GetCurrentStat(BattleStatType.TeamId);
-
-    public float TakeDamage(IBattleEntity attacker, float damage)
+    #region BaseBattleEntity Overrides
+    public override float TakeDamage(IBattleEntity attacker, float damage)
     {
         //투사체는 외부로부터 데미지를 받지 않음.
         return 0.0f;
     }
 
-    public float DealDamage(IBattleEntity target, float baseDamage)
+    protected override void OnValidTriggered(IBattleEntity target, float actualDamage)
     {
-        // 투사체 데미지 배율 적용
-        if (target == null || !target.IsAlive)
+        if (actualDamage > 0f)
         {
-            Debug.Log("[ProjectileBase] Invalid target or target is already dead.", this);
-            return 0f;
+            _battleStat.ApplyDamage(1.0f);
         }
-        float finalDamage = baseDamage * _currentDamageMultiplier;
-        float actualDamage = BattleInteractionSystem.ProcessDamageInteraction(this, target, finalDamage);
-        return actualDamage;
     }
 
-    public void OnDeath(IBattleEntity killer = null)
+    protected override float CalculateFinalDamage(IBattleEntity target)
+    {
+        return GetCurrentStat(BattleStatType.Attack) * _currentDamageMultiplier;
+    }
+
+    public override void OnDeath(IBattleEntity killer = null)
     {
         //Debug.Log("[ProjectileBase] Projectile has been destroyed.", this);
         HandleProjectileDeath(); // 통합 함수 호출
-    }
-
-    public float GetCurrentStat(BattleStatType statType)
-    {
-        return _battleStat != null ? _battleStat.GetCurrentStat(statType) : 0f;
-    }
-
-    public void SetCurrentStat(BattleStatType statType, float value)
-    {
-        _battleStat?.SetCurrentStat(statType, value);
-    }
-
-    public void ModifyStat(BattleStatType statType, float delta)
-    {
-        _battleStat?.ModifyStat(statType, delta);
     }
     #endregion
 
@@ -299,10 +274,11 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
     #endregion
 
     #region Unity Lifecycle
-    private void Start()
+    protected override void Start()
     {
-        InitializeBattleStatEvents();
+        base.Start();
     }
+
     private void Update()
     {
         UpdateLifetime();
@@ -310,12 +286,11 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         OnProjectileUpdate?.Invoke(this);
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected override void OnTriggerEnter(Collider other)
     {
         OnProjectileHit?.Invoke(this, other);
-        ProcessBattleInteraction(other);
+        base.OnTriggerEnter(other);
         AfterProjectileHit?.Invoke(this, other);
-
     }
 
     private void OnEnable()
@@ -323,20 +298,18 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         _remainingLifetime = _lifetimeSeconds;
         InitializeProjectileStats();
         OnProjectileActivated?.Invoke(this);
-        InitializeBattleStatEvents();
         Debug.Log($"[ProjectileBase] Projectile Activated. Lifetime: {_lifetimeSeconds}s, Speed: {_forwardSpeedUnitsPerSecond} units/sec", this);
     }
 
     private void OnDisable()
     {
-        UnsubscribeBattleStatEvents();
         // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
         ClearAllEvents();
-        UnsubscribeBattleStatEvents();
+        base.OnDestroy();
         // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
     }
 
@@ -464,16 +437,7 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
             HandleProjectileDeath(); // 통합 소멸 함수 호출
         }
     }
-    private void ProcessBattleInteraction(Collider other)
-    {
-        IBattleEntity targetEntity = other.GetComponent<IBattleEntity>();
-        if (targetEntity != null && targetEntity.TeamId != TeamId)
-        {
-            float attackStat = GetCurrentStat(BattleStatType.Attack);
-            float damage = DealDamage(targetEntity, attackStat);
-            _battleStat.ApplyDamage(1.0f);
-        }
-    }
+
     private void ClearAllEvents()
     {
         OnProjectileActivated = null;
@@ -496,21 +460,4 @@ public class ProjectileBase : MonoBehaviour, IBattleEntity, IProjectile
         DestroyProjectile();
     }
     #endregion
-
-    #region Privae Binding BattleCompoenet Events
-    private void InitializeBattleStatEvents()
-    {
-        if (_battleStat == null) return;
-
-        _battleStat.OnDeath -= OnDeath;
-        _battleStat.OnDeath += OnDeath;
-    }
-
-    private void UnsubscribeBattleStatEvents()
-    {
-        if (_battleStat == null) return;
-
-        _battleStat.OnDeath -= OnDeath;
-    }
-    #endregion 
 }

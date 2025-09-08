@@ -1743,7 +1743,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _teamId: 1
+  _teamId: 0
   _statData: {fileID: 11400000, guid: bde5c934bd0e9aa4a9d77850234a8cb3, type: 2}
 --- !u!114 &2036164280
 MonoBehaviour:
