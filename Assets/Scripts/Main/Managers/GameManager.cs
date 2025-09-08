@@ -119,6 +119,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // 게임 시작 시 마우스 커서 숨김 및 잠금
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
         // 킬 카운트 및 레벨 리셋
         ResetGameProgress();
 

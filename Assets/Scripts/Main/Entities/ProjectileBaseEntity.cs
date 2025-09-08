@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEditor.Rendering.CameraUI;
 
 /// <summary>
 /// 투사체 소멸 모드

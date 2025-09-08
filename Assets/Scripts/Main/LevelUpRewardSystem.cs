@@ -1,8 +1,9 @@
 ﻿using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Collections;  // IEnumerator용
+using TMPro;              // TMP_Text용
 using UnityEngine;
-using TMPro;  // 파일 최상단에 추가
 
 /// <summary>
 /// 보상 타입 열거형
@@ -313,6 +314,8 @@ public class LevelUpRewardSystem : MonoBehaviour
 
             OnRewardApplied?.Invoke(RewardType.StatIncrease, selectedReward.rewardName);
             Debug.Log($"[LevelUpRewardSystem] Applied {rewardText}", this);
+
+            ShowRewardText(rewardText);
         }
     }
 
@@ -336,6 +339,8 @@ public class LevelUpRewardSystem : MonoBehaviour
 
             OnRewardApplied?.Invoke(RewardType.ProjectileEffect, selectedReward.rewardName);
             Debug.Log($"[LevelUpRewardSystem] Applied {rewardText}", this);
+
+            ShowRewardText(rewardText);
         }
     }
 
@@ -359,6 +364,8 @@ public class LevelUpRewardSystem : MonoBehaviour
 
             OnRewardApplied?.Invoke(RewardType.RareProjectileEffect, selectedReward.rewardName);
             Debug.Log($"[LevelUpRewardSystem] Applied {rewardText}", this);
+
+            ShowRewardText(rewardText);
         }
     }
 
@@ -385,6 +392,8 @@ public class LevelUpRewardSystem : MonoBehaviour
 
             OnRewardApplied?.Invoke(RewardType.RareStatIncrease, selectedReward.rewardName);
             Debug.Log($"[LevelUpRewardSystem] Applied {rewardText}", this);
+
+            ShowRewardText(rewardText);
         }
     }
     #endregion
@@ -462,16 +471,55 @@ public class LevelUpRewardSystem : MonoBehaviour
         switch (rewardType)
         {
             case RewardType.StatIncrease:
-                return "스탯 증가";
+                return "Stat";
             case RewardType.ProjectileEffect:
-                return "투사체 이펙트";
+                return "Projectile";
             case RewardType.RareProjectileEffect:
-                return "레어 투사체 이펙트";
+                return "Rare Projectile";
             case RewardType.RareStatIncrease:
-                return "레어 스탯 증가";
+                return "Rare Stat";
             default:
-                return "알 수 없는 보상";
+                return "Unknown";
         }
+    }
+    #endregion
+
+    #region Private Methods - UI Display
+    private void ShowRewardText(string rewardText)
+    {
+        if (_rewardDisplayText == null) return;
+
+        // 기존 코루틴이 실행 중이면 중단
+        if (_displayCoroutine != null)
+        {
+            StopCoroutine(_displayCoroutine);
+        }
+
+        // 새 코루틴 시작
+        _displayCoroutine = StartCoroutine(DisplayTextCoroutine(rewardText));
+    }
+
+    private void HideRewardText()
+    {
+        if (_rewardDisplayText != null)
+        {
+            _rewardDisplayText.gameObject.SetActive(false);
+        }
+
+        _displayCoroutine = null;
+    }
+
+    private IEnumerator DisplayTextCoroutine(string text)
+    {
+        // 텍스트 설정 및 활성화
+        _rewardDisplayText.text = text;
+        _rewardDisplayText.gameObject.SetActive(true);
+
+        // 설정된 시간만큼 대기
+        yield return new WaitForSeconds(_displayDurationSeconds);
+
+        // 텍스트 숨김
+        HideRewardText();
     }
     #endregion
 }

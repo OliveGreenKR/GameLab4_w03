@@ -1,6 +1,5 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.LightTransport;
 
 public class StraightUp : MonoBehaviour
 {

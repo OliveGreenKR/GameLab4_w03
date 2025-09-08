@@ -897,6 +897,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1359909114}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &892684741 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 318737617611799272, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+  m_PrefabInstance: {fileID: 7564183026276321547}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &997947768
 GameObject:
   m_ObjectHideFlags: 0
@@ -1824,6 +1835,18 @@ PrefabInstance:
       propertyPath: m_text
       value: rewards
       objectReference: {fileID: 0}
+    - target: {fileID: 318737617611799272, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+      propertyPath: m_fontSize
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 318737617611799272, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 318737617611799272, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1155107499525257828, guid: 74205bcbb3deb874481d9a2ff2554dc8, type: 3}
       propertyPath: m_Name
       value: Rewards
@@ -1978,6 +2001,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fed398e406aba14b9a3b024a5f889b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rewardDisplayText: {fileID: 892684741}
+  _displayDurationSeconds: 1.5
   _projectileLauncher: {fileID: 1872166484}
   _playerBattleStat: {fileID: 1018567545}
   _statRewards:
