@@ -60,6 +60,11 @@ public class EnemySpawner : MonoBehaviour
     [GUIColor(0.4f, 0.4f, 1f)]
     private void SpawnImmediateButton() => SpawnImmediate();
 
+    [ButtonGroup("DebugSpawns")]
+    [GUIColor(0.4f, 0.4f, 1f)]
+    private void StartSpawn() => StartSpawning();
+
+
     [ButtonGroup("DebugDifficulty")]
     [Button(ButtonSizes.Large)]
     [GUIColor(0.4f, 1f, 0.4f)]

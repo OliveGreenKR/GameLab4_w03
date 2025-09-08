@@ -286,9 +286,9 @@ MonoBehaviour:
   - {fileID: 1127374274}
   - {fileID: 497946236}
   - {fileID: 876775977}
-  _spawnIntervalSeconds: 5
-  _minPackSize: 3
-  _maxPackSize: 10
+  _spawnIntervalSeconds: 3
+  _minPackSize: 40
+  _maxPackSize: 60
   _initialStatRange:
     minHealth: 5
     maxHealth: 20
