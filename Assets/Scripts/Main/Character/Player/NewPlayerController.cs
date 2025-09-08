@@ -94,6 +94,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     private float _coyoteTimeRemaining = 0f;
 
     private bool _isGrounded = false;
+    private bool _isFiring = false;
     #endregion
 
     #region Unity Lifecycle
@@ -109,10 +110,16 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     {
         InitializeReferences();
         _lastSpawnPosition = transform.position;
+        _isFiring = false;
     }
 
     private void Update()
     {
+        if(_isFiring)
+        {
+            Fire();
+        }
+
         UpdateGroundedState();
         UpdateCoyoteTime();
         HandleMovement();
@@ -122,11 +129,13 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     private void OnEnable()
     {
         EnableInput();
+        _isFiring = false;
     }
 
     private void OnDisable()
     {
         DisableInput();
+        _isFiring = false;
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -190,9 +199,10 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
         _inputs.Player.Move.performed += OnMovePerformed;
         _inputs.Player.Move.canceled += OnMoveCanceled;
         _inputs.Player.Jump.performed += OnJumpPerformed;
-        _inputs.Player.ColorChange.performed += OnMouseClicked;
         _inputs.Player.Zoom.performed += OnMouseRightPressed;
         _inputs.Player.Zoom.canceled += OnMouseRightCancled;
+        _inputs.Player.Fire.performed += OnMouseClicked;
+        _inputs.Player.Fire.canceled += OnMouseClickCanceled;
     }
 
     /// <summary>
@@ -206,9 +216,11 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
         _inputs.Player.Move.performed -= OnMovePerformed;
         _inputs.Player.Move.canceled -= OnMoveCanceled;
         _inputs.Player.Jump.performed -= OnJumpPerformed;
-        _inputs.Player.ColorChange.performed -= OnMouseClicked;
         _inputs.Player.Zoom.performed -= OnMouseRightPressed;
         _inputs.Player.Zoom.canceled -= OnMouseRightCancled;
+        _inputs.Player.Fire.performed -= OnMouseClicked;
+        _inputs.Player.Fire.canceled -= OnMouseClickCanceled;
+
 
         _currentMoveInput = Vector2.zero;
     }
@@ -229,6 +241,14 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     public void SetJumpHeight(float jumpHeight)
     {
         _jumpHeight = jumpHeight;
+    }
+    #endregion
+
+    #region Public Methods - Battle
+    public void Fire()
+    {
+        // 발사 로직 구현
+        Debug.Log("[NewPlayerController] Firing...");
     }
     #endregion
 
@@ -395,6 +415,13 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IInputEventProvi
     private void OnMouseClicked(InputAction.CallbackContext context)
     {
         Debug.Log("[NewPlayerController] Mouse Clicked");
+        _isFiring = true;
+        //Fire();
+    }
+
+    private void OnMouseClickCanceled(InputAction.CallbackContext context)
+    {
+        _isFiring = false;
     }
 
     private void OnMouseRightPressed(InputAction.CallbackContext context)
