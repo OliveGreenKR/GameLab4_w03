@@ -8,7 +8,9 @@ using UnityEngine;
 /// </summary>
 public enum PrefabType
 {
-    Enemy,
+    None,
+    EnemyNormal, 
+    EnemyElite,  
     PickUp
 }
 
@@ -401,7 +403,7 @@ public class PrefabsPool
     private PrefabType GetPrefabTypeFromGameObject(GameObject obj)
     {
         if (obj == null || _prefabMap == null)
-            return PrefabType.Enemy;
+            return PrefabType.None;
 
         // 딕셔너리 역검색: 오브젝트 이름에서 프리팹 이름 패턴 찾기
         string objName = obj.name;
@@ -418,7 +420,7 @@ public class PrefabsPool
         }
 
         Debug.LogWarning($"[PrefabsPool] Could not determine PrefabType for {obj.name}. Defaulting to Enemy.");
-        return PrefabType.Enemy;
+        return PrefabType.None;
     }
     #endregion
 
