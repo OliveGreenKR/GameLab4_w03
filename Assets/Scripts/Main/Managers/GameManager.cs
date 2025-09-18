@@ -2,6 +2,19 @@
 using System;
 using UnityEngine;
 
+
+/// <summary>
+/// 게임 상태 정의
+/// </summary>
+public enum GameState
+{
+    WaveReady,
+    WaveInProgress,
+    WaveCompleted,
+    GameOver,
+    GameCleared
+}
+
 /// <summary>
 /// 게임 전반을 관리하는 싱글톤 매니저
 /// 플레이어 체력, 골드 관리 및 게임오버 판정
@@ -21,9 +34,15 @@ public class GameManager : MonoBehaviour
     [Header("Wave System")]
     [SerializeField] private EnemySpawner _enemySpawner;
     [SerializeField] private int _maxWaves = 10;
+
+    [Header("Game State")]
+    [SerializeField] private GameState _initialGameState = GameState.WaveReady;
     #endregion
 
     #region Properties
+    [ShowInInspector, ReadOnly]
+    public GameState CurrentState { get; private set; }
+
     [ShowInInspector, ReadOnly]
     public int CurrentHealth { get; private set; }
 
@@ -31,27 +50,37 @@ public class GameManager : MonoBehaviour
     public int CurrentGold { get; private set; }
 
     [ShowInInspector, ReadOnly]
-    public bool IsGameOver { get; private set; }
+    public int CurrentWave => _enemySpawner != null ? _enemySpawner.CurrentCycle : 0;
 
     [ShowInInspector, ReadOnly]
-    public int CurrentWave => _enemySpawner != null ? _enemySpawner.CurrentCycle : 0;
+    public int ActiveEnemyCount { get; private set; }
+
+    // 상태 기반 계산 프로퍼티들
+    [ShowInInspector, ReadOnly]
+    public bool IsGameOver => CurrentState == GameState.GameOver;
+
+    [ShowInInspector, ReadOnly]
+    public bool IsGameCleared => CurrentState == GameState.GameCleared;
 
     [ShowInInspector, ReadOnly]
     public bool IsSpawning => _enemySpawner != null && _enemySpawner.IsSpawning;
 
     [ShowInInspector, ReadOnly]
-    public int ActiveEnemyCount { get; private set; }
+    public bool CanStartWave => CurrentState == GameState.WaveReady || CurrentState == GameState.WaveCompleted;
 
     [ShowInInspector, ReadOnly]
-    public bool IsWaveComplete => !IsSpawning && ActiveEnemyCount == 0;
+    public bool IsWaveInProgress => CurrentState == GameState.WaveInProgress;
     #endregion
 
     #region Events
-    /// <summary>골드 변화 이벤트 (oldGold, newGold) </summary>
-    public event Action<int, int> OnGoldChanged;  
+    /// <summary>게임 상태 변경 이벤트 (oldState, newState)</summary>
+    public event Action<GameState, GameState> OnGameStateChanged;
 
-    /// <summary>체력 변화 이벤트 (oldHealth, newHealth) </summary>
-    public event Action<int, int> OnHealthChanged;  
+    /// <summary>골드 변화 이벤트 (oldGold, newGold)</summary>
+    public event Action<int, int> OnGoldChanged;
+
+    /// <summary>체력 변화 이벤트 (oldHealth, newHealth)</summary>
+    public event Action<int, int> OnHealthChanged;
 
     /// <summary>게임오버 이벤트</summary>
     public event Action OnGameOver;
@@ -60,7 +89,7 @@ public class GameManager : MonoBehaviour
     public event Action<int> OnWaveStarted;
 
     /// <summary>웨이브 완료 이벤트 (waveNumber)</summary>
-    public event Action<int> OnWaveCompleted;  
+    public event Action<int> OnWaveCompleted;
 
     /// <summary>게임 클리어 이벤트</summary>
     public event Action OnGameCleared;
@@ -92,7 +121,6 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Public Methods - Game Control
-    /// <summary>게임 재시작</summary>
     public void RestartGame()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(
@@ -101,10 +129,9 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Public Methods - Stats
-    /// <summary>골드 소모</summary>
     public bool SpendGold(int cost)
     {
-        if (cost <= 0 || CurrentGold < cost)
+        if (cost <= 0 || CurrentGold < cost || IsGameOver)
             return false;
 
         int oldGold = CurrentGold;
@@ -113,7 +140,6 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    /// <summary>체력 감소</summary>
     public void TakeDamage(int damage)
     {
         if (damage <= 0 || IsGameOver)
@@ -122,66 +148,113 @@ public class GameManager : MonoBehaviour
         int oldHealth = CurrentHealth;
         CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
         OnHealthChanged?.Invoke(oldHealth, CurrentHealth);
-        CheckGameOver();
+
+        CheckGameOverCondition();
     }
     #endregion
 
     #region Public Methods - Wave Management
-    /// <summary>웨이브 시작</summary>
     public void StartWave()
     {
-        if (_enemySpawner == null || IsGameOver)
+        if (!CanStartWave || _enemySpawner == null)
             return;
 
         _enemySpawner.StartSpawning();
-        OnWaveStarted?.Invoke(CurrentWave);
+        ChangeGameState(GameState.WaveInProgress);
     }
 
-    /// <summary>웨이브 중지</summary>
     public void StopWave()
     {
-        if (_enemySpawner == null)
+        if (_enemySpawner == null || !IsWaveInProgress)
             return;
 
-
         _enemySpawner.StopSpawning();
-    }
-
-    /// <summary>웨이브 완료 체크</summary>
-    public void CheckWaveCompletion()
-    {
-        if (IsWaveComplete && !IsGameOver)
-        {
-            OnWaveCompleted?.Invoke(CurrentWave);
-
-            // 게임 클리어 체크
-            if (CurrentWave >= _maxWaves)
-            {
-                OnGameCleared?.Invoke();
-            }
-        }
+        ChangeGameState(GameState.WaveCompleted);
     }
     #endregion
 
     #region Public Methods - Game Events
-    /// <summary>적 처치시 호출</summary>
     public void OnEnemyKilled(IBattleEntity killer, IBattleEntity victim)
     {
         if (victim == null || IsGameOver)
             return;
-        //TODO : 희생자의 타입별 차등 보상 (일반/엘리트)
-        //골드 획득
+        //increase Gold
         int oldGold = CurrentGold;
         CurrentGold += _enemyKillGoldReward;
         OnGoldChanged?.Invoke(oldGold, CurrentGold);
 
-        // 적 카운트 감소
+        //decrease ActiveEnemyCount
         ActiveEnemyCount = Mathf.Max(0, ActiveEnemyCount - 1);
-        CheckWaveCompletion();
+
+        CheckAndUpdateWaveState();
     }
     #endregion
 
-    #region Private Methods
+    #region Private Methods - State Management
+    private void ChangeGameState(GameState newState)
+    {
+        if (CurrentState == newState)
+            return;
+
+        GameState oldState = CurrentState;
+        CurrentState = newState;
+
+        Debug.Log($"[GameManager] State changed: {oldState} → {newState}");
+
+        OnGameStateChanged?.Invoke(oldState, newState);
+        HandleStateTransition(newState);
+    }
+
+    private void HandleStateTransition(GameState newState)
+    {
+        switch (newState)
+        {
+            case GameState.WaveInProgress:
+                OnWaveStarted?.Invoke(CurrentWave);
+                break;
+
+            case GameState.WaveCompleted:
+                OnWaveCompleted?.Invoke(CurrentWave);
+                break;
+
+            case GameState.GameOver:
+                OnGameOver?.Invoke();
+                break;
+
+            case GameState.GameCleared:
+                OnGameCleared?.Invoke();
+                break;
+        }
+    }
+
+    private void CheckAndUpdateWaveState()
+    {
+        if (CurrentState != GameState.WaveInProgress)
+            return;
+
+        if (!IsSpawning && ActiveEnemyCount == 0)
+        {
+            if (CurrentWave >= _maxWaves)
+            {
+                ChangeGameState(GameState.GameCleared);
+            }
+            else
+            {
+                ChangeGameState(GameState.WaveCompleted);
+            }
+        }
+    }
+
+    private void CheckGameOverCondition()
+    {
+        if (CurrentHealth <= 0 && CurrentState != GameState.GameOver)
+        {
+            ChangeGameState(GameState.GameOver);
+        }
+    }
+    #endregion
+
+    #region Private Methods - Initialization
     private void InitializeSingleton()
     {
         if (Instance == null)
@@ -200,9 +273,10 @@ public class GameManager : MonoBehaviour
     {
         CurrentHealth = _initialHealth;
         CurrentGold = _initialGold;
-        IsGameOver = false;
+        ActiveEnemyCount = 0;
 
-        // 적 처치 이벤트 구독
+        ChangeGameState(_initialGameState);
+
         BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
         BattleInteractionSystem.OnEntityKilled += OnEnemyKilled;
 
@@ -213,23 +287,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void CheckGameOver()
-    {
-        if (CurrentHealth <= 0 && !IsGameOver)
-        {
-            IsGameOver = true;
-            OnGameOver?.Invoke();
-        }
-    }
     private void ReconnectEnemySpawner()
     {
-        // 기존 구독 해제
         if (_enemySpawner != null)
         {
             _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
         }
 
-        // 재참조
         _enemySpawner = FindFirstObjectByType<EnemySpawner>();
 
         if (_enemySpawner != null)
@@ -244,11 +308,11 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    #region Private Methods -  Event CallBacks
+    #region Private Methods - Event CallBacks
     private void OnSpawnCompleted(int spawnedCount, int currentCycle)
     {
         ActiveEnemyCount += spawnedCount;
-        CheckWaveCompletion();
+        CheckAndUpdateWaveState();
     }
 
     private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
