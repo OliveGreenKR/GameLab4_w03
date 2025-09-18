@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Wave System")]
     [SerializeField] private EnemySpawner _enemySpawner;
+    [SerializeField] private int _maxWaves = 10;
     #endregion
 
     #region Properties
@@ -78,12 +79,24 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        // Scene 이벤트 구독 해제
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+
         BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
 
         if (_enemySpawner != null)
         {
             _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
         }
+    }
+    #endregion
+
+    #region Public Methods - Game Control
+    /// <summary>게임 재시작</summary>
+    public void RestartGame()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
     #endregion
 
@@ -140,8 +153,11 @@ public class GameManager : MonoBehaviour
         {
             OnWaveCompleted?.Invoke(CurrentWave);
 
-            // TODO : 게임 클리어 조건 체크 (추후 확장 가능)
-            // if (CurrentWave >= maxWaves) OnGameCleared?.Invoke();
+            // 게임 클리어 체크
+            if (CurrentWave >= _maxWaves)
+            {
+                OnGameCleared?.Invoke();
+            }
         }
     }
     #endregion
@@ -204,6 +220,27 @@ public class GameManager : MonoBehaviour
             OnGameOver?.Invoke();
         }
     }
+    private void ReconnectEnemySpawner()
+    {
+        // 기존 구독 해제
+        if (_enemySpawner != null)
+        {
+            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+        }
+
+        // 재참조
+        _enemySpawner = FindFirstObjectByType<EnemySpawner>();
+
+        if (_enemySpawner != null)
+        {
+            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
+        }
+        else
+        {
+            Debug.LogError("[GameManager] No EnemySpawner found in the scene.");
+        }
+    }
     #endregion
 
     #region Private Methods -  Event CallBacks
@@ -211,6 +248,12 @@ public class GameManager : MonoBehaviour
     {
         ActiveEnemyCount += spawnedCount;
         CheckWaveCompletion();
+    }
+
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        ReconnectEnemySpawner();
+        InitializeStats();
     }
     #endregion
 }
