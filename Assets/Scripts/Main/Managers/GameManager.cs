@@ -143,6 +143,7 @@ public class GameManager : MonoBehaviour
         if (_enemySpawner == null)
             return;
 
+
         _enemySpawner.StopSpawning();
     }
 
