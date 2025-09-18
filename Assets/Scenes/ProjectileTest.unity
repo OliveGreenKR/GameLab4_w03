@@ -1840,7 +1840,7 @@ PrefabInstance:
       objectReference: {fileID: 1676449833}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _effectAssets.Array.size
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: '_effectAssets.Array.data[0]'
