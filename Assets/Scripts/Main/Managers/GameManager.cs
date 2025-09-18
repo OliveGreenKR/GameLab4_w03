@@ -153,9 +153,14 @@ public class GameManager : MonoBehaviour
         if (victim == null || IsGameOver)
             return;
         //TODO : 희생자의 타입별 차등 보상 (일반/엘리트)
+        //골드 획득
         int oldGold = CurrentGold;
         CurrentGold += _enemyKillGoldReward;
         OnGoldChanged?.Invoke(oldGold, CurrentGold);
+
+        // 적 카운트 감소
+        ActiveEnemyCount = Mathf.Max(0, ActiveEnemyCount - 1);
+        CheckWaveCompletion();
     }
     #endregion
 
@@ -181,10 +186,12 @@ public class GameManager : MonoBehaviour
         IsGameOver = false;
 
         // 적 처치 이벤트 구독
+        BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
         BattleInteractionSystem.OnEntityKilled += OnEnemyKilled;
 
         if (_enemySpawner != null)
         {
+            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
             _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
         }
     }
@@ -195,15 +202,6 @@ public class GameManager : MonoBehaviour
         {
             IsGameOver = true;
             OnGameOver?.Invoke();
-        }
-    }
-
-    private void UpdateEnemyCount(IBattleEntity killer, IBattleEntity victim)
-    {
-        if (victim != null)
-        {
-            ActiveEnemyCount = Mathf.Max(0, ActiveEnemyCount - 1);
-            CheckWaveCompletion();
         }
     }
     #endregion
