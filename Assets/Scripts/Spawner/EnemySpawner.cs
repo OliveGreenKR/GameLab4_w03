@@ -3,6 +3,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+// <summary>
+/// 적 타입별 스폰 설정
+/// </summary>
+[Serializable]
+public struct EnemySpawnConfig
+{
+    [Header("Enemy Type")]
+    public PrefabType enemyType;
+
+    [Header("Stat Range")]
+    public SpawnStatRange statRange;
+
+    [Header("Spawn Probability")]
+    [SuffixLabel("weight")]
+    [PropertyRange(0.1f, 10f)]
+    public float spawnWeight;
+
+    public float GetCurrentWeight(int currentCycle)
+    {
+        return spawnWeight;
+    }
+}
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -33,8 +55,9 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private int _maxPackSize = 10;
 
     [TabGroup("Stats")]
-    [Header("Initial Stat Ranges")]
-    [SerializeField] private SpawnStatRange _initialStatRange;
+    [Header("Enemy Type Configurations")]
+    [InfoBox("각 적 타입의 스탯 범위와 스폰 가중치를 설정하세요.")]
+    [SerializeField] private EnemySpawnConfig[] _enemyConfigs;
 
     [TabGroup("Difficulty")]
     [Header("Difficulty Progression")]
@@ -112,7 +135,7 @@ public class EnemySpawner : MonoBehaviour
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public SpawnStatRange CurrentStatRange => _currentStatRange;
+    public Dictionary<PrefabType, SpawnStatRange> CurrentStatRanges => _currentStatRanges;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -152,7 +175,7 @@ public class EnemySpawner : MonoBehaviour
     #endregion
 
     #region Private Fields
-    private SpawnStatRange _currentStatRange;
+    private Dictionary<PrefabType, SpawnStatRange> _currentStatRanges;
     private int _currentMinPackSize;
     private int _currentMaxPackSize;
     private float _nextSpawnTime;
@@ -328,22 +351,31 @@ public class EnemySpawner : MonoBehaviour
     }
 
     /// <summary>
-    /// 특정 스탯 범위 설정
+    /// 특정 적 타입의 스탯 범위 설정
     /// </summary>
+    /// <param name="enemyType">적 타입</param>
     /// <param name="statType">스탯 타입</param>
     /// <param name="minValue">최소값</param>
     /// <param name="maxValue">최대값</param>
-    public void SetStatRange(SpawnStatType statType, float minValue, float maxValue)
+    public void SetStatRange(PrefabType enemyType, SpawnStatType statType, float minValue, float maxValue)
     {
+        if (!_currentStatRanges.ContainsKey(enemyType))
+        {
+            Debug.LogWarning($"[EnemySpawner] Enemy type {enemyType} not found in stat ranges", this);
+            return;
+        }
+
         // 값 검증
         minValue = Mathf.Max(0f, minValue);
         maxValue = Mathf.Max(minValue, maxValue);
 
         // 현재 스탯 범위 업데이트
-        _currentStatRange.SetMinValue(statType, minValue);
-        _currentStatRange.SetMaxValue(statType, maxValue);
+        SpawnStatRange currentRange = _currentStatRanges[enemyType];
+        currentRange.SetMinValue(statType, minValue);
+        currentRange.SetMaxValue(statType, maxValue);
+        _currentStatRanges[enemyType] = currentRange;
 
-        Debug.Log($"[EnemySpawner] {statType} range set to [{minValue:F1}, {maxValue:F1}]", this);
+        Debug.Log($"[EnemySpawner] {enemyType} {statType} range set to [{minValue:F1}, {maxValue:F1}]", this);
     }
 
     /// <summary>
@@ -365,6 +397,43 @@ public class EnemySpawner : MonoBehaviour
     #endregion
 
     #region Private Methods - Spawn Logic
+    private PrefabType SelectRandomEnemyType()
+    {
+        if (_enemyConfigs == null || _enemyConfigs.Length == 0)
+        {
+            Debug.LogWarning("[EnemySpawner] No enemy configs available. Using default EnemyNormal", this);
+            return PrefabType.EnemyNormal;
+        }
+
+        // 총 가중치 계산
+        float totalWeight = 0f;
+        foreach (var config in _enemyConfigs)
+        {
+            totalWeight += config.GetCurrentWeight(CurrentCycle);
+        }
+
+        if (totalWeight <= 0f)
+        {
+            Debug.LogWarning("[EnemySpawner] Total weight is zero. Using first config", this);
+            return _enemyConfigs[0].enemyType;
+        }
+
+        // 가중치 기반 선택
+        float randomPoint = UnityEngine.Random.Range(0f, totalWeight);
+        float currentSum = 0f;
+
+        foreach (var config in _enemyConfigs)
+        {
+            currentSum += config.GetCurrentWeight(CurrentCycle);
+            if (randomPoint <= currentSum)
+            {
+                return config.enemyType;
+            }
+        }
+
+        // 안전장치
+        return _enemyConfigs[_enemyConfigs.Length - 1].enemyType;
+    }
     private void UpdateSpawnTimer()
     {
         TimeUntilNextSpawn = _nextSpawnTime - Time.time;
@@ -437,19 +506,18 @@ public class EnemySpawner : MonoBehaviour
             ISpawnable enemy = CreateEnemyFromPool(spawnPosition, spawnRotation);
             if (enemy != null)
             {
-                // 랜덤 스탯 생성 및 적용
-                Dictionary<SpawnStatType, float> randomStats = GenerateRandomStats();
-                enemy.ApplySpawnStats(randomStats);
-
                 // 스폰 완료 처리
                 enemy.OnSpawned(this);
             }
         }
     }
 
-    private ISpawnable CreateEnemyFromPool(Vector3 worldPosition, Quaternion worldRotation)
+    private ISpawnable CreateEnemyFromPool(Vector3 spawnPosition, Quaternion spawnRotation)
     {
-        GameObject enemyObject = _enemyPool.SpawnObject(PrefabType.Enemy, worldPosition, worldRotation, true);
+        // 확률 기반 적 타입 선택
+        PrefabType selectedEnemyType = SelectRandomEnemyType();
+
+        GameObject enemyObject = _enemyPool.SpawnObject(selectedEnemyType, spawnPosition, spawnRotation, true);
 
         if (enemyObject == null)
         {
@@ -465,6 +533,10 @@ public class EnemySpawner : MonoBehaviour
             _enemyPool.ReturnObject(enemyObject);
             return null;
         }
+
+        // 랜덤 스탯 생성 및 적용
+        Dictionary<SpawnStatType, float> randomStats = GenerateRandomStats(selectedEnemyType);
+        spawnable.ApplySpawnStats(randomStats);
 
         // 풀 반환 콜백 등록
         spawnable.RegisterPoolReturnCallback(returnedSpawnable =>
@@ -531,26 +603,32 @@ public class EnemySpawner : MonoBehaviour
         _currentMinPackSize += Mathf.RoundToInt(_difficultyProgression.GetPackSizeMinIncrease());
         _currentMinPackSize = Mathf.Max(_minPackSize, _currentMinPackSize);
 
-        // 스탯 최소값들 증가
-        foreach (SpawnStatType statType in System.Enum.GetValues(typeof(SpawnStatType)))
+        // 모든 적 타입의 스탯 최소값들 증가
+        var enemyTypes = new List<PrefabType>(_currentStatRanges.Keys);
+
+        foreach (var enemyType in enemyTypes)
         {
-            float currentMin = _currentStatRange.GetMinValue(statType);
-            float increase = _difficultyProgression.GetMinIncrease(statType);
-            _currentStatRange.SetMinValue(statType, currentMin + increase);
+            SpawnStatRange currentRange = _currentStatRanges[enemyType];
+
+            foreach (SpawnStatType statType in System.Enum.GetValues(typeof(SpawnStatType)))
+            {
+                float currentMin = currentRange.GetMinValue(statType);
+                float increase = _difficultyProgression.GetMinIncrease(statType);
+                currentRange.SetMinValue(statType, currentMin + increase);
+
+                // 최대값이 최소값보다 작아지지 않도록 보정
+                float currentMax = currentRange.GetMaxValue(statType);
+                if (currentMax < currentMin + increase)
+                {
+                    currentRange.SetMaxValue(statType, currentMin + increase);
+                }
+            }
+
+            _currentStatRanges[enemyType] = currentRange;
         }
 
         // 최대값이 최소값보다 작아지지 않도록 보정
         _currentMaxPackSize = Mathf.Max(_currentMinPackSize, _currentMaxPackSize);
-
-        foreach (SpawnStatType statType in System.Enum.GetValues(typeof(SpawnStatType)))
-        {
-            float currentMin = _currentStatRange.GetMinValue(statType);
-            float currentMax = _currentStatRange.GetMaxValue(statType);
-            if (currentMax < currentMin)
-            {
-                _currentStatRange.SetMaxValue(statType, currentMin);
-            }
-        }
 
         Debug.Log($"[EnemySpawner] Mandatory upgrades applied - Min Pack Size: {_currentMinPackSize}", this);
     }
@@ -567,16 +645,21 @@ public class EnemySpawner : MonoBehaviour
         }
         else
         {
-            // 스탯 최대값 업그레이드
+            // 모든 적 타입의 스탯 최대값 업그레이드
             SpawnStatType statType = upgrade.GetStatType();
-            float currentMax = _currentStatRange.GetMaxValue(statType);
-            float newMax = currentMax + upgrade.upgradeAmount;
-            _currentStatRange.SetMaxValue(statType, newMax);
+            var enemyTypes = new List<PrefabType>(_currentStatRanges.Keys);
 
-            Debug.Log($"[EnemySpawner] {statType} max upgraded by {upgrade.upgradeAmount:F1} to {newMax:F1} " +
+            foreach (var enemyType in enemyTypes)
+            {
+                SpawnStatRange currentRange = _currentStatRanges[enemyType];
+                float currentMax = currentRange.GetMaxValue(statType);
+                float newMax = currentMax + upgrade.upgradeAmount;
+                currentRange.SetMaxValue(statType, newMax);
+                _currentStatRanges[enemyType] = currentRange;
+            }
+
+            Debug.Log($"[EnemySpawner] {statType} max upgraded by {upgrade.upgradeAmount:F1} for all enemy types " +
                      $"(Weight: {upgrade.GetCurrentWeight(CurrentCycle):F1})", this);
-
-            OnMaxValueUpgraded?.Invoke(upgrade.target, newMax);
         }
 
         // 선택 확률 정보 로깅
@@ -589,14 +672,22 @@ public class EnemySpawner : MonoBehaviour
     #endregion
 
     #region Private Methods - Stat Generation
-    private Dictionary<SpawnStatType, float> GenerateRandomStats()
+    private Dictionary<SpawnStatType, float> GenerateRandomStats(PrefabType enemyType)
     {
         Dictionary<SpawnStatType, float> randomStats = new Dictionary<SpawnStatType, float>();
+
+        if (!_currentStatRanges.ContainsKey(enemyType))
+        {
+            Debug.LogWarning($"[EnemySpawner] No stat range found for {enemyType}. Using default values.", this);
+            return randomStats;
+        }
+
+        SpawnStatRange statRange = _currentStatRanges[enemyType];
 
         // 각 스탯 타입별로 랜덤 값 생성
         foreach (SpawnStatType statType in System.Enum.GetValues(typeof(SpawnStatType)))
         {
-            float randomValue = _currentStatRange.GetRandomValue(statType);
+            float randomValue = statRange.GetRandomValue(statType);
             randomStats[statType] = randomValue;
         }
 
@@ -610,14 +701,32 @@ public class EnemySpawner : MonoBehaviour
 
     private void InitializeStatRanges()
     {
-        // 초기 스탯 범위를 현재 스탯 범위에 복사
-        _currentStatRange = _initialStatRange;
+        if (_enemyConfigs == null || _enemyConfigs.Length == 0)
+        {
+            Debug.LogError("[EnemySpawner] Enemy configs not set!", this);
+            return;
+        }
+
+        if (_currentStatRanges == null)
+        {
+            _currentStatRanges = new Dictionary<PrefabType, SpawnStatRange>();
+        }
+        else
+        {
+            _currentStatRanges.Clear();
+        }
+
+        // 각 적 타입별로 현재 스탯 범위 초기화
+        foreach (var config in _enemyConfigs)
+        {
+            _currentStatRanges[config.enemyType] = config.statRange;
+        }
 
         // 현재 팩 사이즈 범위 초기화
         _currentMinPackSize = _minPackSize;
         _currentMaxPackSize = _maxPackSize;
 
-        Debug.Log($"[EnemySpawner] Stat ranges initialized - Health: [{_currentStatRange.GetMinValue(SpawnStatType.Health):F1}, {_currentStatRange.GetMaxValue(SpawnStatType.Health):F1}]", this);
+        Debug.Log($"[EnemySpawner] Stat ranges initialized for {_currentStatRanges.Count} enemy types", this);
     }
     #endregion
 
