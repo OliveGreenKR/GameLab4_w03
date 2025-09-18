@@ -29,7 +29,11 @@ public class GameManager : MonoBehaviour
     [Header("Initial Stats")]
     [SerializeField] private int _initialHealth = 100;
     [SerializeField] private int _initialGold = 50;
-    [SerializeField] private int _enemyKillGoldReward = 10;
+
+    [Header("Enemy Kill Rewards")]
+    [InfoBox("적 타입별 골드 보상 설정")]
+    [SerializeField] private int _normalEnemyGoldReward = 1;
+    [SerializeField] private int _eliteEnemyGoldReward = 25;
 
     [Header("Wave System")]
     [SerializeField] private EnemySpawner _enemySpawner;
@@ -178,15 +182,63 @@ public class GameManager : MonoBehaviour
     {
         if (victim == null || IsGameOver)
             return;
-        //increase Gold
+
+        // Proxy에서 적 타입 조회
+        PrefabType enemyType = GetEnemyTypeFromVictim(victim);
+        int goldReward = GetGoldRewardForEnemyType(enemyType);
+
+        // 골드 지급
         int oldGold = CurrentGold;
-        CurrentGold += _enemyKillGoldReward;
+        CurrentGold += goldReward;
         OnGoldChanged?.Invoke(oldGold, CurrentGold);
 
-        //decrease ActiveEnemyCount
+        // 적 수 감소
         ActiveEnemyCount = Mathf.Max(0, ActiveEnemyCount - 1);
-
         CheckAndUpdateWaveState();
+    }
+    #endregion
+
+    #region Private Methods - Reward Calculation
+    /// <summary>
+    /// 처치된 적으로부터 적 타입 조회
+    /// </summary>
+    /// <param name="victim">처치된 적 엔티티</param>
+    /// <returns>적 타입 (찾지 못하면 EnemyNormal)</returns>
+    private PrefabType GetEnemyTypeFromVictim(IBattleEntity victim)
+    {
+        if (victim?.GameObject == null)
+        {
+            Debug.LogWarning("[GameManager] Victim or GameObject is null. Using normal enemy reward.");
+            return PrefabType.EnemyNormal;
+        }
+
+        EnemyGameManagerProxy proxy = victim.GameObject.GetComponent<EnemyGameManagerProxy>();
+        if (proxy == null)
+        {
+            Debug.LogWarning($"[GameManager] No EnemyGameManagerProxy found on {victim.GameObject.name}. Using normal enemy reward.", victim.GameObject);
+            return PrefabType.EnemyNormal;
+        }
+
+        return proxy.EnemyType;
+    }
+
+    /// <summary>
+    /// 적 타입에 따른 골드 보상 계산
+    /// </summary>
+    /// <param name="enemyType">적 타입</param>
+    /// <returns>골드 보상량</returns>
+    private int GetGoldRewardForEnemyType(PrefabType enemyType)
+    {
+        switch (enemyType)
+        {
+            case PrefabType.EnemyNormal:
+                return _normalEnemyGoldReward;
+            case PrefabType.EnemyElite:
+                return _eliteEnemyGoldReward;
+            default:
+                Debug.LogWarning($"[GameManager] Unknown enemy type: {enemyType}. Using normal reward.");
+                return _normalEnemyGoldReward;
+        }
     }
     #endregion
 
