@@ -77,25 +77,21 @@ public struct WeightBasedUpgrade
     [BoxGroup("Upgrade Settings")]
     [InfoBox("업그레이드 적용 시 증가할 수치입니다.")]
     [SuffixLabel("amount")]
-    [PropertyRange(1f, 100f)]
     public float upgradeAmount;
 
     [BoxGroup("Weight Settings")]
     [InfoBox("가중치가 높을수록 선택될 확률이 높습니다. 절대값이 아닌 상대적 비율입니다.")]
     [SuffixLabel("weight")]
-    [PropertyRange(1f, 100f)]
     public float initialWeight;
 
     [BoxGroup("Weight Settings")]
     [InfoBox("매 주기마다 가중치가 이만큼 증가합니다. 시간이 지날수록 중요해지는 업그레이드에 높게 설정하세요.")]
     [SuffixLabel("per cycle")]
-    [PropertyRange(0f, 10f)]
     public float weightIncrease;
 
     [BoxGroup("Weight Settings")]
     [InfoBox("가중치의 최대 한계값입니다. 무한정 증가를 방지합니다.")]
     [SuffixLabel("max")]
-    [PropertyRange(1f, 1000f)]
     public float maxWeight;
 
     /// <summary>
