@@ -27,6 +27,22 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     [Header("Projectile Type")]
     [SerializeField] private ProjectileType _projectileType = ProjectileType.BasicProjectile;
 
+    [TabGroup("Collision")]
+    [Header("Advanced Collision Detection")]
+    [SuffixLabel("units/sec")]
+    [SerializeField] private float _highSpeedThreshold = 50f;
+
+    [TabGroup("Collision")]
+    [SuffixLabel("units")]
+    [SerializeField] private float _sphereCastRadius = 0.1f;
+
+    [TabGroup("Collision")]
+    [SuffixLabel("seconds")]
+    [SerializeField] private float _hitExitTimeoutSeconds = 0.5f;
+
+    [TabGroup("Collision")]
+    [SerializeField] private LayerMask _collisionLayerMask = -1;
+
     [TabGroup("Movement")]
     [Header("Movement Settings")]
     [SuffixLabel("units/sec")]
@@ -101,6 +117,140 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     /// 투사체 업데이트 시 발생하는 이벤트 (매 프레임)
     /// </summary>
     public event System.Action<IProjectile> OnProjectileUpdate;
+    #endregion
+
+    #region Properties
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public ProjectileDestroyMode CurrentDestroyMode => _destroyMode;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float RemainingLifeTime => _remainingLifetime;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public Collider AttackTrigger => _attackTrigger;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentDamageMultiplier => _currentDamageMultiplier;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentSpeedMultiplier => _currentSpeedMultiplier;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public int CurrentSplitProjectileCount => _currentSplitProjectileCount;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentAttackStat => GetCurrentStat(BattleStatType.Attack);
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public int CurrentPierceCount => _currentPierceCount;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    [SuffixLabel("degrees")]
+    public float CurrentSplitAngleRange => _currentSplitAngleRange;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public int CurrentSplitAvailableCount => _currentSplitAvailableCount;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public bool IsSplitDelayed => _isSplitDelayed;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float SplitDelayTimeRemaining => _splitDelayTimeRemaining;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentSpeed => _forwardSpeedUnitsPerSecond * _currentSpeedMultiplier;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float SphereRadius => _sphereCastRadius;
+
+    #endregion
+
+    #region Private Fields
+    //Basic Projectiles State
+    private float _remainingLifetime;
+    private int _currentPierceCount;
+    private float _currentDamageMultiplier;
+    private float _currentSpeedMultiplier;
+
+    // Precise collision system
+    private HashSet<IBattleEntity> _hitTargets;
+    private Dictionary<IBattleEntity, float> _hitExitTimers;
+    private Dictionary<IBattleEntity, Vector3> _hitTargetPositions;
+
+    //Split
+    private int _currentSplitCount;
+    private int _currentSplitAvailableCount;
+    private int _currentSplitProjectileCount;
+    private float _currentSplitAngleRange;
+
+    //Owner Launcher
+    private ProjectileLauncher _owner;
+
+    //Split Delay System
+    private bool _isSplitDelayed = false;
+    private float _splitDelayTimeRemaining = 0f;
+
+    #endregion
+
+    #region Unity Lifecycle
+    protected override void Start()
+    {
+        base.Start();
+
+    }
+
+    private void Update()
+    {
+        base.Update();
+
+        UpdateLifetime();
+        UpdateSplitDelay();
+        CheckTargetPassThrough();
+
+        // 이동 전 예측적 충돌 검사
+        PredictiveCollisionCheck();
+
+        if (IsAlive) // 충돌 후 살아있을 때만 이동
+            GoForward();
+
+        UpdateHitTargetTimers();
+
+        OnProjectileUpdate?.Invoke(this);
+    }
+
+    private void OnEnable()
+    {
+        _remainingLifetime = _lifetimeSeconds;
+        InitializeProjectileStats();
+        OnProjectileActivated?.Invoke(this);
+        //Debug.Log($"[ProjectileBase] Projectile Activated. Lifetime: {_lifetimeSeconds}s, Speed: {_forwardSpeedUnitsPerSecond} units/sec", this);
+    }
+
+    private void OnDisable()
+    {
+        // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
+    }
+
+    protected override void OnDestroy()
+    {
+        ClearAllEvents();
+        base.OnDestroy();
+        // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
+    }
     #endregion
 
     #region BaseBattleEntity Overrides
@@ -245,147 +395,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     }
     #endregion
 
-    #region Properties
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public ProjectileDestroyMode CurrentDestroyMode => _destroyMode;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float RemainingLifeTime => _remainingLifetime;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public Collider AttackTrigger => _attackTrigger;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float CurrentDamageMultiplier => _currentDamageMultiplier;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float CurrentSpeedMultiplier => _currentSpeedMultiplier;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public int CurrentSplitProjectileCount => _currentSplitProjectileCount;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float CurrentAttackStat => GetCurrentStat(BattleStatType.Attack);
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public int CurrentPierceCount => _currentPierceCount;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    [SuffixLabel("degrees")]
-    public float CurrentSplitAngleRange => _currentSplitAngleRange;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public int CurrentSplitAvailableCount => _currentSplitAvailableCount;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public bool IsSplitDelayed => _isSplitDelayed;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float SplitDelayTimeRemaining => _splitDelayTimeRemaining;
-
-    #endregion
-
-    #region Private Fields
-    //Basic Projectiles State
-    private float _remainingLifetime;
-    private int _currentPierceCount;
-    private float _currentDamageMultiplier;
-    private float _currentSpeedMultiplier;
-
-    //Split
-    private int _currentSplitCount;
-    private int _currentSplitAvailableCount;
-    private int _currentSplitProjectileCount;
-    private float _currentSplitAngleRange;
-
-    //Owner Launcher
-    private ProjectileLauncher _owner;
-
-    //Split Delay System
-    private bool _isSplitDelayed = false;
-    private float _splitDelayTimeRemaining = 0f;
-
-    #endregion
-
-    #region Unity Lifecycle
-    protected override void Start()
-    {
-        base.Start();
-
-    }
-
-    private void Update()
-    {
-        base.Update();
-
-        UpdateLifetime();
-        UpdateSplitDelay();
-        GoForward();
-        OnProjectileUpdate?.Invoke(this);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        IBattleEntity target = other.GetComponent<IBattleEntity>();
-        if (target != null)
-        {
-            Debug.Log($"[ProjectileBase] TriggerEnter with {other.name}, Target Team: {target.TeamId}, Projectile Team: {TeamId}", this);
-            float damage = ProcessDamageToTarget(target);
-            if (damage > 0f)
-            {
-                OnProjectileHit?.Invoke(this, other);
-                AfterProjectileHit?.Invoke(this, other);
-                _battleStat.ApplyDamage(1.0f); // 관통 횟수 및 체력 감소
-                HandleSplitAfterHit();
-            }
-        }
-
-        
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        //투사체 지연 상태 중 관통 종료 시 바로 분열
-        if (_isSplitDelayed)
-        {
-            Debug.LogWarning($"TriggerExit! try to Split!");
-            ExecuteDelayedSplit();
-        }
-    }
-
-    private void OnEnable()
-    {
-        _remainingLifetime = _lifetimeSeconds;
-        InitializeProjectileStats();
-        OnProjectileActivated?.Invoke(this);
-        //Debug.Log($"[ProjectileBase] Projectile Activated. Lifetime: {_lifetimeSeconds}s, Speed: {_forwardSpeedUnitsPerSecond} units/sec", this);
-    }
-
-    private void OnDisable()
-    {
-        // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
-    }
-
-    protected override void OnDestroy()
-    {
-        ClearAllEvents();
-        base.OnDestroy();
-        // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
-    }
-    #endregion
-
     #region Public Methods
     public void Initialize(float lifetimeSeconds = -1f, float forwardSpeed = -1f)
     {
@@ -473,15 +482,27 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         _currentSplitAvailableCount = _baseSplitAvailableCount;
         _currentSplitProjectileCount = _baseSplitProjectileCount;
         _currentSplitAngleRange = _baseSplitAngleRange;
+
+        // Collision system initialization
+        if (_hitTargets == null)
+            _hitTargets = new HashSet<IBattleEntity>();
+        else
+            _hitTargets.Clear();
+
+        if (_hitExitTimers == null)
+            _hitExitTimers = new Dictionary<IBattleEntity, float>();
+        else
+            _hitExitTimers.Clear();
+
+        if (_hitTargetPositions == null)
+            _hitTargetPositions = new Dictionary<IBattleEntity, Vector3>();
+        else
+            _hitTargetPositions.Clear();
+
         // BattleStat 완전 초기화
         if (_battleStat != null)
         {
-            _battleStat.InitializeStats(); // BattleStatData로부터 완전 리셋
-            //Debug.Log($"[ProjectileBase] Initialized BattleStat for Projectile.", this);
-            ////현재 스탯 출력
-            //Debug.Log($"[ProjectileBase] Current Attack Stat: {GetCurrentStat(BattleStatType.Attack)}", this);
-            //Debug.Log($"[ProjectileBase] Current Health Stat: {GetCurrentStat(BattleStatType.Health)}", this);
-
+            _battleStat.InitializeStats();
         }
         SyncPierceCountToBattleStat();
     }
@@ -598,6 +619,105 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         //DestroyProjectile();
         //2.실제 소멸 처리(분열 없음)
         DestroyProjectileWithoutSplit();
+    }
+    #endregion
+
+    #region Private Methods - Collision Detection(Predictive SphereCast)
+    private void PredictiveCollisionCheck()
+    {
+        float actualSpeed = _forwardSpeedUnitsPerSecond * _currentSpeedMultiplier;
+        float deltaDistance = actualSpeed * Time.deltaTime;
+        Vector3 direction = transform.forward;
+
+        ProcessPredictiveSphereCast(direction, deltaDistance);
+    }
+
+    private void ProcessPredictiveSphereCast(Vector3 direction, float distance)
+    {
+        RaycastHit[] hits = Physics.SphereCastAll(transform.position, _sphereCastRadius, direction, distance, _collisionLayerMask);
+        //Debug.Log($"[ProjectileBase] SphereCast detected {hits.Length} hits.", this);
+        foreach (var hit in hits)
+        {
+            IBattleEntity target = hit.collider.GetComponent<IBattleEntity>();
+            if (target != null && IsValidCollisionTarget(target))
+            {
+                if (_hitTargets.Contains(target)) continue;
+
+                float damage = ProcessDamageToTarget(target);
+                if (damage > 0f)
+                {
+                    //Debug.DrawLine(transform.position, hit.point, Color.red, 1.0f);
+                    Debug.Log($"[ProjectileBase] Hit valid target: {target.GameObject.name}, Dealt Damage: {damage}");
+                    RegisterHitTarget(target);
+                    OnProjectileHit?.Invoke(this, hit.collider);
+                    AfterProjectileHit?.Invoke(this, hit.collider);
+                    _battleStat.ApplyDamage(1.0f);
+
+                    if (!IsAlive) break;
+
+                    HandleSplitAfterHit();
+                }
+            }
+        }
+    }
+
+    private bool IsValidCollisionTarget(IBattleEntity target)
+    {
+        return target != null && target.IsAlive && target.TeamId != TeamId;
+    }
+
+    private void RegisterHitTarget(IBattleEntity target)
+    {
+        _hitTargets.Add(target);
+        _hitExitTimers[target] = _hitExitTimeoutSeconds;
+        _hitTargetPositions[target] = target.Transform.position;
+    }
+
+    private void UpdateHitTargetTimers()
+    {
+        var expiredTargets = new List<IBattleEntity>();
+
+        foreach (var kvp in _hitExitTimers.ToArray())
+        {
+            _hitExitTimers[kvp.Key] = kvp.Value - Time.deltaTime;
+            if (_hitExitTimers[kvp.Key] <= 0f)
+            {
+                expiredTargets.Add(kvp.Key);
+            }
+        }
+
+        CleanupExpiredHitTargets(expiredTargets);
+    }
+
+    private void CheckTargetPassThrough()
+    {
+        if (!_isSplitDelayed) return;
+
+        foreach (var kvp in _hitTargetPositions.ToArray())
+        {
+            IBattleEntity target = kvp.Key;
+            Vector3 hitPosition = kvp.Value;
+
+            // 투사체가 타겟을 지나쳤는지 확인
+            Vector3 toTarget = target.Transform.position - transform.position;
+
+            // 내적이 음수면 지나친 것
+            if (Vector3.Dot(toTarget.normalized, transform.forward) < 0f)
+            {
+                ExecuteDelayedSplit();
+                return;
+            }
+        }
+    }
+
+    private void CleanupExpiredHitTargets(List<IBattleEntity> expiredTargets)
+    {
+        foreach (var target in expiredTargets)
+        {
+            _hitTargets.Remove(target);
+            _hitExitTimers.Remove(target);
+            _hitTargetPositions.Remove(target);
+        }
     }
     #endregion
 

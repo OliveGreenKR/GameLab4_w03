@@ -154,8 +154,13 @@ MonoBehaviour:
   _invulnerabilityDuration: 0
   _destroyMode: 0
   _projectileType: 0
-  _forwardSpeedUnitsPerSecond: 100
   _highSpeedThreshold: 50
+  _sphereCastRadius: 0.75
+  _hitExitTimeoutSeconds: 0.3
+  _collisionLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _forwardSpeedUnitsPerSecond: 100
   _lifetimeSeconds: 10
   _basePierceCount: 0
   _baseDamageMultiplier: 1
@@ -165,7 +170,6 @@ MonoBehaviour:
   _baseSplitAngleRange: 120
   _maxSplitDelayedTime: 1
   _attackTrigger: {fileID: 4899914466480511714}
-  _sphereCollider: {fileID: 4899914466480511714}
   _rigid: {fileID: 8447907966392869884}
 --- !u!114 &3720800618165384622
 MonoBehaviour:

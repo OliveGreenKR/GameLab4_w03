@@ -1721,67 +1721,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2441022364053703845, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
   m_PrefabInstance: {fileID: 8441707565246381950}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1808316066054256768
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2429705639421591400, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_Name
-      value: ProjectileBase
-      objectReference: {fileID: 0}
-    - target: {fileID: 6510760826802340225, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 103d629a949838040a9dc6756c0a90a4, type: 3}
 --- !u!1001 &8441707565246381950
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1839,12 +1778,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1676449833}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
+      propertyPath: _projectileSpeed
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
+      propertyPath: _fireRatePerSecond
+      value: 25.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _projectileLifetime
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _effectAssets.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: '_effectAssets.Array.data[0]'
@@ -1875,4 +1822,3 @@ SceneRoots:
   - {fileID: 1427442637}
   - {fileID: 1424796536}
   - {fileID: 1676449837}
-  - {fileID: 1808316066054256768}
