@@ -37,8 +37,7 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
 
     public virtual float DealDamage(IBattleEntity target, float baseDamage)
     {
-        float finalDamage = CalculateFinalDamage(target);
-        return BattleInteractionSystem.ProcessDamageInteraction(this, target, finalDamage);
+        return ProcessDamageToTarget(target);
     }
 
     public float GetCurrentStat(BattleStatType statType)
@@ -96,16 +95,6 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
         UpdateInvulnerability();
     }
 
-    protected virtual void OnTriggerEnter(Collider other)
-    {
-        ProcessTriggerEnter(other);
-    }
-
-    protected virtual void OnTriggerExit(Collider other)
-    {
-        ProcessTriggerExit(other);
-    }
-
     protected virtual void OnDestroy()
     {
         UnsubscribeFromBattleStatEvents();
@@ -149,19 +138,6 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
 
     #region Protected Methods - Virtual
     /// <summary>
-    /// 유효한 트리거 처리 (기본 데미지 교환) 후 호출
-    /// </summary>
-    /// <param name="target">트리거된 배틀 엔티티</param>
-    /// <param name="actualDamage">실제 가해진 데미지</param>
-    protected virtual void OnValidTriggered(IBattleEntity target, float actualDamage) { }
-
-    /// <summary>
-    /// 유효한 트리거 종료 시 호출
-    /// </summary>
-    /// <param name="target">트리거 종료된 배틀 엔티티</param>
-    protected virtual void OnValidTriggerExited(IBattleEntity target) { }
-
-    /// <summary>
     /// 나가는 데미지 계산
     /// </summary>
     /// <param name="target">대상 엔티티</param>
@@ -179,6 +155,21 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
     protected virtual void OnDamageTakenFromBattleStat(float damage, IBattleEntity attacker)
     {
         // 하위 클래스에서 오버라이드하여 추가 처리
+    }
+
+    protected float ProcessDamageToTarget(IBattleEntity target)
+    {
+        if (target == null || !IsAlive)
+            return 0f;
+
+        if (BattleInteractionSystem.IsSameTeam(this, target))
+            return 0f;
+
+        float outgoingDamage = CalculateFinalDamage(target);
+        if (outgoingDamage <= 0f)
+            return 0f;
+
+        return BattleInteractionSystem.ProcessDamageInteraction(this, target, outgoingDamage);
     }
     #endregion
 
@@ -222,41 +213,9 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
         _battleStat.OnDeath -= OnBattleStatDeath;
     }
 
-    
-
     private void OnBattleStatDeath(IBattleEntity killer)
     {
         OnDeath(killer);
-    }
-    #endregion
-
-    #region Private Methods - Trigger Processing
-    private void ProcessTriggerEnter(Collider other)
-    {
-        if (_isInvulnerable)
-            return;
-
-        IBattleEntity otherEntity = other.GetComponent<IBattleEntity>();
-        if (otherEntity == null) return;
-
-        if (BattleInteractionSystem.IsSameTeam(this, otherEntity)) return;
-
-        float outgoingDamage = CalculateFinalDamage(otherEntity);
-        if (outgoingDamage <= 0f) return;
-
-        float actualDamage = BattleInteractionSystem.ProcessDamageInteraction(this, otherEntity, outgoingDamage);
-
-        OnValidTriggered(otherEntity, actualDamage);
-    }
-
-    private void ProcessTriggerExit(Collider other)
-    {
-        IBattleEntity otherEntity = other.GetComponent<IBattleEntity>();
-        if (otherEntity == null) return;
-
-        if (BattleInteractionSystem.IsSameTeam(this, otherEntity)) return;
-
-        OnValidTriggerExited(otherEntity);
     }
     #endregion
 }
