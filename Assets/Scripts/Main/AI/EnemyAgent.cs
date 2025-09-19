@@ -29,6 +29,10 @@ public class EnemyAgent : MonoBehaviour
             {
                 _agent.SetDestination(_targetTransform.position);
             }
+            else
+            {
+                _targetTransform = GameObject.FindGameObjectWithTag("Player").transform;
+            }
         }
     }
 
