@@ -224,7 +224,8 @@ public class TurretSectorDetection : MonoBehaviour
             Collider hitCollider = _colliderBuffer[i];
             if (hitCollider == null) continue;
 
-            IBattleEntity enemy = hitCollider.GetComponent<IBattleEntity>();
+            IBattleEntity enemy = hitCollider.gameObject.GetComponent<IBattleEntity>();
+            Debug.Log($"Enemy component: {enemy != null}, IsAlive: {enemy?.IsAlive}");
             if (enemy != null && enemy.IsAlive && IsEnemyInSector(enemy))
             {
                 _tempDetectedList.Add(enemy);
@@ -244,7 +245,11 @@ public class TurretSectorDetection : MonoBehaviour
 
     private bool IsEnemyInSector(IBattleEntity enemy)
     {
-        if (enemy == null || !enemy.IsAlive) return false;
+        if (enemy == null || !enemy.IsAlive)
+        {
+            Debug.Log("[TurretSectorDetection] Invalid enemy reference", this);
+            return false;
+        }
 
         return IsEnemyInRange(enemy) && IsEnemyInAngle(enemy);
     }

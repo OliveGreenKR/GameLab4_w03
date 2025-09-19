@@ -95,12 +95,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1061214435546946921}
-  - component: {fileID: 8901355017916029020}
-  - component: {fileID: 7594426957367278276}
-  - component: {fileID: 7961509311370938210}
-  - component: {fileID: 2524625491819027453}
   m_Layer: 0
-  m_Name: BattleComponent
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -123,71 +119,6 @@ Transform:
   - {fileID: 384910152254801022}
   m_Father: {fileID: 8442260816445954499}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &8901355017916029020
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 737609512284449962}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.5272164, y: 2.5299125, z: 2.4398265}
-  m_Center: {x: 0, y: 0, z: 0.0022893548}
---- !u!114 &7594426957367278276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 737609512284449962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a92cac13d4dbee24391181e22e4fac1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _battleStat: {fileID: 7961509311370938210}
-  _invulnerabilityDuration: 1
-  _enemyTeamId: 99
---- !u!114 &7961509311370938210
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 737609512284449962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e208e082ee2a85245b1513b12f38d42e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _teamId: 99
-  _statData: {fileID: 11400000, guid: 0e8149dfc671a1d41949fb2180ed945a, type: 2}
---- !u!114 &2524625491819027453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 737609512284449962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 099471cc0fbdc1940a80ffca63d62b50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _battleStat: {fileID: 235258640616262511}
-  _invulnerabilityDuration: 0.1
-  _hasContactDamage: 1
 --- !u!1 &4000790838496881239
 GameObject:
   m_ObjectHideFlags: 0
@@ -289,6 +220,7 @@ GameObject:
   - component: {fileID: 235258640616262511}
   - component: {fileID: 2811780280800612177}
   - component: {fileID: 7885049915312599146}
+  - component: {fileID: 8916186915782852267}
   m_Layer: 0
   m_Name: EliteEnemy
   m_TagString: Untagged
@@ -405,3 +337,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyType: 2
+--- !u!65 &8916186915782852267
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7655413781182626458}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.5272164, y: 2.5299125, z: 2.4398265}
+  m_Center: {x: 0, y: 0, z: 0.0022893548}

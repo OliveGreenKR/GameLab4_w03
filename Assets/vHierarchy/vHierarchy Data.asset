@@ -316,7 +316,7 @@ MonoBehaviour:
           isIconRecursive: 0
           isColorRecursive: 0
         - colorIndex: 8
-          iconNameOrGuid: 
+          iconNameOrGuid: WheelCollider Icon
           isIconRecursive: 0
           isColorRecursive: 0
         - colorIndex: 0
