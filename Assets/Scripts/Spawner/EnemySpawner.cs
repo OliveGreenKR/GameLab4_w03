@@ -42,7 +42,6 @@ public class EnemySpawner : MonoBehaviour
     [TabGroup("Spawn Settings")]
     [Header("Spawn Timing")]
     [SuffixLabel("seconds")]
-    [PropertyRange(0.1f, 60f)]
     [SerializeField] private float _spawnIntervalSeconds = 5f;
 
     [TabGroup("Spawn Settings")]
@@ -60,9 +59,9 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private EnemySpawnConfig[] _enemyConfigs;
 
     [TabGroup("Difficulty")]
-    [Header("Difficulty Progression")]
-    [InfoBox("매 주기마다 반드시 적용되는 최소값 증가량입니다.")]
-    [SerializeField] private DifficultyProgression _difficultyProgression;
+    [Header("Hybrid Difficulty System")]
+    [InfoBox("타입별 고정값/% 방식 선택 가능한 하이브리드 난이도 시스템")]
+    [SerializeField] private HybridDifficultyProgression _hybridDifficulty;
 
     [TabGroup("Difficulty")]
     [Header("Weight-Based Max Value Upgrades")]
@@ -72,7 +71,6 @@ public class EnemySpawner : MonoBehaviour
     [TabGroup("Difficulty")]
     [Header("Difficulty Timing")]
     [SuffixLabel("spawns")]
-    [PropertyRange(1, 50)]
     [SerializeField] private int _difficultyUpdateInterval = 5;
     #endregion
 
@@ -172,6 +170,16 @@ public class EnemySpawner : MonoBehaviour
     [TabGroup("Weight System Debug")]
     [ShowInInspector, ReadOnly]
     public WeightBasedUpgrade? LastSelectedUpgrade { get; private set; }
+
+    [TabGroup("Hybrid System Debug")]
+    [ShowInInspector, ReadOnly]
+    [InfoBox("하이브리드 난이도 시스템 설정 검증 결과")]
+    public string HybridSystemValidation => _hybridDifficulty.ValidateConfiguration();
+
+    [TabGroup("Hybrid System Debug")]
+    [ShowInInspector, ReadOnly]
+    [InfoBox("설정된 적 타입 목록")]
+    public PrefabType[] ConfiguredEnemyTypes => _hybridDifficulty.GetConfiguredEnemyTypes();
     #endregion
 
     #region Private Fields
@@ -325,25 +333,36 @@ public class EnemySpawner : MonoBehaviour
         // 가중치 시스템 상태 초기화
         LastSelectedUpgrade = null;
 
-        // 가중치 시스템 검증
-        if (_maxUpgradeCollection != null)
+        // 하이브리드 시스템 검증
+        if (_hybridDifficulty.enemyTypeConfigs != null)
         {
-            string validationResult = _maxUpgradeCollection.ValidateConfiguration();
+            string validationResult = _hybridDifficulty.ValidateConfiguration();
             if (validationResult != "설정이 올바릅니다.")
             {
-                Debug.LogWarning($"[EnemySpawner] Weight system validation after reset: {validationResult}", this);
+                Debug.LogWarning($"[EnemySpawner] Hybrid system validation after reset: {validationResult}", this);
             }
             else
             {
-                var initialProbabilities = _maxUpgradeCollection.GetSelectionProbabilities(CurrentCycle);
-                string probabilityInfo = string.Join(", ",
-                    initialProbabilities.Select(kvp => $"{kvp.Key.GetDisplayName()}: {kvp.Value:F1}%"));
-                Debug.Log($"[EnemySpawner] Reset complete - Initial upgrade probabilities: {probabilityInfo}", this);
+                PrefabType[] configuredTypes = _hybridDifficulty.GetConfiguredEnemyTypes();
+                Debug.Log($"[EnemySpawner] Reset complete - Configured enemy types: {string.Join(", ", configuredTypes)}", this);
             }
         }
         else
         {
-            Debug.LogWarning("[EnemySpawner] Max upgrade collection is null after reset", this);
+            Debug.LogWarning("[EnemySpawner] Hybrid difficulty system is not configured", this);
+        }
+
+        // 가중치 시스템 검증
+        if (_maxUpgradeCollection != null)
+        {
+            string validationResult = _maxUpgradeCollection.ValidateConfiguration();
+            if (validationResult == "설정이 올바릅니다.")
+            {
+                var initialProbabilities = _maxUpgradeCollection.GetSelectionProbabilities(CurrentCycle);
+                string probabilityInfo = string.Join(", ",
+                    initialProbabilities.Select(kvp => $"{kvp.Key.GetDisplayName()}: {kvp.Value:F1}%"));
+                Debug.Log($"[EnemySpawner] Initial upgrade probabilities: {probabilityInfo}", this);
+            }
         }
 
         Debug.Log("[EnemySpawner] Difficulty reset to initial values", this);
@@ -386,7 +405,7 @@ public class EnemySpawner : MonoBehaviour
         CurrentCycle++;
 
         // 필수 업그레이드 적용
-        ApplyMandatoryUpgrades();
+        ApplyHybridUpgrades();
 
         // 가중치 기반 최대값 업그레이드 처리
         ProcessWeightBasedMaxUpgrade();
@@ -587,7 +606,7 @@ public class EnemySpawner : MonoBehaviour
             CurrentCycle++;
 
             // 필수 업그레이드 적용
-            ApplyMandatoryUpgrades();
+            ApplyHybridUpgrades();
 
             // 가중치 기반 최대값 업그레이드 처리
             ProcessWeightBasedMaxUpgrade();
@@ -597,40 +616,90 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    private void ApplyMandatoryUpgrades()
+    private void ApplyHybridUpgrades()
     {
-        // 팩 사이즈 최소값 증가
-        _currentMinPackSize += Mathf.RoundToInt(_difficultyProgression.GetPackSizeMinIncrease());
-        _currentMinPackSize = Mathf.Max(_minPackSize, _currentMinPackSize);
+        // 하이브리드 시스템 유효성 검사
+        string validationResult = _hybridDifficulty.ValidateConfiguration();
+        if (validationResult != "설정이 올바릅니다.")
+        {
+            Debug.LogWarning($"[EnemySpawner] Hybrid system validation failed: {validationResult}", this);
+            return;
+        }
 
-        // 모든 적 타입의 스탯 최소값들 증가
+        // 팩 사이즈 업그레이드 적용
+        ApplyPackSizeHybridUpgrades();
+
+        // 적 타입별 스탯 업그레이드 적용
+        ApplyStatHybridUpgrades();
+
+        Debug.Log($"[EnemySpawner] Hybrid upgrades applied for cycle {CurrentCycle}", this);
+    }
+
+    /// <summary>
+    /// 팩 사이즈 하이브리드 업그레이드 적용
+    /// </summary>
+    private void ApplyPackSizeHybridUpgrades()
+    {
+        PrefabType[] configuredTypes = _hybridDifficulty.GetConfiguredEnemyTypes();
+
+        foreach (var enemyType in configuredTypes)
+        {
+            var config = _hybridDifficulty.GetConfigForEnemyType(enemyType);
+            if (!config.HasValue) continue;
+
+            // 해당 타입의 팩 사이즈 영향도만큼 전체 팩 사이즈 증가
+            float packSizeIncrease = config.Value.ApplyPackSizeIncrease(1f) - 1f; // 증가분만 계산
+
+            if (packSizeIncrease > 0f)
+            {
+                _currentMinPackSize += Mathf.RoundToInt(packSizeIncrease);
+                _currentMaxPackSize += Mathf.RoundToInt(packSizeIncrease);
+
+                Debug.Log($"[EnemySpawner] {enemyType} pack size upgrade applied: +{packSizeIncrease:F1}", this);
+            }
+        }
+
+        // 최소값이 최대값보다 커지지 않도록 보정
+        _currentMinPackSize = Mathf.Max(_minPackSize, _currentMinPackSize);
+        _currentMaxPackSize = Mathf.Max(_currentMinPackSize, _currentMaxPackSize);
+    }
+
+    /// <summary>
+    /// 스탯 하이브리드 업그레이드 적용
+    /// </summary>
+    private void ApplyStatHybridUpgrades()
+    {
         var enemyTypes = new List<PrefabType>(_currentStatRanges.Keys);
 
         foreach (var enemyType in enemyTypes)
         {
+            var config = _hybridDifficulty.GetConfigForEnemyType(enemyType);
+            if (!config.HasValue) continue;
+
             SpawnStatRange currentRange = _currentStatRanges[enemyType];
 
+            // 각 스탯 타입별로 Min/Max 값 업그레이드
             foreach (SpawnStatType statType in System.Enum.GetValues(typeof(SpawnStatType)))
             {
                 float currentMin = currentRange.GetMinValue(statType);
-                float increase = _difficultyProgression.GetMinIncrease(statType);
-                currentRange.SetMinValue(statType, currentMin + increase);
+                float currentMax = currentRange.GetMaxValue(statType);
+
+                // 하이브리드 증가 적용
+                float newMin = config.Value.statModifiers.ApplyMinIncrease(statType, currentMin);
+                float newMax = config.Value.statModifiers.ApplyMaxIncrease(statType, currentMax);
 
                 // 최대값이 최소값보다 작아지지 않도록 보정
-                float currentMax = currentRange.GetMaxValue(statType);
-                if (currentMax < currentMin + increase)
-                {
-                    currentRange.SetMaxValue(statType, currentMin + increase);
-                }
+                newMax = Mathf.Max(newMin, newMax);
+
+                currentRange.SetMinValue(statType, newMin);
+                currentRange.SetMaxValue(statType, newMax);
+
+                Debug.Log($"[EnemySpawner] {enemyType} {statType} hybrid upgrade: " +
+                         $"Min {currentMin:F1}→{newMin:F1}, Max {currentMax:F1}→{newMax:F1}", this);
             }
 
             _currentStatRanges[enemyType] = currentRange;
         }
-
-        // 최대값이 최소값보다 작아지지 않도록 보정
-        _currentMaxPackSize = Mathf.Max(_currentMinPackSize, _currentMaxPackSize);
-
-        Debug.Log($"[EnemySpawner] Mandatory upgrades applied - Min Pack Size: {_currentMinPackSize}", this);
     }
 
     private void ApplyWeightBasedUpgrade(WeightBasedUpgrade upgrade)

@@ -24,6 +24,45 @@ public struct StatHybridModifier
     DifficultyModifierType modifierType;
     DifficultyProgression fixedProgression;      // 고정값 선택시
     StatPercentageModifier percentProgression;   // % 선택시
+
+    /// <summary>
+    /// 지정된 스탯 타입의 최소값에 증가 적용
+    /// </summary>
+    /// <param name="statType">스탯 타입</param>
+    /// <param name="currentValue">현재 값</param>
+    /// <returns>증가 적용된 새 값</returns>
+    public float ApplyMinIncrease(SpawnStatType statType, float currentValue)
+    {
+        switch (modifierType)
+        {
+            case DifficultyModifierType.FixedValue:
+                return currentValue + fixedProgression.GetMinIncrease(statType);
+            case DifficultyModifierType.Percentage:
+                return currentValue * (1f + percentProgression.GetMinIncreasePercent(statType));
+            default:
+                return currentValue;
+        }
+    }
+
+    /// <summary>
+    /// 지정된 스탯 타입의 최대값에 증가 적용
+    /// </summary>
+    /// <param name="statType">스탯 타입</param>
+    /// <param name="currentValue">현재 값</param>
+    /// <returns>증가 적용된 새 값</returns>
+    public float ApplyMaxIncrease(SpawnStatType statType, float currentValue)
+    {
+        switch (modifierType)
+        {
+            case DifficultyModifierType.FixedValue:
+                // 고정값 방식에서는 Min/Max 구분이 없으므로 동일한 증가량 적용
+                return currentValue + fixedProgression.GetMinIncrease(statType);
+            case DifficultyModifierType.Percentage:
+                return currentValue * (1f + percentProgression.GetMaxIncreasePercent(statType));
+            default:
+                return currentValue;
+        }
+    }
 }
 
 /// <summary>
