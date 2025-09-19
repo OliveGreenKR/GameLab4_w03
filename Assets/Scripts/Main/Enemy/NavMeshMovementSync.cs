@@ -56,6 +56,7 @@ public class NavMeshMovementSync : MonoBehaviour
     {
         if (_enemyBattleEntity != null)
         {
+            _enemyBattleEntity.OnSpawnStatChanged -= OnMoveSpeedChanged;
             _enemyBattleEntity.OnSpawnStatChanged += OnMoveSpeedChanged;
 
             // 이미 스폰된 상태라면 즉시 동기화 (이벤트 놓침 방지)
