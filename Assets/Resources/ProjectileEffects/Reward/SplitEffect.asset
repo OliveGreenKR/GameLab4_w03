@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _priority: 100
   _description: "\uCD94\uAC00 1\uBD84\uC5F4, \uAC01\uB3C4 45\xB0, \uC18D\uB3C4 0.9x,
-    \uC0DD\uBA85\uC2DC\uAC04 0.9x"
+    \uC0DD\uBA85\uC2DC\uAC04 0.7x"
   _applicationMode: 1
   _splitCount: 1
   _splitAngleRangeDegrees: 45
   _speedMultiplier: 0.85
   _damageMultiplier: 1
-  _lifetimeMultiplier: 0.85
+  _lifetimeMultiplier: 0.7

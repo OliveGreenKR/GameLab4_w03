@@ -363,8 +363,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 603934798}
-  _invulnerabilityDuration: 0
-  _hasContactDamage: 0
+  _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &603934798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -714,8 +714,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 823887401}
-  _invulnerabilityDuration: 0
-  _hasContactDamage: 0
+  _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &823887403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -917,8 +917,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1008245303}
-  _invulnerabilityDuration: 0
-  _hasContactDamage: 0
+  _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &1008245303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1071,8 +1071,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1311654097}
-  _invulnerabilityDuration: 0
-  _hasContactDamage: 0
+  _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &1311654097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1526,8 +1526,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1707852743}
-  _invulnerabilityDuration: 0
-  _hasContactDamage: 0
+  _invulnerabilityDuration: 1
+  _hasContactDamage: 1
 --- !u!114 &1707852743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1839,22 +1839,27 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1676449833}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
+      propertyPath: _projectileLifetime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _effectAssets.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: '_effectAssets.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: c6540b7774face34599de37487c77635, type: 2}
+      objectReference: {fileID: 11400000, guid: 055ba47aea7c9304cbdb373a56b1734d, type: 2}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: '_effectAssets.Array.data[1]'
       value: 
-      objectReference: {fileID: 11400000, guid: c6540b7774face34599de37487c77635, type: 2}
+      objectReference: {fileID: 11400000, guid: 055ba47aea7c9304cbdb373a56b1734d, type: 2}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _projectilePool._defaultPoolSize
-      value: 500
+      value: 1000
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 9048291988229795870, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

@@ -233,6 +233,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         {
             // 현재 상태 그대로 복사
             clone.Initialize(_remainingLifetime, _forwardSpeedUnitsPerSecond);
+            //clone.SetLifetime(_remainingLifetime);
             clone.SetDamageMultiplier(_currentDamageMultiplier);
             clone.SetSpeedMultiplier(_currentSpeedMultiplier);
             clone.SetPierceCount(_currentPierceCount);
@@ -340,6 +341,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         IBattleEntity target = other.GetComponent<IBattleEntity>();
         if (target != null)
         {
+            Debug.Log($"[ProjectileBase] TriggerEnter with {other.name}, Target Team: {target.TeamId}, Projectile Team: {TeamId}", this);
             float damage = ProcessDamageToTarget(target);
             if (damage > 0f)
             {
@@ -442,8 +444,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
                 clone.GameObject.transform.SetParent(this.transform.parent);
             }
         }
-
-        Debug.Log($"[ProjectileBase] Split into {splitedcloneCount} cloned projectiles", this);
     }
 
     /// <summary>
@@ -516,7 +516,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
 
         if (_isSplitDelayed) return; // 이미 분열 대기 중이면 무시
 
-        //Debug.Log($"[ProjectileBase] Split delayed after hit. Available: {_currentSplitAvailableCount}", this);
+        Debug.Log($"[ProjectileBase] Split delayed after hit. Available: {_currentSplitAvailableCount}", this);
 
         _isSplitDelayed = true;
         _splitDelayTimeRemaining = _maxSplitDelayedTime;
@@ -588,7 +588,8 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         //    Debug.Log($"[ProjectileBase] Split delayed started. Time remaining: {_splitDelayTimeRemaining:F2}s", this);
         //    return; // 즉시 소멸하지 않음
         //}
-        ProcessSplit(); // 타격 후 분열 처리
+
+        //ProcessSplit(); // 타격 후 분열 처리
 
         // 1. 소멸 전 이벤트 호출
         BeforeProjectileDestroyed?.Invoke(this);

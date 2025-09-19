@@ -132,6 +132,7 @@ public class SplitEffectSO : ProjectileEffectSO
     public override void DetachFromProjectile(IProjectile projectile)
     {
         //LogEffect("Detached from projectile", projectile);
+
     }
     #endregion
 

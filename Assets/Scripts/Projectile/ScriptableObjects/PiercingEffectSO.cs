@@ -76,7 +76,6 @@ public class PiercingEffectSO : ProjectileEffectSO
     }
     /// <summary>
     /// 투사체 소멸시 정리 작업
-    /// 관통 이펙트는 투사체 속성 변경이므로 특별한 정리 불필요
     /// </summary>
     /// <param name="projectile">정리할 투사체</param>
     public override void DetachFromProjectile(IProjectile projectile)

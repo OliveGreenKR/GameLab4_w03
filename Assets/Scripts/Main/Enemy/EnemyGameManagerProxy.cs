@@ -74,13 +74,9 @@ public class EnemyGameManagerProxy : MonoBehaviour
         // IBattleEntity는 OnDeath 이벤트가 없으므로 BaseBattleEntity의 OnDeath를 찾음
         if (_battleEntity is BaseBattleEntity battleEntity)
         {
-            // BaseBattleEntity.OnDeath는 virtual 메서드이므로 직접 호출 불가
-            // CharacterBattleEntity의 OnCharacterDeath 이벤트 사용
-            if (_battleEntity is CharacterBattleEntity characterEntity)
-            {
-                characterEntity.OnCharacterDeath -= OnBattleEntityDeath;
-                characterEntity.OnCharacterDeath += OnBattleEntityDeath;
-            }
+            var stat = battleEntity.GetComponent<BattleStatComponent>();
+            stat.OnDeath -= OnBattleEntityDeath;
+            stat.OnDeath += OnBattleEntityDeath;
         }
     }
 
@@ -88,9 +84,11 @@ public class EnemyGameManagerProxy : MonoBehaviour
     {
         if (_battleEntity == null) return;
 
-        if (_battleEntity is CharacterBattleEntity characterEntity)
+        if (_battleEntity is BaseBattleEntity battleEntity)
         {
-            characterEntity.OnCharacterDeath -= OnBattleEntityDeath;
+            var stat = battleEntity.GetComponent<BattleStatComponent>();
+            stat.OnDeath -= OnBattleEntityDeath;
+            return;
         }
     }
     #endregion
