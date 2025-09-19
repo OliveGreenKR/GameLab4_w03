@@ -252,6 +252,41 @@ public class ProjectileLauncher : MonoBehaviour
     {
         _fireRatePerSecond = Mathf.Clamp(fireRatePerSecond, 0.1f, 50f);
     }
+
+    /// <summary>투사체 속도 설정</summary>
+    /// <param name="speed">투사체 속도 (units/sec)</param>
+    public void SetProjectileSpeed(float speed)
+    {
+        _projectileSpeed = Mathf.Clamp(speed, 1f, 100f);
+    }
+
+    /// <summary>투사체 생명시간 설정</summary>
+    /// <param name="lifetime">생명시간 (초)</param>
+    public void SetProjectileLifetime(float lifetime)
+    {
+        _projectileLifetime = Mathf.Clamp(lifetime, 0f, 10f);
+    }
+
+    /// <summary>현재 발사속도 조회</summary>
+    /// <returns>초당 발사 횟수</returns>
+    public float GetFireRate()
+    {
+        return _fireRatePerSecond;
+    }
+
+    /// <summary>현재 투사체 속도 조회</summary>
+    /// <returns>투사체 속도</returns>
+    public float GetProjectileSpeed()
+    {
+        return _projectileSpeed;
+    }
+
+    /// <summary>현재 투사체 생명시간 조회</summary>
+    /// <returns>생명시간 (초)</returns>
+    public float GetProjectileLifetime()
+    {
+        return _projectileLifetime;
+    }
     #endregion
 
     #region Private Methods
