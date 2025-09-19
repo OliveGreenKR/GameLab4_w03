@@ -120,8 +120,11 @@ public class TurretRotationController : MonoBehaviour
     {
         if (_rotationTransform == null) return;
 
-        ContinuousMinAngle = ClampAngle(minAngle);
-        ContinuousMaxAngle = ClampAngle(maxAngle);
+        Debug.Log($"[TurretRotationController] Starting continuous rotation between {minAngle:F1}° and {maxAngle:F1}°", this);
+        ContinuousMinAngle = minAngle;
+        ContinuousMaxAngle = maxAngle;
+
+        Debug.Log($"[TurretRotationController] Started continuous rotation BEFORE [{ContinuousMinAngle:F1}°, {ContinuousMaxAngle:F1}°]", this);
 
         if (Mathf.Abs(ContinuousMaxAngle - ContinuousMinAngle) < KINDA_SMALL)
         {
@@ -232,18 +235,33 @@ public class TurretRotationController : MonoBehaviour
 
     private void UpdateContinuousRotation()
     {
-        float angleDifference = Mathf.DeltaAngle(CurrentYRotation, TargetYRotation);
         float rotationStep = _rotationSpeed * Time.deltaTime;
 
-        if (Mathf.Abs(angleDifference) <= rotationStep)
+        if (_continuousRotationForward)
         {
-            CurrentYRotation = TargetYRotation;
-            CalculateNextContinuousTarget();
+            // 항상 증가 방향
+            if (CurrentYRotation >= TargetYRotation)
+            {
+                CurrentYRotation = TargetYRotation;
+                CalculateNextContinuousTarget();
+            }
+            else
+            {
+                CurrentYRotation += rotationStep;
+            }
         }
         else
         {
-            float rotationDirection = Mathf.Sign(angleDifference);
-            CurrentYRotation += rotationDirection * rotationStep;
+            // 항상 감소 방향  
+            if (CurrentYRotation <= TargetYRotation)
+            {
+                CurrentYRotation = TargetYRotation;
+                CalculateNextContinuousTarget();
+            }
+            else
+            {
+                CurrentYRotation -= rotationStep;
+            }
         }
 
         CurrentYRotation = ClampAngle(CurrentYRotation);
@@ -253,7 +271,7 @@ public class TurretRotationController : MonoBehaviour
     {
         if (_continuousRotationForward)
         {
-            if (Mathf.Abs(CurrentYRotation - ContinuousMaxAngle) < KINDA_SMALL)
+            if (Mathf.Abs(Mathf.DeltaAngle(CurrentYRotation, ContinuousMaxAngle)) < KINDA_SMALL)
             {
                 _continuousRotationForward = false;
                 TargetYRotation = ContinuousMinAngle;
@@ -267,7 +285,7 @@ public class TurretRotationController : MonoBehaviour
         }
         else
         {
-            if (Mathf.Abs(CurrentYRotation - ContinuousMinAngle) < KINDA_SMALL)
+            if (Mathf.Abs(Mathf.DeltaAngle(CurrentYRotation, ContinuousMinAngle)) < KINDA_SMALL)
             {
                 _continuousRotationForward = true;
                 TargetYRotation = ContinuousMaxAngle;

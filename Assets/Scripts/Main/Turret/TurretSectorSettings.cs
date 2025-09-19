@@ -11,20 +11,19 @@ public class TurretSectorSettings : MonoBehaviour
     #region Serialized Fields
     [TabGroup("Sector Detection")]
     [Header("Detection Sector")]
-    [InfoBox("부채꼴 탐지 영역 설정")]
+    [InfoBox("부채꼴 탐지 영역 설정, 노란색")]
     [SuffixLabel("degrees")]
-    [PropertyRange(10f, 120f)]
+    [PropertyRange(5f, 360f)]
     [SerializeField] private float _sectorAngleDegrees = 45f;
 
     [TabGroup("Sector Detection")]
     [SuffixLabel("units")]
     [InfoBox("탐지 영역 반지름- 푸른색원")]
-    [PropertyRange(1f, 50f)]
     [SerializeField] private float _detectionRadius = 15f;
 
     [TabGroup("Scan Range")]
     [Header("Scanning Boundaries")]
-    [InfoBox("터렛 스캔 가능 범위 설정 (중앙 기준), 노란색")]
+    [InfoBox("터렛 스캔 가능 범위 설정 (중앙 기준), 붉은색")]
     [SuffixLabel("degrees")]
     [PropertyRange(-180f, 0f)]
     [SerializeField] private float _scanRangeMin = -45f;
@@ -71,9 +70,6 @@ public class TurretSectorSettings : MonoBehaviour
     [ShowInInspector, ReadOnly]
     public float EffectiveScanRangeTotal => EffectiveScanMax - EffectiveScanMin;
 
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public bool IsValidConfiguration => ValidateCurrentSettings();
     #endregion
 
     #region Events
@@ -93,19 +89,10 @@ public class TurretSectorSettings : MonoBehaviour
     #region Unity Lifecycle
     private void Awake()
     {
-        // 컴포넌트 초기화 시 기본 검증
-        ClampAllValues();
     }
 
     private void Start()
     {
-        // 초기 설정 유효성 검증
-        if (!ValidateCurrentSettings())
-        {
-            Debug.LogWarning("[TurretSectorSettings] Invalid initial configuration detected", this);
-            ClampAllValues();
-        }
-
         // 초기 설정 완료 알림
         NotifySettingsChanged();
 
@@ -114,9 +101,6 @@ public class TurretSectorSettings : MonoBehaviour
 
     private void OnValidate()
     {
-        // Inspector에서 값 변경 시 실시간 검증
-        ClampAllValues();
-
         // 런타임 중이면 변경 사항 알림
         if (Application.isPlaying)
         {
@@ -137,36 +121,6 @@ public class TurretSectorSettings : MonoBehaviour
     #endregion
 
     #region Public Methods - Settings Access
-    /// <summary>현재 설정의 유효성 검증</summary>
-    /// <returns>설정이 유효하면 true</returns>
-    public bool ValidateCurrentSettings()
-    {
-        if (!IsAngleRangeValid())
-        {
-            Debug.LogWarning("[TurretSectorSettings] Invalid angle range configuration", this);
-            return false;
-        }
-
-        if (!IsEffectiveRangeValid())
-        {
-            Debug.LogWarning("[TurretSectorSettings] Invalid effective range configuration", this);
-            return false;
-        }
-
-        if (_detectionRadius <= 0f)
-        {
-            Debug.LogWarning("[TurretSectorSettings] Invalid detection radius", this);
-            return false;
-        }
-
-        if (_sectorAngleDegrees <= 0f)
-        {
-            Debug.LogWarning("[TurretSectorSettings] Invalid sector angle", this);
-            return false;
-        }
-
-        return true;
-    }
 
     /// <summary>설정 요약 정보 반환</summary>
     /// <returns>설정 요약 문자열</returns>
@@ -247,26 +201,6 @@ public class TurretSectorSettings : MonoBehaviour
     #endregion
 
     #region Private Methods - Validation
-    private void ClampAllValues()
-    {
-        // 부채꼴 각도 범위 제한
-        _sectorAngleDegrees = Mathf.Clamp(_sectorAngleDegrees, 10f, 120f);
-
-        // 탐지 반지름 범위 제한
-        _detectionRadius = Mathf.Clamp(_detectionRadius, 1f, 50f);
-
-        // 스캔 범위 제한 및 순서 보정
-        _scanRangeMin = Mathf.Clamp(_scanRangeMin, -180f, 0f);
-        _scanRangeMax = Mathf.Clamp(_scanRangeMax, 0f, 180f);
-
-        // 최소값이 최대값보다 크지 않도록 보정
-        if (_scanRangeMin >= _scanRangeMax)
-        {
-            _scanRangeMin = _scanRangeMax - 10f;
-            _scanRangeMin = Mathf.Max(_scanRangeMin, -180f);
-        }
-    }
-
     private void NotifySettingsChanged()
     {
         // 설정 변경 이벤트 발생
@@ -274,35 +208,6 @@ public class TurretSectorSettings : MonoBehaviour
         OnSectorAngleChanged?.Invoke(_sectorAngleDegrees);
         OnDetectionRadiusChanged?.Invoke(_detectionRadius);
         OnScanRangeChanged?.Invoke(_scanRangeMin, _scanRangeMax);
-    }
-
-    private bool IsAngleRangeValid()
-    {
-        // 스캔 범위 기본 유효성 검사
-        if (_scanRangeMax <= _scanRangeMin)
-            return false;
-
-        // 최소 스캔 범위 확보 (10도 이상)
-        if ((_scanRangeMax - _scanRangeMin) < 10f)
-            return false;
-
-        return true;
-    }
-
-    private bool IsEffectiveRangeValid()
-    {
-        // 유효 스캔 범위 검사
-        float effectiveRange = EffectiveScanRangeTotal;
-
-        // 부채꼴 각도로 인해 유효 범위가 너무 작아지는지 확인
-        if (effectiveRange <= 0f)
-            return false;
-
-        // 최소 유효 범위 확보 (5도 이상)
-        if (effectiveRange < 5f)
-            return false;
-
-        return true;
     }
     #endregion
 
