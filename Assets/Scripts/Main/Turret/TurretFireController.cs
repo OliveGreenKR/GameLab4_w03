@@ -44,6 +44,7 @@ public class TurretFireController : MonoBehaviour
     [Header("Fire Execution Settings")]
     [SuffixLabel("degrees")]
     [SerializeField] private float _aimingToleranceAngle = 2f;
+    [InfoBox("Require Aiming ToleranceAngle")]
     [SerializeField] private bool _requireAimingAccuracy = true;
     #endregion
 

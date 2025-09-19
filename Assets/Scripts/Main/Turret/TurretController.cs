@@ -74,6 +74,9 @@ public class TurretController : MonoBehaviour
     [SerializeField] private bool _enableDebugLogs = true;
     #endregion
 
+    #region Serialzied Properties - debug Buttons   
+    #endregion
+
     #region Properties
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]

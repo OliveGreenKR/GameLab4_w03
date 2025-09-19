@@ -237,14 +237,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileLauncher: {fileID: 1935573807}
   _minFireRate: 0.1
-  _maxFireRate: 50
+  _maxFireRate: 70
   _defaultFireRate: 5
   _minBaseDamage: 1
   _maxBaseDamage: 1000
   _defaultBaseDamage: 25
   _minProjectileSpeed: 1
-  _maxProjectileSpeed: 200
-  _defaultProjectileSpeed: 30
+  _maxProjectileSpeed: 100
+  _defaultProjectileSpeed: 1
   _minLifetime: 0.1
   _maxLifetime: 30
   _defaultLifetime: 3
