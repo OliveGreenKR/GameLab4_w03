@@ -110,14 +110,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         return 0.0f;
     }
 
-    protected override void OnValidTriggered(IBattleEntity target, float actualDamage)
-    {
-        if (actualDamage > 0f)
-        {
-            _battleStat.ApplyDamage(1.0f);
-        }
-    }
-
     protected override float CalculateFinalDamage(IBattleEntity target)
     {
         return GetCurrentStat(BattleStatType.Attack) * _currentDamageMultiplier;
@@ -127,16 +119,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         //Debug.Log("[ProjectileBase] Projectile has been destroyed.", this);
         HandleProjectileDeath(); // 통합 함수 호출
-    }
-
-    protected override void OnValidTriggerExited(IBattleEntity target)
-    {
-        //투사체 지연 상태 중 관통 종료 시 바로 분열
-        if (_isSplitDelayed)
-        {
-            Debug.LogWarning($"TriggerExit! try to Split!");
-            ExecuteDelayedSplit();
-        }
     }
     #endregion
 
@@ -353,14 +335,32 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         OnProjectileUpdate?.Invoke(this);
     }
 
-    protected override void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        base.OnTriggerEnter(other);
-        OnProjectileHit?.Invoke(this, other);
-        AfterProjectileHit?.Invoke(this, other);
+        IBattleEntity target = other.GetComponent<IBattleEntity>();
+        if (target != null)
+        {
+            float damage = ProcessDamageToTarget(target);
+            if (damage > 0f)
+            {
+                OnProjectileHit?.Invoke(this, other);
+                AfterProjectileHit?.Invoke(this, other);
+                _battleStat.ApplyDamage(1.0f); // 관통 횟수 및 체력 감소
+                HandleSplitAfterHit();
+            }
+        }
 
-        // 매 타격 후 분열 체크 (관통 처리 완료 후)
-        HandleSplitAfterHit();
+        
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        //투사체 지연 상태 중 관통 종료 시 바로 분열
+        if (_isSplitDelayed)
+        {
+            Debug.LogWarning($"TriggerExit! try to Split!");
+            ExecuteDelayedSplit();
+        }
     }
 
     private void OnEnable()
@@ -406,6 +406,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     /// </summary>
     public void DestroyProjectile()
     {
+        Debug.Log($"[ProjectileBase] DestroyProjectile called. Splitting if possible.", this);
         ProcessSplit();
         DestroyProjectileWithoutSplit();
     }
@@ -539,7 +540,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         if (!_isSplitDelayed) return;
 
         // 분열 실행
-
         ProcessSplit();
 
         // 분열 지연 상태 해제
@@ -588,6 +588,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         //    Debug.Log($"[ProjectileBase] Split delayed started. Time remaining: {_splitDelayTimeRemaining:F2}s", this);
         //    return; // 즉시 소멸하지 않음
         //}
+        ProcessSplit(); // 타격 후 분열 처리
 
         // 1. 소멸 전 이벤트 호출
         BeforeProjectileDestroyed?.Invoke(this);

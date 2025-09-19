@@ -149,6 +149,7 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
 
     /// <summary>
     /// 데미지 받았을 때 호출되는 함수
+    /// 하위 클래스에서 오버라이드하여 추가 처리
     /// </summary>
     /// <param name="damage"></param>
     /// <param name="attacker"></param>
@@ -156,7 +157,9 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
     {
         // 하위 클래스에서 오버라이드하여 추가 처리
     }
+    #endregion
 
+    #region Protected Methods - Non-Virtual
     protected float ProcessDamageToTarget(IBattleEntity target)
     {
         if (target == null || !IsAlive)
