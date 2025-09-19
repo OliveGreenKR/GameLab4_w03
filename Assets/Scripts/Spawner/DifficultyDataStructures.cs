@@ -17,6 +17,16 @@ public enum DifficultyModifierType
 }
 
 /// <summary>
+/// 하이브리트 스탯 증가 설정 (고정, % 혼합)
+/// </summary>
+public struct StatHybridModifier
+{
+    DifficultyModifierType modifierType;
+    DifficultyProgression fixedProgression;      // 고정값 선택시
+    StatPercentageModifier percentProgression;   // % 선택시
+}
+
+/// <summary>
 /// 스탯별 % 기반 증가율 설정
 /// </summary>
 [Serializable]
@@ -101,22 +111,40 @@ public struct EnemyTypeDifficultyConfig
     public PrefabType enemyType;
 
     [BoxGroup("Pack Size Modifiers")]
-    [InfoBox("팩 사이즈 증가율 설정 (이 타입의 스폰 비중 조정)")]
-    [SuffixLabel("%")]
-    [PropertyRange(0f, 100f)]
-    public float packSizeInfluencePercent;
+    [InfoBox("이 타입의 팩 사이즈 증가 방식 설정")]
+    [Header("Pack Size Increase Type")]
+    public DifficultyModifierType packSizeModifierType;
 
-    [BoxGroup("Stat Percentage Modifiers")]
-    [InfoBox("스탯별 % 기반 증가율")]
-    public StatPercentageModifier statModifiers;
+    [BoxGroup("Pack Size Modifiers")]
+    [ShowIf("@packSizeModifierType == DifficultyModifierType.FixedValue")]
+    [SuffixLabel("enemies")]
+    public float packSizeFixedIncrease;
+
+    [BoxGroup("Pack Size Modifiers")]
+    [ShowIf("@packSizeModifierType == DifficultyModifierType.Percentage")]
+    [SuffixLabel("%")]
+    public float packSizePercentIncrease;
+
+    [BoxGroup("Stat Hybrid Modifiers")]
+    [InfoBox("스탯별 하이브리드 증가 설정")]
+    public StatHybridModifier statModifiers;
 
     /// <summary>
-    /// 팩 사이즈 영향도 반환 (0.0 ~ 1.0)
+    /// 팩 사이즈 증가 적용
     /// </summary>
-    /// <returns>팩 사이즈 영향도</returns>
-    public float GetPackSizeInfluence()
+    /// <param name="currentPackSize">현재 팩 사이즈</param>
+    /// <returns>증가 적용된 새 팩 사이즈</returns>
+    public float ApplyPackSizeIncrease(float currentPackSize)
     {
-        return packSizeInfluencePercent * 0.01f;
+        switch (packSizeModifierType)
+        {
+            case DifficultyModifierType.FixedValue:
+                return currentPackSize + packSizeFixedIncrease;
+            case DifficultyModifierType.Percentage:
+                return currentPackSize * (1f + (packSizePercentIncrease * 0.01f));
+            default:
+                return currentPackSize;
+        }
     }
 
     /// <summary>
@@ -130,20 +158,12 @@ public struct EnemyTypeDifficultyConfig
 }
 
 /// <summary>
-/// % 기반 난이도 진행 시스템
-/// 기존 고정값 시스템과 병행 사용 가능
+/// 하이브리드 난이도 진행 시스템
+/// 적 타입별로 고정값/% 방식 자유 선택
 /// </summary>
 [Serializable]
-public struct PercentageBasedDifficultyProgression
+public struct HybridDifficultyProgression
 {
-    [BoxGroup("System Settings")]
-    [InfoBox("% 기반 시스템 사용 여부")]
-    [SerializeField] public bool usePercentageSystem;
-
-    [BoxGroup("Fallback Settings")]
-    [InfoBox("% 시스템 비활성화 시 사용할 기존 고정값 시스템")]
-    [SerializeField] public DifficultyProgression fallbackProgression;
-
     [BoxGroup("Enemy Type Configurations")]
     [InfoBox("적 타입별 개별 난이도 설정 목록")]
     [SerializeField] public EnemyTypeDifficultyConfig[] enemyTypeConfigs;
@@ -194,9 +214,6 @@ public struct PercentageBasedDifficultyProgression
     /// <returns>검증 결과 메시지</returns>
     public string ValidateConfiguration()
     {
-        if (!usePercentageSystem)
-            return "% 시스템이 비활성화되어 있습니다.";
-
         if (enemyTypeConfigs == null || enemyTypeConfigs.Length == 0)
             return "적 타입 설정이 없습니다.";
 
