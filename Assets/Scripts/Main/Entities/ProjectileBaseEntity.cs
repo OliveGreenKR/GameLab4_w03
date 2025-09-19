@@ -357,6 +357,9 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         base.OnTriggerEnter(other);
         OnProjectileHit?.Invoke(this, other);
         AfterProjectileHit?.Invoke(this, other);
+
+        // 매 타격 후 분열 체크 (관통 처리 완료 후)
+        HandleSplitAfterHit();
     }
 
     private void OnEnable()
@@ -378,7 +381,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         base.OnDestroy();
         // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
     }
-
     #endregion
 
     #region Public Methods
@@ -502,6 +504,22 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         }
     }
 
+    /// <summary>
+    /// 타격 후 분열 처리 (매 타격마다 실행, Delayed 방식)
+    /// </summary>
+    private void HandleSplitAfterHit()
+    {
+        if (_currentSplitAvailableCount <= 0 || _owner == null || _currentSplitProjectileCount <= 0)
+            return;
+
+        if (_isSplitDelayed) return; // 이미 분열 대기 중이면 무시
+
+        //Debug.Log($"[ProjectileBase] Split delayed after hit. Available: {_currentSplitAvailableCount}", this);
+
+        _isSplitDelayed = true;
+        _splitDelayTimeRemaining = _maxSplitDelayedTime;
+    }
+
     private void UpdateSplitDelay()
     {
         if (!_isSplitDelayed) return;
@@ -561,14 +579,14 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         if (!gameObject.activeInHierarchy) return; // 중복 호출 방지
 
-        // 분열 조건 체크
-        if (SplitAvailableCount > 0 && !_isSplitDelayed)
-        {
-            _isSplitDelayed = true;
-            _splitDelayTimeRemaining = _maxSplitDelayedTime;
-            Debug.Log($"[ProjectileBase] Split delayed started. Time remaining: {_splitDelayTimeRemaining:F2}s", this);
-            return; // 즉시 소멸하지 않음
-        }
+        //// 분열 조건 체크
+        //if (SplitAvailableCount > 0 && !_isSplitDelayed)
+        //{
+        //    _isSplitDelayed = true;
+        //    _splitDelayTimeRemaining = _maxSplitDelayedTime;
+        //    Debug.Log($"[ProjectileBase] Split delayed started. Time remaining: {_splitDelayTimeRemaining:F2}s", this);
+        //    return; // 즉시 소멸하지 않음
+        //}
 
         // 1. 소멸 전 이벤트 호출
         BeforeProjectileDestroyed?.Invoke(this);

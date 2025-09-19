@@ -268,6 +268,7 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
+        SpawnImmediate(); // 즉시 스폰
         IsSpawning = true;
         _nextSpawnTime = Time.time + _spawnIntervalSeconds;
 
