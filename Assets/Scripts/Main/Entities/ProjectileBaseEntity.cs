@@ -354,8 +354,8 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
 
     protected override void OnTriggerEnter(Collider other)
     {
-        OnProjectileHit?.Invoke(this, other);
         base.OnTriggerEnter(other);
+        OnProjectileHit?.Invoke(this, other);
         AfterProjectileHit?.Invoke(this, other);
     }
 

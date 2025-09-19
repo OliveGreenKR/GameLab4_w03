@@ -18,12 +18,13 @@ public class TurretSectorSettings : MonoBehaviour
 
     [TabGroup("Sector Detection")]
     [SuffixLabel("units")]
+    [InfoBox("탐지 영역 반지름- 푸른색원")]
     [PropertyRange(1f, 50f)]
     [SerializeField] private float _detectionRadius = 15f;
 
     [TabGroup("Scan Range")]
     [Header("Scanning Boundaries")]
-    [InfoBox("터렛 스캔 가능 범위 설정 (중앙 기준)")]
+    [InfoBox("터렛 스캔 가능 범위 설정 (중앙 기준), 노란색")]
     [SuffixLabel("degrees")]
     [PropertyRange(-180f, 0f)]
     [SerializeField] private float _scanRangeMin = -45f;
