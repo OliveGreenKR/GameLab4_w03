@@ -116,13 +116,14 @@ GameObject:
   - component: {fileID: 7663295947113335173}
   - component: {fileID: 3342975155027581448}
   - component: {fileID: 5289648399551077228}
+  - component: {fileID: 7456599373262166233}
   m_Layer: 0
   m_Name: enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1773419499822682767
 Transform:
   m_ObjectHideFlags: 0
@@ -218,7 +219,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _enemyBattleEntity: {fileID: 7663295947113335173}
   _navMeshAgent: {fileID: 9194659079445390000}
-  _baseMoveSpeed: 3.5
+  _baseMoveSpeed: 10
+--- !u!114 &7456599373262166233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5175902631662209742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74511c62bad315c49802f569f655b14f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _enemyType: 1
 --- !u!1 &6469273310690769977
 GameObject:
   m_ObjectHideFlags: 0

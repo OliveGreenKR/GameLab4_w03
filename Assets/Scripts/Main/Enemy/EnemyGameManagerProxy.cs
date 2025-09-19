@@ -21,10 +21,6 @@ public class EnemyGameManagerProxy : MonoBehaviour
     [TabGroup("Debug")]
     [Required, ShowInInspector, ReadOnly]
     public bool HasBattleEntity => _battleEntity != null;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public bool IsGameManagerAvailable => GameManager.Instance != null;
     #endregion
 
     #region Private Fields
