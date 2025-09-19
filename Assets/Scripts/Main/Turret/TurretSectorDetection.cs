@@ -17,28 +17,28 @@ public class TurretSectorDetection : MonoBehaviour
     [SerializeField] private TurretSectorSettings _sectorSettings;
 
     [TabGroup("Detection")]
-    [Header("Trigger Collider")]
-    [Required]
-    [InfoBox("탐지용 트리거 콜라이더 ")]
-    [SerializeField] private SphereCollider _triggerCollider;
+    [Header("Layer Filtering")]
+    [InfoBox("탐지할 적 레이어 마스크")]
+    [SerializeField] private LayerMask _enemyLayerMask = -1;
 
     [TabGroup("Detection")]
-    [Header("Collider Auto-Sizing")]
-    [InfoBox("탐지 반지름 대비 콜라이더 크기 배수")]
-    [SuffixLabel("multiplier")]
-    [PropertyRange(1.0f, 2.0f)]
-    [SerializeField] private float _colliderSizeMultiplier = 1.2f;
+    [Header("Detection Buffer")]
+    [InfoBox("OverlapSphere 결과 캐싱 배열 크기")]
+    [SuffixLabel("colliders")]
+    [PropertyRange(10, 100)]
+    [SerializeField] private int _colliderBufferSize = 100;
 
     [TabGroup("Performance")]
     [Header("Update Settings")]
     [SuffixLabel("seconds")]
     [SerializeField] private float _filterUpdateInterval = 0.1f;
+
+    [TabGroup("Performance")]
+    [SuffixLabel("seconds")]
+    [SerializeField] private float _overlapDetectionInterval = 0.05f;
     #endregion
 
     #region Properties
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public int RegisteredEnemyCount => _registeredEnemies.Count;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -62,9 +62,10 @@ public class TurretSectorDetection : MonoBehaviour
     #endregion
 
     #region Private Fields
-    private HashSet<IBattleEntity> _registeredEnemies = new HashSet<IBattleEntity>();
+    private Collider[] _colliderBuffer;
     private List<IBattleEntity> _detectedEnemies = new List<IBattleEntity>();
     private List<IBattleEntity> _tempDetectedList = new List<IBattleEntity>();
+    private float _nextOverlapTime;
     #endregion
 
     #region Unity Lifecycle
@@ -77,6 +78,8 @@ public class TurretSectorDetection : MonoBehaviour
     {
         ValidateReferences();
         SubscribeToSettings();
+
+        _nextOverlapTime = Time.time + _overlapDetectionInterval;
         NextFilterTime = Time.time + _filterUpdateInterval;
         IsInitialized = true;
     }
@@ -85,6 +88,14 @@ public class TurretSectorDetection : MonoBehaviour
     {
         if (!IsInitialized) return;
 
+        // OverlapSphere 주기적 실행
+        if (Time.time >= _nextOverlapTime)
+        {
+            PerformOverlapDetection();
+            _nextOverlapTime = Time.time + _overlapDetectionInterval;
+        }
+
+        // 필터링 업데이트
         if (Time.time >= NextFilterTime)
         {
             UpdateDetectionFilter();
@@ -92,27 +103,11 @@ public class TurretSectorDetection : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        IBattleEntity enemy = other.GetComponent<IBattleEntity>();
-        if (enemy != null && enemy.IsAlive)
-        {
-            RegisterEnemy(enemy);
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        IBattleEntity enemy = other.GetComponent<IBattleEntity>();
-        if (enemy != null)
-        {
-            UnregisterEnemy(enemy);
-        }
-    }
-
     private void OnValidate()
     {
         _filterUpdateInterval = Mathf.Clamp(_filterUpdateInterval, 0.05f, 0.2f);
+        _overlapDetectionInterval = Mathf.Clamp(_overlapDetectionInterval, 0.02f, 0.1f);
+        _colliderBufferSize = Mathf.Clamp(_colliderBufferSize, 10, 100);
     }
 
     private void OnDestroy()
@@ -122,55 +117,16 @@ public class TurretSectorDetection : MonoBehaviour
     #endregion
 
     #region Private Methods - Collider Management
-    private void UpdateColliderSize()
-    {
-        if (_triggerCollider == null || _sectorSettings == null)
-            return;
-
-        SphereCollider sphereCollider = _triggerCollider as SphereCollider;
-        if (sphereCollider == null)
-        {
-            Debug.LogWarning("[TurretSectorDetection] Trigger collider is not a SphereCollider. Auto-sizing skipped.", this);
-            return;
-        }
-
-        float targetRadius = CalculateColliderRadius();
-        sphereCollider.radius = targetRadius;
-
-        Debug.Log($"[TurretSectorDetection] Collider radius updated to {targetRadius:F1} units", this);
-    }
-
     private float CalculateColliderRadius()
     {
         if (_sectorSettings == null)
             return 1f;
 
         float baseRadius = _sectorSettings.DetectionRadius;
-        float scaledRadius = baseRadius * _colliderSizeMultiplier;
+        float scaledRadius = baseRadius;
 
         // 안전한 범위로 제한
         return Mathf.Clamp(scaledRadius, 1f, 100f);
-    }
-
-    private bool ValidateColliderForAutoSizing()
-    {
-        if (_triggerCollider == null)
-            return false;
-
-        if (!_triggerCollider.isTrigger)
-        {
-            Debug.LogWarning("[TurretSectorDetection] Collider should be set as trigger for auto-sizing", this);
-            return false;
-        }
-
-        SphereCollider sphereCollider = _triggerCollider as SphereCollider;
-        if (sphereCollider == null)
-        {
-            Debug.LogWarning("[TurretSectorDetection] Only SphereCollider is supported for auto-sizing", this);
-            return false;
-        }
-
-        return true;
     }
     #endregion
 
@@ -246,21 +202,30 @@ public class TurretSectorDetection : MonoBehaviour
     #endregion
 
     #region Private Methods - Detection Logic
-    private void UpdateDetectionFilter()
+    private void PerformOverlapDetection()
     {
-        if (_sectorSettings == null) return;
+        if (_sectorSettings == null || _colliderBuffer == null)
+            return;
 
-        ClearInvalidEnemies();
-        FilterRegisteredEnemies();
-    }
+        Vector3 detectionCenter = DetectionCenter;
+        float detectionRadius = _sectorSettings.DetectionRadius;
 
-    private void FilterRegisteredEnemies()
-    {
+        int hitCount = Physics.OverlapSphereNonAlloc(
+            detectionCenter,
+            detectionRadius,
+            _colliderBuffer,
+            _enemyLayerMask
+        );
+
         _tempDetectedList.Clear();
 
-        foreach (var enemy in _registeredEnemies)
+        for (int i = 0; i < hitCount; i++)
         {
-            if (IsEnemyInSector(enemy))
+            Collider hitCollider = _colliderBuffer[i];
+            if (hitCollider == null) continue;
+
+            IBattleEntity enemy = hitCollider.GetComponent<IBattleEntity>();
+            if (enemy != null && enemy.IsAlive && IsEnemyInSector(enemy))
             {
                 _tempDetectedList.Add(enemy);
             }
@@ -268,6 +233,13 @@ public class TurretSectorDetection : MonoBehaviour
 
         _detectedEnemies.Clear();
         _detectedEnemies.AddRange(_tempDetectedList);
+    }
+
+    private void UpdateDetectionFilter()
+    {
+        if (_sectorSettings == null) return;
+
+        ClearInvalidEnemies();
     }
 
     private bool IsEnemyInSector(IBattleEntity enemy)
@@ -280,7 +252,7 @@ public class TurretSectorDetection : MonoBehaviour
     private bool IsEnemyInRange(IBattleEntity enemy)
     {
         Vector3 toEnemy = enemy.Transform.position - DetectionCenter;
-        toEnemy.y = 0f; // Y축 무시
+        toEnemy.y = 0f;
 
         float sqrDistance = toEnemy.sqrMagnitude;
         float detectionRadius = _sectorSettings.DetectionRadius;
@@ -291,7 +263,7 @@ public class TurretSectorDetection : MonoBehaviour
     private bool IsEnemyInAngle(IBattleEntity enemy)
     {
         Vector3 toEnemy = enemy.Transform.position - DetectionCenter;
-        toEnemy.y = 0f; // Y축 무시
+        toEnemy.y = 0f;
 
         if (toEnemy.sqrMagnitude < KINDA_SMALL) return true;
 
@@ -300,34 +272,15 @@ public class TurretSectorDetection : MonoBehaviour
 
         if (forward.sqrMagnitude < KINDA_SMALL) return false;
 
-        // 내적으로 각도 계산 (성능 최적화)
         float dotProduct = Vector3.Dot(forward.normalized, toEnemy.normalized);
         float halfSectorAngle = _sectorSettings.SectorAngleDegrees * 0.5f;
         float cosHalfAngle = Mathf.Cos(halfSectorAngle * Mathf.Deg2Rad);
 
         return dotProduct >= cosHalfAngle;
     }
-    #endregion
-
-    #region Private Methods - Registration
-    private void RegisterEnemy(IBattleEntity enemy)
-    {
-        if (enemy == null || !enemy.IsAlive) return;
-
-        _registeredEnemies.Add(enemy);
-    }
-
-    private void UnregisterEnemy(IBattleEntity enemy)
-    {
-        if (enemy == null) return;
-
-        _registeredEnemies.Remove(enemy);
-        _detectedEnemies.Remove(enemy);
-    }
 
     private void ClearInvalidEnemies()
     {
-        _registeredEnemies.RemoveWhere(enemy => enemy == null || !enemy.IsAlive);
         _detectedEnemies.RemoveAll(enemy => enemy == null || !enemy.IsAlive);
     }
     #endregion
@@ -335,15 +288,11 @@ public class TurretSectorDetection : MonoBehaviour
     #region Private Methods - Initialization
     private void InitializeComponent()
     {
-        _registeredEnemies = new HashSet<IBattleEntity>();
         _detectedEnemies = new List<IBattleEntity>();
         _tempDetectedList = new List<IBattleEntity>();
 
-        // 초기 콜라이더 크기 설정
-        if (ValidateColliderForAutoSizing())
-        {
-            UpdateColliderSize();
-        }
+        // OverlapSphere 결과 캐싱 배열 초기화
+        _colliderBuffer = new Collider[_colliderBufferSize];
     }
 
     private void ValidateReferences()
@@ -354,20 +303,10 @@ public class TurretSectorDetection : MonoBehaviour
             return;
         }
 
-        if (_triggerCollider == null)
+        if (_colliderBuffer == null || _colliderBuffer.Length != _colliderBufferSize)
         {
-            _triggerCollider = GetComponent<SphereCollider>();
-            if (_triggerCollider == null)
-            {
-                Debug.LogError("[TurretSectorDetection] No trigger collider found!", this);
-                return;
-            }
-        }
-
-        if (!_triggerCollider.isTrigger)
-        {
-            Debug.LogWarning("[TurretSectorDetection] Collider should be set as trigger", this);
-            _triggerCollider.isTrigger = true;
+            Debug.LogWarning("[TurretSectorDetection] Collider buffer not properly initialized", this);
+            _colliderBuffer = new Collider[_colliderBufferSize];
         }
     }
 
@@ -390,9 +329,6 @@ public class TurretSectorDetection : MonoBehaviour
     private void OnSettingsChanged(TurretSectorSettings settings)
     {
         RefreshDetectionArea();
-
-        // 설정 변경에 따른 콜라이더 크기 자동 조정
-        UpdateColliderSize();
     }
     #endregion
 }
