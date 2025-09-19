@@ -176,30 +176,6 @@ public class TurretSectorSettings : MonoBehaviour
                $"Scan: [{_scanRangeMin:F1}°, {_scanRangeMax:F1}°], " +
                $"Effective: [{EffectiveScanMin:F1}°, {EffectiveScanMax:F1}°]";
     }
-
-    /// <summary>다른 컴포넌트로 설정 전달</summary>
-    /// <param name="targetComponent">설정을 받을 컴포넌트</param>
-    public void ApplySettingsTo(MonoBehaviour targetComponent)
-    {
-        if (targetComponent == null)
-        {
-            Debug.LogWarning("[TurretSectorSettings] Target component is null", this);
-            return;
-        }
-
-        // TurretRotationController에 설정 전달
-        if (targetComponent is TurretRotationController rotationController)
-        {
-            rotationController.SetSectorAngle(_sectorAngleDegrees);
-            rotationController.SetScanRange(_scanRangeMax - _scanRangeMin);
-            Debug.Log($"[TurretSectorSettings] Applied settings to {targetComponent.GetType().Name}", this);
-        }
-        // 향후 다른 컴포넌트 타입들 추가 가능
-        else
-        {
-            Debug.LogWarning($"[TurretSectorSettings] Unsupported component type: {targetComponent.GetType().Name}", this);
-        }
-    }
     #endregion
 
     #region Public Methods - Upgrade Interface
