@@ -461,7 +461,7 @@ public class PrefabsPool
         int currentPoolSize = _poolCreations.ContainsKey(prefabType) ? _poolCreations[prefabType] : _defaultPoolSize;
         int expansionSize = Mathf.Max(5, Mathf.RoundToInt(currentPoolSize * 0.5f)); // 최소 5개 보장
 
-        Debug.Log($"[PrefabsPool] Expanding pool for {prefabType}: +{expansionSize} objects (Current: {currentPoolSize})", this);
+        Debug.Log($"[PrefabsPool] Expanding pool for {prefabType}: +{expansionSize} objects (Current: {currentPoolSize})");
 
         // 확장 실행
         for (int i = 0; i < expansionSize; i++)
@@ -474,7 +474,7 @@ public class PrefabsPool
             }
         }
 
-        Debug.Log($"[PrefabsPool] Pool expansion completed for {prefabType}. New pool size: {pool.Count}", this);
+        Debug.Log($"[PrefabsPool] Pool expansion completed for {prefabType}. New pool size: {pool.Count}");
     }
 
     /// <summary>

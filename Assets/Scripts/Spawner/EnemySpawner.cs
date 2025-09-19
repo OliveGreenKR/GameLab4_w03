@@ -85,6 +85,10 @@ public class EnemySpawner : MonoBehaviour
     [GUIColor(0.4f, 0.4f, 1f)]
     private void StartSpawn() => StartSpawning();
 
+    [ButtonGroup("DebugSpawns")]
+    [GUIColor(0.4f, 0.4f, 1f)]
+    private void StopSpawn() => StopSpawning();
+
 
     [ButtonGroup("DebugDifficulty")]
     [Button(ButtonSizes.Large)]
@@ -536,7 +540,7 @@ public class EnemySpawner : MonoBehaviour
         // 확률 기반 적 타입 선택
         PrefabType selectedEnemyType = SelectRandomEnemyType();
 
-        GameObject enemyObject = _enemyPool.SpawnObject(selectedEnemyType, spawnPosition, spawnRotation, true);
+        GameObject enemyObject = _enemyPool.SpawnObject(selectedEnemyType, spawnPosition, spawnRotation, isForcely:false);
 
         if (enemyObject == null)
         {

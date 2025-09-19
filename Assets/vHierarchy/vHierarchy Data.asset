@@ -20,6 +20,7 @@ MonoBehaviour:
     - dfda7dfd3e6f02746be5c87e2d77671c
     - 279568727a1ffcd49bae247c289ddf7a
     - 34b03fdac07c9324fb38f09c252499cb
+    - c9712a2766445ef43bff7152a97af274
     values:
     - goDatas_byGlobalId:
         keys: []
@@ -297,6 +298,24 @@ MonoBehaviour:
         values:
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+    - goDatas_byGlobalId:
+        keys:
+        - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1323416447-0
+        - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1218236528-0
+        - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1838710319-0
+        values:
+        - colorIndex: 0
+          iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Terrain Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 8
+          iconNameOrGuid: 
           isIconRecursive: 0
           isColorRecursive: 0
   bookmarks: []
