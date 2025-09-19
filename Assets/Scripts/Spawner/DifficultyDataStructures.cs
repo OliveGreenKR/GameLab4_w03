@@ -4,6 +4,17 @@ using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+/// <summary>
+/// 난이도 증가 방식 타입
+/// </summary>
+public enum DifficultyModifierType
+{
+    [InspectorName("고정값 (+숫자)")]
+    FixedValue,
+
+    [InspectorName("백분율 (+%)")]
+    Percentage
+}
 
 /// <summary>
 /// 스탯별 % 기반 증가율 설정
