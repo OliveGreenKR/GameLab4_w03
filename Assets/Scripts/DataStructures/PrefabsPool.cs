@@ -25,6 +25,10 @@ public class PrefabsPool
     {
         public PrefabType type;
         public GameObject prefab;
+
+        [Header("Pool Settings")]
+        [InfoBox("이 타입의 개별 풀 사이즈. 0이면 기본값 사용")]
+        public int individualPoolSize;
     }
 
     #region Serialized Fields
@@ -33,7 +37,7 @@ public class PrefabsPool
 
     [Header("Prefab Mapping")]
     [Required]
-    [InfoBox("각 PrefabType에 해당하는 프리팹을 직접 할당하세요")]
+    [InfoBox("각 PrefabType에 해당하는 프리팹과 개별 풀 사이즈를 설정하세요")]
     [SerializeField] private PrefabMapEntry[] _prefabEntries;
 
     #endregion
@@ -60,7 +64,8 @@ public class PrefabsPool
     private Dictionary<PrefabType, Queue<GameObject>> _prefabPools;
     private Transform _poolParentTransform;
     private Dictionary<PrefabType, int> _poolCreations = new Dictionary<PrefabType, int>();
-
+    // 타입별 부모 Transform 관리
+    private Dictionary<PrefabType, Transform> _typeParentTransforms = new Dictionary<PrefabType, Transform>();
     // 타입별 활성 객체 수 카운트 (외부 조회용)
     private Dictionary<PrefabType, int> _activeObjects = new Dictionary<PrefabType, int>();
     // 개별 GameObject 시간 추적 (강제 회수용)
@@ -92,14 +97,18 @@ public class PrefabsPool
 
         InitializeDictionaries();
         InitializeFromPrefabMap();
+        CreateTypeParentTransforms();
         IsInitialized = true;
 
-        // PreWarm
+        // PreWarm - 타입별 개별 풀 사이즈 적용
         foreach (var pair in _prefabMap)
         {
             _poolCreations.Add(pair.Key, 0);
             _activeObjects.Add(pair.Key, 0);
-            PrewarmPool(pair.Key, _defaultPoolSize);
+
+            // 타입별 풀 사이즈 결정
+            int poolSize = GetPoolSizeForType(pair.Key);
+            PrewarmPool(pair.Key, poolSize);
         }
         Debug.Log("[PrefabsPool] Initialization completed");
     }
@@ -207,9 +216,22 @@ public class PrefabsPool
 
         obj.SetActive(false);
 
-        if (_poolParentTransform != null && obj.transform.parent != _poolParentTransform)
+        // 타입별 부모 Transform 할당
+        Transform targetParent = null;
+        if (_typeParentTransforms.ContainsKey(prefabType) && _typeParentTransforms[prefabType] != null)
         {
-            obj.transform.SetParent(_poolParentTransform);
+            targetParent = _typeParentTransforms[prefabType];
+        }
+        else if (_poolParentTransform != null)
+        {
+            // 백업: 타입별 부모가 없으면 기본 부모 사용
+            targetParent = _poolParentTransform;
+            Debug.LogWarning($"[PrefabsPool] Type parent not found for {prefabType}, using default parent");
+        }
+
+        if (targetParent != null && obj.transform.parent != targetParent)
+        {
+            obj.transform.SetParent(targetParent);
         }
 
         Queue<GameObject> pool = GetOrCreatePool(prefabType);
@@ -378,6 +400,52 @@ public class PrefabsPool
             Debug.Log($"[PrefabsPool] Registered {entry.type}: {entry.prefab.name}");
         }
     }
+
+    /// <summary>
+    /// 타입별 부모 Transform 생성
+    /// </summary>
+    private void CreateTypeParentTransforms()
+    {
+        if (_prefabMap == null || _poolParentTransform == null)
+            return;
+
+        foreach (var kvp in _prefabMap)
+        {
+            PrefabType prefabType = kvp.Key;
+
+            // 타입별 부모 오브젝트 생성
+            GameObject typeParent = new GameObject(prefabType.ToString());
+            typeParent.transform.SetParent(_poolParentTransform);
+
+            // 딕셔너리에 등록
+            _typeParentTransforms[prefabType] = typeParent.transform;
+
+            Debug.Log($"[PrefabsPool] Created parent transform for {prefabType}");
+        }
+    }
+
+    /// <summary>
+    /// 특정 타입의 풀 사이즈 반환
+    /// </summary>
+    /// <param name="prefabType">조회할 프리팹 타입</param>
+    /// <returns>해당 타입의 풀 사이즈</returns>
+    private int GetPoolSizeForType(PrefabType prefabType)
+    {
+        if (_prefabEntries == null)
+            return _defaultPoolSize;
+
+        // PrefabMapEntry에서 해당 타입의 individualPoolSize 조회
+        foreach (var entry in _prefabEntries)
+        {
+            if (entry.type == prefabType)
+            {
+                // individualPoolSize가 0이면 기본값 사용
+                return entry.individualPoolSize > 0 ? entry.individualPoolSize : _defaultPoolSize;
+            }
+        }
+
+        return _defaultPoolSize;
+    }
     #endregion
 
     #region Private Methods - Pool Management
@@ -441,9 +509,16 @@ public class PrefabsPool
 
         newObject.name = prefab.name + ":" + (++_poolCreations[prefabType]).ToString();
 
-        if (_poolParentTransform != null)
+        // 타입별 부모 Transform 할당
+        if (_typeParentTransforms.ContainsKey(prefabType) && _typeParentTransforms[prefabType] != null)
         {
+            newObject.transform.SetParent(_typeParentTransforms[prefabType]);
+        }
+        else if (_poolParentTransform != null)
+        {
+            // 백업: 타입별 부모가 없으면 기본 부모 사용
             newObject.transform.SetParent(_poolParentTransform);
+            Debug.LogWarning($"[PrefabsPool] Type parent not found for {prefabType}, using default parent");
         }
 
         newObject.SetActive(false);
