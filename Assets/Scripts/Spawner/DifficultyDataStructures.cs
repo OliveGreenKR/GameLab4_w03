@@ -4,6 +4,208 @@ using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+
+/// <summary>
+/// 스탯별 % 기반 증가율 설정
+/// </summary>
+[Serializable]
+public struct StatPercentageModifier
+{
+    [BoxGroup("Health Modifiers")]
+    [InfoBox("체력 관련 % 증가율 설정")]
+    [SuffixLabel("%")]
+    public float healthMinIncreasePercent;
+
+    [BoxGroup("Health Modifiers")]
+    [SuffixLabel("%")]
+    public float healthMaxIncreasePercent;
+
+    [BoxGroup("Move Speed Modifiers")]
+    [InfoBox("이동속도 관련 % 증가율 설정")]
+    [SuffixLabel("%")]
+    public float moveSpeedMinIncreasePercent;
+
+    [BoxGroup("Move Speed Modifiers")]
+    [SuffixLabel("%")]
+    public float moveSpeedMaxIncreasePercent;
+
+    [BoxGroup("Attack Modifiers")]
+    [InfoBox("공격력 관련 % 증가율 설정")]
+    [SuffixLabel("%")]
+    public float attackMinIncreasePercent;
+
+    [BoxGroup("Attack Modifiers")]
+    [SuffixLabel("%")]
+    public float attackMaxIncreasePercent;
+
+    /// <summary>
+    /// 지정된 스탯 타입의 최소값 증가율 반환
+    /// </summary>
+    /// <param name="statType">스탯 타입</param>
+    /// <returns>% 증가율 (0.0 ~ 1.0)</returns>
+    public float GetMinIncreasePercent(SpawnStatType statType)
+    {
+        switch (statType)
+        {
+            case SpawnStatType.Health:
+                return healthMinIncreasePercent * 0.01f;
+            case SpawnStatType.MoveSpeed:
+                return moveSpeedMinIncreasePercent * 0.01f;
+            case SpawnStatType.Attack:
+                return attackMinIncreasePercent * 0.01f;
+            default:
+                return 0f;
+        }
+    }
+
+    /// <summary>
+    /// 지정된 스탯 타입의 최대값 증가율 반환
+    /// </summary>
+    /// <param name="statType">스탯 타입</param>
+    /// <returns>% 증가율 (0.0 ~ 1.0)</returns>
+    public float GetMaxIncreasePercent(SpawnStatType statType)
+    {
+        switch (statType)
+        {
+            case SpawnStatType.Health:
+                return healthMaxIncreasePercent * 0.01f;
+            case SpawnStatType.MoveSpeed:
+                return moveSpeedMaxIncreasePercent * 0.01f;
+            case SpawnStatType.Attack:
+                return attackMaxIncreasePercent * 0.01f;
+            default:
+                return 0f;
+        }
+    }
+}
+
+/// <summary>
+/// 적 타입별 개별 난이도 설정
+/// </summary>
+[Serializable]
+public struct EnemyTypeDifficultyConfig
+{
+    [BoxGroup("Enemy Type")]
+    [InfoBox("이 설정을 적용할 적 타입")]
+    public PrefabType enemyType;
+
+    [BoxGroup("Pack Size Modifiers")]
+    [InfoBox("팩 사이즈 증가율 설정 (이 타입의 스폰 비중 조정)")]
+    [SuffixLabel("%")]
+    [PropertyRange(0f, 100f)]
+    public float packSizeInfluencePercent;
+
+    [BoxGroup("Stat Percentage Modifiers")]
+    [InfoBox("스탯별 % 기반 증가율")]
+    public StatPercentageModifier statModifiers;
+
+    /// <summary>
+    /// 팩 사이즈 영향도 반환 (0.0 ~ 1.0)
+    /// </summary>
+    /// <returns>팩 사이즈 영향도</returns>
+    public float GetPackSizeInfluence()
+    {
+        return packSizeInfluencePercent * 0.01f;
+    }
+
+    /// <summary>
+    /// 해당 타입의 기본 유효성 검사
+    /// </summary>
+    /// <returns>유효하면 true</returns>
+    public bool IsValid()
+    {
+        return enemyType != default(PrefabType);
+    }
+}
+
+/// <summary>
+/// % 기반 난이도 진행 시스템
+/// 기존 고정값 시스템과 병행 사용 가능
+/// </summary>
+[Serializable]
+public struct PercentageBasedDifficultyProgression
+{
+    [BoxGroup("System Settings")]
+    [InfoBox("% 기반 시스템 사용 여부")]
+    [SerializeField] public bool usePercentageSystem;
+
+    [BoxGroup("Fallback Settings")]
+    [InfoBox("% 시스템 비활성화 시 사용할 기존 고정값 시스템")]
+    [SerializeField] public DifficultyProgression fallbackProgression;
+
+    [BoxGroup("Enemy Type Configurations")]
+    [InfoBox("적 타입별 개별 난이도 설정 목록")]
+    [SerializeField] public EnemyTypeDifficultyConfig[] enemyTypeConfigs;
+
+    /// <summary>
+    /// 특정 적 타입의 설정 조회
+    /// </summary>
+    /// <param name="enemyType">조회할 적 타입</param>
+    /// <returns>해당 타입 설정, 없으면 null</returns>
+    public EnemyTypeDifficultyConfig? GetConfigForEnemyType(PrefabType enemyType)
+    {
+        if (enemyTypeConfigs == null) return null;
+
+        foreach (var config in enemyTypeConfigs)
+        {
+            if (config.enemyType == enemyType && config.IsValid())
+            {
+                return config;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 모든 설정된 적 타입 목록 반환
+    /// </summary>
+    /// <returns>설정된 적 타입 배열</returns>
+    public PrefabType[] GetConfiguredEnemyTypes()
+    {
+        if (enemyTypeConfigs == null) return new PrefabType[0];
+
+        var types = new System.Collections.Generic.List<PrefabType>();
+        foreach (var config in enemyTypeConfigs)
+        {
+            if (config.IsValid())
+            {
+                types.Add(config.enemyType);
+            }
+        }
+
+        return types.ToArray();
+    }
+
+    /// <summary>
+    /// 설정 검증
+    /// </summary>
+    /// <returns>검증 결과 메시지</returns>
+    public string ValidateConfiguration()
+    {
+        if (!usePercentageSystem)
+            return "% 시스템이 비활성화되어 있습니다.";
+
+        if (enemyTypeConfigs == null || enemyTypeConfigs.Length == 0)
+            return "적 타입 설정이 없습니다.";
+
+        // 중복 타입 검사
+        var seenTypes = new System.Collections.Generic.HashSet<PrefabType>();
+        foreach (var config in enemyTypeConfigs)
+        {
+            if (!config.IsValid())
+                continue;
+
+            if (seenTypes.Contains(config.enemyType))
+                return $"중복된 적 타입 설정: {config.enemyType}";
+
+            seenTypes.Add(config.enemyType);
+        }
+
+        return "설정이 올바릅니다.";
+    }
+}
+
 /// <summary>
 /// 난이도 진행 설정 구조체
 /// 주기마다 반드시 증가하는 최소값들을 정의
