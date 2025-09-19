@@ -305,6 +305,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1323416447-0
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1218236528-0
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1838710319-0
+        - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-128196123-0
         values:
         - colorIndex: 0
           iconNameOrGuid: Settings Icon
@@ -318,11 +319,11 @@ MonoBehaviour:
           iconNameOrGuid: 
           isIconRecursive: 0
           isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: CapsuleCollider Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
   bookmarks: []
   bookmarkedScenePaths:
-  - Assets/Scenes/NewControlTest.unity
   - Assets/Scenes/ProjectileTest.unity
   - Assets/Scenes/EnemySpawnerTest.unity
-  - Assets/Scenes/MainMenu.unity
-  - Assets/Scenes/Playing.unity
-  - Assets/Scenes/GameOver.unity

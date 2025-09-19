@@ -325,9 +325,9 @@ public class TurretSectorSettings : MonoBehaviour
 
         // 전체 스캔 범위 경계 - 빨간색
         Gizmos.color = Color.red;
-        DrawAngleLine(position, forward, _scanRangeMin, _detectionRadius);
-        DrawAngleLine(position, forward, _scanRangeMax, _detectionRadius);
-        DrawArcGizmo(position, forward, _scanRangeMin, _scanRangeMax, _detectionRadius * 0.8f);
+        DrawAngleLine(position, Vector3.forward, _scanRangeMin, _detectionRadius);
+        DrawAngleLine(position, Vector3.forward, _scanRangeMax, _detectionRadius);
+        DrawArcGizmo(position, Vector3.forward, _scanRangeMin, _scanRangeMax, _detectionRadius * 0.8f);
 
         // 유효 스캔 범위 - 초록색
         Gizmos.color = Color.green;

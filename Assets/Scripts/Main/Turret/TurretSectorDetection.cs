@@ -19,8 +19,15 @@ public class TurretSectorDetection : MonoBehaviour
     [TabGroup("Detection")]
     [Header("Trigger Collider")]
     [Required]
-    [InfoBox("탐지용 트리거 콜라이더 (반지름 × 1.2 권장)")]
-    [SerializeField] private Collider _triggerCollider;
+    [InfoBox("탐지용 트리거 콜라이더 ")]
+    [SerializeField] private SphereCollider _triggerCollider;
+
+    [TabGroup("Detection")]
+    [Header("Collider Auto-Sizing")]
+    [InfoBox("탐지 반지름 대비 콜라이더 크기 배수")]
+    [SuffixLabel("multiplier")]
+    [PropertyRange(1.0f, 2.0f)]
+    [SerializeField] private float _colliderSizeMultiplier = 1.2f;
 
     [TabGroup("Performance")]
     [Header("Update Settings")]
@@ -111,6 +118,59 @@ public class TurretSectorDetection : MonoBehaviour
     private void OnDestroy()
     {
         UnsubscribeFromSettings();
+    }
+    #endregion
+
+    #region Private Methods - Collider Management
+    private void UpdateColliderSize()
+    {
+        if (_triggerCollider == null || _sectorSettings == null)
+            return;
+
+        SphereCollider sphereCollider = _triggerCollider as SphereCollider;
+        if (sphereCollider == null)
+        {
+            Debug.LogWarning("[TurretSectorDetection] Trigger collider is not a SphereCollider. Auto-sizing skipped.", this);
+            return;
+        }
+
+        float targetRadius = CalculateColliderRadius();
+        sphereCollider.radius = targetRadius;
+
+        Debug.Log($"[TurretSectorDetection] Collider radius updated to {targetRadius:F1} units", this);
+    }
+
+    private float CalculateColliderRadius()
+    {
+        if (_sectorSettings == null)
+            return 1f;
+
+        float baseRadius = _sectorSettings.DetectionRadius;
+        float scaledRadius = baseRadius * _colliderSizeMultiplier;
+
+        // 안전한 범위로 제한
+        return Mathf.Clamp(scaledRadius, 1f, 100f);
+    }
+
+    private bool ValidateColliderForAutoSizing()
+    {
+        if (_triggerCollider == null)
+            return false;
+
+        if (!_triggerCollider.isTrigger)
+        {
+            Debug.LogWarning("[TurretSectorDetection] Collider should be set as trigger for auto-sizing", this);
+            return false;
+        }
+
+        SphereCollider sphereCollider = _triggerCollider as SphereCollider;
+        if (sphereCollider == null)
+        {
+            Debug.LogWarning("[TurretSectorDetection] Only SphereCollider is supported for auto-sizing", this);
+            return false;
+        }
+
+        return true;
     }
     #endregion
 
@@ -278,6 +338,12 @@ public class TurretSectorDetection : MonoBehaviour
         _registeredEnemies = new HashSet<IBattleEntity>();
         _detectedEnemies = new List<IBattleEntity>();
         _tempDetectedList = new List<IBattleEntity>();
+
+        // 초기 콜라이더 크기 설정
+        if (ValidateColliderForAutoSizing())
+        {
+            UpdateColliderSize();
+        }
     }
 
     private void ValidateReferences()
@@ -290,7 +356,7 @@ public class TurretSectorDetection : MonoBehaviour
 
         if (_triggerCollider == null)
         {
-            _triggerCollider = GetComponent<Collider>();
+            _triggerCollider = GetComponent<SphereCollider>();
             if (_triggerCollider == null)
             {
                 Debug.LogError("[TurretSectorDetection] No trigger collider found!", this);
@@ -324,6 +390,9 @@ public class TurretSectorDetection : MonoBehaviour
     private void OnSettingsChanged(TurretSectorSettings settings)
     {
         RefreshDetectionArea();
+
+        // 설정 변경에 따른 콜라이더 크기 자동 조정
+        UpdateColliderSize();
     }
     #endregion
 }
