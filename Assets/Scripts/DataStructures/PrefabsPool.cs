@@ -125,7 +125,19 @@ public class PrefabsPool
             return obj;
         }
 
-        Debug.LogWarning($"[PrefabsPool] Pool empty for type: {prefabType}. Instantiating new object.");
+        // 풀이 비어있으면 동적 확장 후 다시 시도
+        Debug.LogWarning($"[PrefabsPool] Pool empty for type: {prefabType}. Expanding pool dynamically.");
+        ExpandPool(prefabType);
+
+        // 확장 후 다시 시도
+        if (pool.Count > 0)
+        {
+            GameObject obj = pool.Dequeue();
+            return obj;
+        }
+
+        // 확장도 실패한 경우 (매우 드문 경우)
+        Debug.LogError($"[PrefabsPool] Failed to expand pool for type: {prefabType}. Creating single object.");
         return CreateNewObject(prefabType);
     }
 
@@ -160,8 +172,19 @@ public class PrefabsPool
             return recycledObject;
         }
 
-        // 회수할 오브젝트도 없으면 새로 생성
-        Debug.LogWarning($"[PrefabsPool] Pool empty for type: {prefabType}. Instantiating new object.");
+        // 회수할 오브젝트도 없으면 동적 확장
+        Debug.LogWarning($"[PrefabsPool] Pool empty for type: {prefabType}. Expanding pool dynamically.");
+        ExpandPool(prefabType);
+
+        // 확장 후 다시 시도
+        if (pool.Count > 0)
+        {
+            GameObject obj = pool.Dequeue();
+            return obj;
+        }
+
+        // 확장도 실패한 경우 (매우 드문 경우)
+        Debug.LogError($"[PrefabsPool] Failed to expand pool for type: {prefabType}. Creating single object.");
         return CreateNewObject(prefabType);
     }
 
@@ -312,7 +335,8 @@ public class PrefabsPool
         Debug.Log("[PrefabsPool] All pools cleared");
     }
     #endregion
-    #region Private Methods - Initialization & Pooling
+
+    #region Private Methods - Initialization
     private void InitializeDictionaries()
     {
         _prefabPools = new Dictionary<PrefabType, Queue<GameObject>>();
@@ -354,7 +378,42 @@ public class PrefabsPool
             Debug.Log($"[PrefabsPool] Registered {entry.type}: {entry.prefab.name}");
         }
     }
+    #endregion
 
+    #region Private Methods - Pool Management
+    /// <summary>
+    /// 동적 풀 확장 - 현재 풀 크기의 1.5배로 확장
+    /// </summary>
+    /// <param name="prefabType">확장할 프리팹 타입</param>
+    private void ExpandPool(PrefabType prefabType)
+    {
+        Queue<GameObject> pool = GetOrCreatePool(prefabType);
+
+        // 현재 풀의 총 생성된 객체 수를 기준으로 확장 크기 계산
+        int currentPoolSize = _poolCreations.ContainsKey(prefabType) ? _poolCreations[prefabType] : _defaultPoolSize;
+        int expansionSize = Mathf.Max(5, Mathf.RoundToInt(currentPoolSize * 0.5f)); // 최소 5개 보장
+
+        Debug.Log($"[PrefabsPool] Expanding pool for {prefabType}: +{expansionSize} objects (Current: {currentPoolSize})", this);
+
+        // 확장 실행
+        for (int i = 0; i < expansionSize; i++)
+        {
+            GameObject newObject = CreateNewObject(prefabType);
+            if (newObject != null)
+            {
+                newObject.SetActive(false);
+                pool.Enqueue(newObject);
+            }
+        }
+
+        Debug.Log($"[PrefabsPool] Pool expansion completed for {prefabType}. New pool size: {pool.Count}", this);
+    }
+
+    /// <summary>
+    /// 지정된 타입의 풀을 가져오거나 새로 생성
+    /// </summary>
+    /// <param name="prefabType">프리팹 타입</param>
+    /// <returns>해당 타입의 풀</returns>
     private Queue<GameObject> GetOrCreatePool(PrefabType prefabType)
     {
         if (!_prefabPools.ContainsKey(prefabType))
@@ -364,6 +423,11 @@ public class PrefabsPool
         return _prefabPools[prefabType];
     }
 
+    /// <summary>
+    /// 새 오브젝트 생성
+    /// </summary>
+    /// <param name="prefabType">생성할 프리팹 타입</param>
+    /// <returns>생성된 GameObject</returns>
     private GameObject CreateNewObject(PrefabType prefabType)
     {
         if (!_prefabMap.ContainsKey(prefabType) || _prefabMap[prefabType] == null)
@@ -387,6 +451,10 @@ public class PrefabsPool
         return newObject;
     }
 
+    /// <summary>
+    /// 풀별 개체 수 반환
+    /// </summary>
+    /// <returns>타입별 풀 개체 수 딕셔너리</returns>
     private Dictionary<PrefabType, int> GetPoolCounts()
     {
         var counts = new Dictionary<PrefabType, int>();
@@ -400,6 +468,11 @@ public class PrefabsPool
         return counts;
     }
 
+    /// <summary>
+    /// GameObject로부터 PrefabType 추론
+    /// </summary>
+    /// <param name="obj">분석할 GameObject</param>
+    /// <returns>추론된 PrefabType</returns>
     private PrefabType GetPrefabTypeFromGameObject(GameObject obj)
     {
         if (obj == null || _prefabMap == null)
@@ -419,7 +492,7 @@ public class PrefabsPool
             }
         }
 
-        Debug.LogWarning($"[PrefabsPool] Could not determine PrefabType for {obj.name}. Defaulting to Enemy.");
+        Debug.LogWarning($"[PrefabsPool] Could not determine PrefabType for {obj.name}. Defaulting to None.");
         return PrefabType.None;
     }
     #endregion
@@ -483,4 +556,6 @@ public class PrefabsPool
         return null;
     }
     #endregion
+
+
 }
