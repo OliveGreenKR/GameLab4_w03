@@ -1192,8 +1192,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxSpreadAngle: 30
-  _accuracyPenaltyPerShot: 5
-  _accuracyRecoveryRate: 10
+  _accuracyPenaltyPerShot: 2
+  _accuracyRecoveryRate: 30
   _maxAccuracyPenalty: 50
 --- !u!114 &761691829
 MonoBehaviour:

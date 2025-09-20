@@ -6,7 +6,7 @@ public enum RotationSpace
     World
 }
 
-public class AngleController : MonoBehaviour, IAngleController
+public class TPSCameraTarget : MonoBehaviour, IAngleController
 {
     #region Serialized Fields
     [Header("Rotation Settings")]
