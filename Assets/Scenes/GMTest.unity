@@ -1179,8 +1179,7 @@ MonoBehaviour:
   _recoilConverter: {fileID: 1072174463}
   _projectileLauncher: {fileID: 962896344}
   _aimPointManager: {fileID: 831523057}
-  _activeEffects:
-  - {fileID: 11400000, guid: 2a35297ec78b3e9448c406cb2f9ca1d7, type: 2}
+  _activeEffects: []
 --- !u!114 &761691819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1594,21 +1593,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4390947304085020657, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
-      propertyPath: m_IsTrigger
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5175902631662209742, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
       propertyPath: m_Name
       value: enemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 5175902631662209742, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5289648399551077228, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
-      propertyPath: _baseMoveSpeed
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2325,17 +2312,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2811780280800612177, guid: dc784ebed57bb4a45a3cf7cccfbec9db, type: 3}
-      propertyPath: _baseMoveSpeed
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7655413781182626458, guid: dc784ebed57bb4a45a3cf7cccfbec9db, type: 3}
       propertyPath: m_Name
       value: EliteEnemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 7655413781182626458, guid: dc784ebed57bb4a45a3cf7cccfbec9db, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8442260816445954499, guid: dc784ebed57bb4a45a3cf7cccfbec9db, type: 3}
       propertyPath: m_LocalPosition.x
