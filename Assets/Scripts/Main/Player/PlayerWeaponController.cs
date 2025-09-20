@@ -1,42 +1,40 @@
 ﻿using Sirenix.OdinInspector;
+using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 플레이어 무기 시스템 통합 관리자
+/// 무기 스탯, 효과, 정확도, 발사를 총괄 제어
+/// </summary>
 public class PlayerWeaponController : MonoBehaviour
 {
     #region Serialized Fields
     [TabGroup("References")]
     [Header("Core References")]
     [Required]
-    [SerializeField] private ProjectileLauncher _projectileLauncher;
+    [SerializeField] private WeaponStatSO _baseWeaponStats;
 
     [TabGroup("References")]
     [Required]
     [SerializeField] private AccuracySystem _accuracySystem;
 
-    [TabGroup("Weapon")]
-    [Header("Weapon Configuration")]
+    [TabGroup("References")]
     [Required]
-    [SerializeField] private WeaponStatSO _weaponStatSO;
+    [SerializeField] private ProjectileLauncher _projectileLauncher;
 
-    [TabGroup("Settings")]
-    [Header("Input Settings")]
-    [SerializeField] private bool _enableInput = true;
+    [TabGroup("References")]
+    [Required]
+    [SerializeField] private AimPointManager _aimPointManager;
 
-    [TabGroup("Settings")]
-    [Header("Mode Switch Settings")]
-    [SuffixLabel("seconds")]
-    [PropertyRange(0.1f, 2f)]
-    [SerializeField] private float _modeSwitchCooldown = 0.5f;
+    [TabGroup("Effects")]
+    [Header("Active Weapon Effects")]
+    [SerializeField] private List<WeaponEffectSO> _activeEffects = new List<WeaponEffectSO>();
     #endregion
 
     #region Properties
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public WeaponStatData CurrentWeaponStats { get; private set; }
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public WeaponMode CurrentMode { get; private set; }
+    public WeaponStatData FinalStats { get; private set; }
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -44,50 +42,268 @@ public class PlayerWeaponController : MonoBehaviour
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public float FireCooldownRemaining { get; private set; }
+    public float CooldownRemaining { get; private set; }
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public float ModeSwitchCooldownRemaining { get; private set; }
+    public int ActiveEffectCount => _activeEffects?.Count ?? 0;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentAccuracy => _accuracySystem?.CurrentAccuracy ?? 0f;
     #endregion
 
     #region Private Fields
-    private bool _isFiring = false;
-    private float _nextFireTime = 0f;
-    private float _nextModeSwitchTime = 0f;
+    private bool _isInitialized = false;
     #endregion
 
     #region Unity Lifecycle
-    private void Awake() { }
-    private void Start() { }
-    private void Update() { }
+    private void Awake()
+    {
+        ValidateReferences();
+    }
+
+    private void Start()
+    {
+        InitializeWeaponSystem();
+    }
+
+    private void Update()
+    {
+    }
+
+    private void OnValidate()
+    {
+        if (Application.isPlaying && _isInitialized)
+        {
+            CalculateFinalStats();
+            UpdateLauncherSettings();
+            UpdateAccuracySystem();
+        }
+    }
     #endregion
 
-    #region Public Methods - Weapon Control
-    public void StartFiring() { }
-    public void StopFiring() { }
-    public bool TryFire() { }
-    public void SwitchToMode(WeaponMode mode) { }
-    public void CycleModeNext() { }
+    #region Public Methods - Weapon Effect Management
+    /// <summary>무기 효과 추가</summary>
+    /// <param name="effect">추가할 효과</param>
+    public void ApplyWeaponEffect(WeaponEffectSO effect)
+    {
+        if (effect == null)
+        {
+            Debug.LogWarning("[PlayerWeaponController] Cannot apply null weapon effect", this);
+            return;
+        }
+
+        if (_activeEffects == null)
+        {
+            _activeEffects = new List<WeaponEffectSO>();
+        }
+
+        if (_activeEffects.Contains(effect))
+        {
+            Debug.LogWarning($"[PlayerWeaponController] Effect {effect.EffectName} already applied", this);
+            return;
+        }
+
+        _activeEffects.Add(effect);
+        CalculateFinalStats();
+        UpdateLauncherSettings();
+        UpdateAccuracySystem();
+
+        Debug.Log($"[PlayerWeaponController] Applied weapon effect: {effect.EffectName}", this);
+    }
+
+    /// <summary>무기 효과 제거</summary>
+    /// <param name="effect">제거할 효과</param>
+    /// <returns>제거 성공 여부</returns>
+    public bool RemoveWeaponEffect(WeaponEffectSO effect)
+    {
+        if (effect == null || _activeEffects == null)
+            return false;
+
+        bool removed = _activeEffects.Remove(effect);
+
+        if (removed)
+        {
+            CalculateFinalStats();
+            UpdateLauncherSettings();
+            UpdateAccuracySystem();
+
+            Debug.Log($"[PlayerWeaponController] Removed weapon effect: {effect.EffectName}", this);
+        }
+
+        return removed;
+    }
+
+    /// <summary>모든 무기 효과 제거</summary>
+    public void ClearAllEffects()
+    {
+        if (_activeEffects == null || _activeEffects.Count == 0)
+            return;
+
+        int removedCount = _activeEffects.Count;
+        _activeEffects.Clear();
+
+        CalculateFinalStats();
+        UpdateLauncherSettings();
+        UpdateAccuracySystem();
+
+        Debug.Log($"[PlayerWeaponController] Cleared {removedCount} weapon effects", this);
+    }
+
+    /// <summary>특정 효과 적용 여부 확인</summary>
+    /// <param name="effect">확인할 효과</param>
+    /// <returns>적용 중이면 true</returns>
+    public bool HasWeaponEffect(WeaponEffectSO effect)
+    {
+        return effect != null && _activeEffects != null && _activeEffects.Contains(effect);
+    }
     #endregion
 
-    #region Public Methods - Stat Management
-    public void UpgradeFireRate(float amount) { }
-    public void UpgradeDamage(float amount) { }
-    public void UpgradeAccuracy(float amount) { }
-    public void SetWeaponStatSO(WeaponStatSO weaponStatSO) { }
+    #region Public Methods - Fire Control
+    /// <summary>발사 시도</summary>
+    /// <returns>발사 성공 여부</returns>
+    public bool TryFire()
+    {
+        if (!CanFireInternal())
+            return false;
+
+        Vector3 direction = GetAccurateDirection();
+        bool success = _projectileLauncher.Fire(direction);
+
+        if (success && _accuracySystem != null)
+        {
+            _accuracySystem.AddRecoil(FinalStats.CurrentRecoil);
+        }
+
+        return success;
+    }
+
+    /// <summary>강제 발사 (쿨다운 무시)</summary>
+    /// <returns>발사 성공 여부</returns>
+    public bool ForceFire()
+    {
+        if (!_isInitialized || _projectileLauncher == null)
+            return false;
+
+        Vector3 direction = GetAccurateDirection();
+        bool success = _projectileLauncher.Fire(direction);
+
+        if (success && _accuracySystem != null)
+        {
+            _accuracySystem.AddRecoil(FinalStats.CurrentRecoil);
+        }
+
+        return success;
+    }
+
+    /// <summary>현재 조준 방향 조회</summary>
+    /// <returns>정확도가 적용된 발사 방향</returns>
+    public Vector3 GetAccurateDirection()
+    {
+        Vector3 baseDirection = CalculateBaseDirection();
+
+        if (_accuracySystem == null)
+            return baseDirection;
+
+        return _accuracySystem.ApplySpreadToDirection(baseDirection, _accuracySystem.CurrentAccuracy);
+    }
+    #endregion
+
+    #region Private Methods - Stat Calculation
+    private void InitializeWeaponSystem()
+    {
+        if (_baseWeaponStats == null)
+        {
+            Debug.LogError("[PlayerWeaponController] Base weapon stats required!", this);
+            return;
+        }
+
+        CalculateFinalStats();
+        UpdateLauncherSettings();
+        UpdateAccuracySystem();
+
+        _isInitialized = true;
+        Debug.Log("[PlayerWeaponController] Weapon system initialized", this);
+    }
+
+    private void CalculateFinalStats()
+    {
+        if (_baseWeaponStats == null) return;
+
+        WeaponStatData baseStats = _baseWeaponStats.CreateRuntimeStats();
+        WeaponStatData finalStats = baseStats;
+
+        // 효과들을 우선순위 순으로 정렬 후 적용
+        if (_activeEffects != null && _activeEffects.Count > 0)
+        {
+            var sortedEffects = new List<WeaponEffectSO>(_activeEffects);
+            sortedEffects.Sort((a, b) => a.Priority.CompareTo(b.Priority));
+
+            foreach (var effect in sortedEffects)
+            {
+                if (effect != null && effect.CanApplyToWeapon(finalStats))
+                {
+                    finalStats = effect.ApplyToWeapon(finalStats);
+                }
+            }
+        }
+
+        FinalStats = finalStats;
+    }
+
+    private void UpdateLauncherSettings()
+    {
+        if (_projectileLauncher == null) return;
+
+        _projectileLauncher.SetFireRate(FinalStats.CurrentFireRate);
+        _projectileLauncher.SetProjectileSpeed(FinalStats.CurrentProjectileSpeed);
+        _projectileLauncher.SetProjectileLifetime(FinalStats.CurrentProjectileLifetime);
+    }
+
+    private void UpdateAccuracySystem()
+    {
+        if (_accuracySystem == null) return;
+
+        _accuracySystem.SetWeaponStats(FinalStats);
+    }
+
+    private void ValidateReferences()
+    {
+        if (_baseWeaponStats == null)
+            Debug.LogError("[PlayerWeaponController] Base weapon stats not assigned!", this);
+
+        if (_accuracySystem == null)
+            Debug.LogError("[PlayerWeaponController] Accuracy system not assigned!", this);
+
+        if (_projectileLauncher == null)
+            Debug.LogError("[PlayerWeaponController] Projectile launcher not assigned!", this);
+
+        if (_aimPointManager == null)
+            Debug.LogError("[PlayerWeaponController] Aim point manager not assigned!", this);
+    }
     #endregion
 
     #region Private Methods - Fire Logic
-    private bool CanFireNow() { }
-    private void ExecuteFire() { }
-    private Vector3 CalculateFireDirection() { }
-    private void ApplyFireCooldown() { }
-    #endregion
+    private bool CanFireInternal()
+    {
+        if (!_isInitialized || _projectileLauncher == null)
+            return false;
 
-    #region Private Methods - Mode Management
-    private void ApplyModeToStats() { }
-    private void UpdateCooldowns() { }
-    private void InitializeWeaponStats() { }
+        return FinalStats.CurrentFireRate > 0f && _projectileLauncher.CanFire;
+    }
+
+    private Vector3 CalculateBaseDirection()
+    {
+        if (_aimPointManager == null || _projectileLauncher == null)
+            return transform.forward;
+
+        Vector3 shootPosition = _projectileLauncher.transform.position;
+        Vector3 targetPosition = _aimPointManager.AimPoint;
+
+        Vector3 direction = (targetPosition - shootPosition).normalized;
+
+        return direction.sqrMagnitude > 0.1f ? direction : transform.forward;
+    }
     #endregion
 }
