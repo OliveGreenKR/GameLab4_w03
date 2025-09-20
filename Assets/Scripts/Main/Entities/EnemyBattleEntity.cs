@@ -138,6 +138,18 @@ public class EnemyBattleEntity : BaseBattleEntity, ISpawnable
             }
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log($"[EnemyBattleEntity] OnCollisionEnter with {collision.gameObject.name}");
+        var otherEntity = collision.gameObject.GetComponent<IBattleEntity>();
+        if (otherEntity != null && otherEntity.IsAlive && otherEntity.TeamId != TeamId)
+        {
+            // 접촉한 상대에게 데미지 처리
+            DealDamage(otherEntity, GetCurrentStat(BattleStatType.Attack));
+            Debug.Log($"[EnemyBattleEntity] Dealt contact damage to {otherEntity.GameObject.name}", this);
+        }
+    }
     #endregion
 
     #region ISpawnable Implementation - Position and Rotation

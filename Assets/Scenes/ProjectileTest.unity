@@ -363,7 +363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 603934798}
-  _invulnerabilityDuration: 1
+  _invulnerabilityDuration: 0
   _hasContactDamage: 1
 --- !u!114 &603934798
 MonoBehaviour:
@@ -714,7 +714,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 823887401}
-  _invulnerabilityDuration: 1
+  _invulnerabilityDuration: 0
   _hasContactDamage: 1
 --- !u!114 &823887403
 MonoBehaviour:
@@ -917,7 +917,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1008245303}
-  _invulnerabilityDuration: 1
+  _invulnerabilityDuration: 0
   _hasContactDamage: 1
 --- !u!114 &1008245303
 MonoBehaviour:
@@ -1071,7 +1071,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1311654097}
-  _invulnerabilityDuration: 1
+  _invulnerabilityDuration: 0
   _hasContactDamage: 1
 --- !u!114 &1311654097
 MonoBehaviour:
@@ -1526,7 +1526,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _battleStat: {fileID: 1707852743}
-  _invulnerabilityDuration: 1
+  _invulnerabilityDuration: 0
   _hasContactDamage: 1
 --- !u!114 &1707852743
 MonoBehaviour:
@@ -1783,7 +1783,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _fireRatePerSecond
-      value: 25.7
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _projectileLifetime
@@ -1791,7 +1791,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _effectAssets.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: '_effectAssets.Array.data[0]'

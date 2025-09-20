@@ -244,7 +244,7 @@ MonoBehaviour:
   _defaultBaseDamage: 25
   _minProjectileSpeed: 1
   _maxProjectileSpeed: 100
-  _defaultProjectileSpeed: 1
+  _defaultProjectileSpeed: 30
   _minLifetime: 0.1
   _maxLifetime: 30
   _defaultLifetime: 3
@@ -1806,8 +1806,8 @@ MonoBehaviour:
   - {fileID: 1496758181}
   - {fileID: 645292009}
   _spawnIntervalSeconds: 5
-  _minPackSize: 5
-  _maxPackSize: 5
+  _minPackSize: 10
+  _maxPackSize: 10
   _enemyConfigs:
   - enemyType: 1
     statRange:
@@ -1826,17 +1826,17 @@ MonoBehaviour:
       maxMoveSpeed: 5
       minAttack: 10
       maxAttack: 10
-    spawnWeight: 5
+    spawnWeight: 3
   _hybridDifficulty:
     enemyTypeConfigs:
     - enemyType: 1
-      packSizeModifierType: 0
+      packSizeModifierType: 1
       packSizeFixedIncrease: 15
-      packSizePercentIncrease: 0
+      packSizePercentIncrease: 30
     - enemyType: 2
       packSizeModifierType: 1
       packSizeFixedIncrease: 5
-      packSizePercentIncrease: 20
+      packSizePercentIncrease: 10
   _maxUpgradeCollection:
     _upgrades: []
   _difficultyUpdateInterval: 5
@@ -1901,7 +1901,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 25
   m_Depth: -1
   m_CullingMask:
@@ -1926,8 +1926,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1848795741}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 20, z: -31.400002}
+  m_LocalRotation: {x: 0.09641871, y: -0.08202187, z: 0.007951878, w: 0.9919237}
+  m_LocalPosition: {x: 3.5888176, y: 5.5589905, z: -49.56405}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
