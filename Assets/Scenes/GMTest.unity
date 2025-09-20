@@ -340,7 +340,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5175902631662209742, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5289648399551077228, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
       propertyPath: _baseMoveSpeed
@@ -1175,10 +1175,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _baseWeaponStats: {fileID: 11400000, guid: 4cce8f36362e86b4f854d95ba7f62999, type: 2}
   _accuracySystem: {fileID: 761691819}
+  _recoilSystem: {fileID: 761691829}
   _projectileLauncher: {fileID: 962896344}
   _aimPointManager: {fileID: 831523057}
-  _activeEffects:
-  - {fileID: 11400000, guid: 2a35297ec78b3e9448c406cb2f9ca1d7, type: 2}
+  _activeEffects: []
 --- !u!114 &761691819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1192,7 +1192,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxSpreadAngle: 30
-  _recoilRecoveryRate: 5
+  _accuracyPenaltyPerShot: 5
+  _accuracyRecoveryRate: 10
+  _maxAccuracyPenalty: 50
+--- !u!114 &761691829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 761691806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3f2c6f1cad81aa45831710bd82690dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxRecoilIntensity: 1
+  _recoilRecoveryRate: 2
+  _recoilDirection: {x: 0, y: 1}
+  _recoilRandomness: 0.2
 --- !u!1001 &816707984
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1205,10 +1223,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: TPSPlayer
       objectReference: {fileID: 0}
+    - target: {fileID: 1770502401926893667, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.318
+      objectReference: {fileID: 0}
     - target: {fileID: 3958529434543869523, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: _playerWeaponController
       value: 
       objectReference: {fileID: 761691818}
+    - target: {fileID: 4471660500654166704, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4652513387228675290, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1253,10 +1279,58 @@ PrefabInstance:
       propertyPath: _effectAssets.Array.size
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5085340246680585062, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085340246680585062, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.3319998
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085340246680585062, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085340246680585062, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085340246680585062, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.000000014588799
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085340246680585062, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.0000000024645472
+      objectReference: {fileID: 0}
+    - target: {fileID: 5085340246680585062, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 3.5954782e-17
+      objectReference: {fileID: 0}
     - target: {fileID: 5597853729675806886, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: _jumpHeight
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 5844669746643537085, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6689903427683199600, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.772
+      objectReference: {fileID: 0}
+    - target: {fileID: 6689903427683199600, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 7479191219436902505, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: field of view
+      value: 100.26653
+      objectReference: {fileID: 0}
+    - target: {fileID: 8951435946397346846, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: _aimCamera
+      value: 
+      objectReference: {fileID: 831523058}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1267,6 +1341,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8827062219219739129, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 761691819}
+    - targetCorrespondingSourceObject: {fileID: 8827062219219739129, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 761691829}
   m_SourcePrefab: {fileID: 100100000, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
 --- !u!114 &831523057 stripped
 MonoBehaviour:
@@ -1279,6 +1356,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b848fbe251dd6f40bdd40649f33681a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!20 &831523058 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 7479191219436902505, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+  m_PrefabInstance: {fileID: 816707984}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &867297365
 GameObject:
   m_ObjectHideFlags: 0
