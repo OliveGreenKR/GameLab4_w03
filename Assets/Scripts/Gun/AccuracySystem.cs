@@ -60,6 +60,14 @@ public class AccuracySystem : MonoBehaviour
     [Header("Recoil Recovery")]
     [SuffixLabel("units/sec")]
     [SerializeField] private float _recoilRecoveryRate = 5f;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentRecoilValue => CurrentRecoilState.CurrentRecoil;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float RecoilRatio => CurrentRecoilState.RecoilRatio;
     #endregion
 
     #region Properties
@@ -71,8 +79,6 @@ public class AccuracySystem : MonoBehaviour
     [ShowInInspector, ReadOnly]
     public float CurrentAccuracy { get; private set; }
 
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
     public RecoilState CurrentRecoilState { get; private set; }
     #endregion
 
