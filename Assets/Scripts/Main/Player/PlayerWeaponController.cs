@@ -253,7 +253,7 @@ public class PlayerWeaponController : MonoBehaviour
 
         Vector3 baseDirection = CalculateBaseDirection();
         Vector3 accurateDirection = (_accuracySystem != null)
-            ? _accuracySystem.ApplySpreadToDirection(baseDirection, _accuracySystem.CurrentAccuracy)
+            ? _accuracySystem.ApplySpreadToDirection(baseDirection)
             : baseDirection;
 
         // 디버그 정보 저장
@@ -262,11 +262,6 @@ public class PlayerWeaponController : MonoBehaviour
         _hasDebugDirections = true;
 
         bool success = _projectileLauncher.Fire(accurateDirection);
-
-        if (success && _accuracySystem != null)
-        {
-            _accuracySystem.AddRecoil(FinalStats.CurrentRecoil);
-        }
 
         return success;
     }
@@ -280,7 +275,7 @@ public class PlayerWeaponController : MonoBehaviour
         if (_accuracySystem == null)
             return baseDirection;
 
-        return _accuracySystem.ApplySpreadToDirection(baseDirection, _accuracySystem.CurrentAccuracy);
+        return _accuracySystem.ApplySpreadToDirection(baseDirection);
     }
     #endregion
 

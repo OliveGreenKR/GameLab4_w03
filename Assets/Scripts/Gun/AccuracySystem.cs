@@ -3,53 +3,6 @@ using UnityEngine;
 
 public class AccuracySystem : MonoBehaviour
 {
-    #region Nested Types
-    [System.Serializable]
-    public struct RecoilState
-    {
-        #region Fields
-        private readonly float _currentRecoil;
-        private readonly float _maxRecoil;
-        private readonly float _recoveryRate;
-        #endregion
-
-        #region Properties
-        public float CurrentRecoil => _currentRecoil;
-        public float RecoilRatio => _maxRecoil > 0f ? _currentRecoil / _maxRecoil : 0f;
-        #endregion
-
-        #region Constructor
-        public RecoilState(float maxRecoil, float recoveryRate)
-        {
-            _currentRecoil = 0f;
-            _maxRecoil = Mathf.Max(0.1f, maxRecoil);
-            _recoveryRate = Mathf.Max(0f, recoveryRate);
-        }
-
-        private RecoilState(float currentRecoil, float maxRecoil, float recoveryRate)
-        {
-            _currentRecoil = currentRecoil;
-            _maxRecoil = maxRecoil;
-            _recoveryRate = recoveryRate;
-        }
-        #endregion
-
-        #region Public Methods
-        public RecoilState AddRecoil(float amount)
-        {
-            float newRecoil = Mathf.Clamp(_currentRecoil + amount, 0f, _maxRecoil);
-            return new RecoilState(newRecoil, _maxRecoil, _recoveryRate);
-        }
-
-        public RecoilState UpdateRecovery(float deltaTime)
-        {
-            float newRecoil = Mathf.Max(0f, _currentRecoil - _recoveryRate * deltaTime);
-            return new RecoilState(newRecoil, _maxRecoil, _recoveryRate);
-        }
-        #endregion
-    }
-    #endregion
-
     #region Serialized Fields
     [TabGroup("Settings")]
     [Header("Accuracy Settings")]
@@ -57,17 +10,18 @@ public class AccuracySystem : MonoBehaviour
     [SerializeField] private float _maxSpreadAngle = 15f;
 
     [TabGroup("Settings")]
-    [Header("Recoil Recovery")]
-    [SuffixLabel("units/sec")]
-    [SerializeField] private float _recoilRecoveryRate = 5f;
+    [Header("Accuracy Penalty")]
+    [InfoBox("연사 시 정확도 저하")]
+    [SuffixLabel("penalty/shot")]
+    [SerializeField] private float _accuracyPenaltyPerShot = 5f;
 
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float CurrentRecoilValue => CurrentRecoilState.CurrentRecoil;
+    [TabGroup("Settings")]
+    [SuffixLabel("penalty/sec")]
+    [SerializeField] private float _accuracyRecoveryRate = 10f;
 
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float RecoilRatio => CurrentRecoilState.RecoilRatio;
+    [TabGroup("Settings")]
+    [SuffixLabel("penalty")]
+    [SerializeField] private float _maxAccuracyPenalty = 50f;
     #endregion
 
     #region Properties
@@ -79,7 +33,13 @@ public class AccuracySystem : MonoBehaviour
     [ShowInInspector, ReadOnly]
     public float CurrentAccuracy { get; private set; }
 
-    public RecoilState CurrentRecoilState { get; private set; }
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentAccuracyPenalty { get; private set; }
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public float BaseAccuracy => _currentWeaponStats.CurrentAccuracy;
     #endregion
 
     #region Private Fields
@@ -89,29 +49,23 @@ public class AccuracySystem : MonoBehaviour
     #region Unity Lifecycle
     private void Update()
     {
-        UpdateRecoilRecovery();
+        UpdateAccuracyRecovery();
         UpdateCurrentAccuracy();
     }
     #endregion
 
     #region Public Methods - Accuracy Calculation
-    public float CalculateFinalAccuracy(WeaponStatData weaponStats, RecoilState recoilState)
+    /// <summary>
+    /// 방향에 스프레드 적용
+    /// </summary>
+    /// <param name="baseDirection">기본 방향</param>
+    /// <returns>스프레드가 적용된 방향</returns>
+    public Vector3 ApplySpreadToDirection(Vector3 baseDirection)
     {
-        float baseAccuracy = weaponStats.CurrentAccuracy;
-
-        // 반동으로 인한 정확도 감소
-        float recoilPenalty = baseAccuracy * recoilState.RecoilRatio * 0.5f;
-        float finalAccuracy = baseAccuracy - recoilPenalty;
-
-        return Mathf.Clamp(finalAccuracy, 0f, 100f);
-    }
-
-    public Vector3 ApplySpreadToDirection(Vector3 baseDirection, float accuracy)
-    {
-        if (accuracy >= 100f)
+        if (CurrentAccuracy >= 100f)
             return baseDirection;
 
-        float spreadAngle = CalculateSpreadAngle(accuracy);
+        float spreadAngle = CalculateSpreadAngle(CurrentAccuracy);
         Vector2 spreadOffset = GetRandomSpreadOffset(spreadAngle);
 
         Vector3 right = Vector3.Cross(baseDirection, Vector3.up).normalized;
@@ -123,41 +77,84 @@ public class AccuracySystem : MonoBehaviour
         return spreadDirection.normalized;
     }
 
-    public float GetCrosshairSpread(float accuracy)
+    /// <summary>
+    /// 크로스헤어 스프레드 비율 계산
+    /// </summary>
+    /// <returns>0~1 스프레드 비율</returns>
+    public float GetCrosshairSpread()
     {
-        float spreadAngle = CalculateSpreadAngle(accuracy);
+        float spreadAngle = CalculateSpreadAngle(CurrentAccuracy);
         return spreadAngle / _maxSpreadAngle;
+    }
+
+    /// <summary>
+    /// 현재 정확도 반환
+    /// </summary>
+    /// <returns>현재 정확도 (0~100)</returns>
+    public float GetCurrentAccuracy()
+    {
+        return CurrentAccuracy;
     }
     #endregion
 
-    #region Public Methods - Recoil Management
-    public void AddRecoil(float amount)
+    #region Public Methods - Accuracy Penalty
+    /// <summary>
+    /// 연사 시 정확도 페널티 추가
+    /// </summary>
+    /// <param name="penaltyAmount">페널티 양 (기본값: 설정된 페널티)</param>
+    public void AddAccuracyPenalty(float penaltyAmount = -1f)
     {
-        CurrentRecoilState = CurrentRecoilState.AddRecoil(amount);
+        if (penaltyAmount < 0f)
+            penaltyAmount = _accuracyPenaltyPerShot;
+
+        CurrentAccuracyPenalty = Mathf.Min(CurrentAccuracyPenalty + penaltyAmount, _maxAccuracyPenalty);
     }
 
-    public void UpdateRecoilRecovery()
+    /// <summary>
+    /// 정확도 페널티 초기화
+    /// </summary>
+    public void ResetAccuracyPenalty()
     {
-        CurrentRecoilState = CurrentRecoilState.UpdateRecovery(Time.deltaTime);
-    }
-
-    public void ResetRecoil()
-    {
-        float maxRecoil = _currentWeaponStats.CurrentRecoil;
-        CurrentRecoilState = new RecoilState(maxRecoil, _recoilRecoveryRate);
+        CurrentAccuracyPenalty = 0f;
     }
     #endregion
 
     #region Public Methods - Configuration
+    /// <summary>
+    /// 무기 스탯 설정
+    /// </summary>
+    /// <param name="weaponStats">무기 스탯 데이터</param>
     public void SetWeaponStats(WeaponStatData weaponStats)
     {
         _currentWeaponStats = weaponStats;
-        float maxRecoil = weaponStats.CurrentRecoil;
-        CurrentRecoilState = new RecoilState(maxRecoil, _recoilRecoveryRate);
+    }
+
+    /// <summary>
+    /// 최대 스프레드 각도 설정
+    /// </summary>
+    /// <param name="maxSpreadAngle">최대 스프레드 각도</param>
+    public void SetMaxSpreadAngle(float maxSpreadAngle)
+    {
+        _maxSpreadAngle = Mathf.Clamp(maxSpreadAngle, 1f, 45f);
     }
     #endregion
 
     #region Private Methods
+    private void UpdateAccuracyRecovery()
+    {
+        if (CurrentAccuracyPenalty > 0f)
+        {
+            CurrentAccuracyPenalty = Mathf.Max(0f, CurrentAccuracyPenalty - _accuracyRecoveryRate * Time.deltaTime);
+        }
+    }
+
+    private void UpdateCurrentAccuracy()
+    {
+        float baseAccuracy = _currentWeaponStats.CurrentAccuracy;
+        CurrentAccuracy = Mathf.Clamp(baseAccuracy - CurrentAccuracyPenalty, 0f, 100f);
+        CurrentSpreadAngle = CalculateSpreadAngle(CurrentAccuracy);
+    }
+
     private float CalculateSpreadAngle(float accuracy)
     {
         float normalizedAccuracy = Mathf.Clamp01(accuracy / 100f);
@@ -169,12 +166,6 @@ public class AccuracySystem : MonoBehaviour
         Vector2 randomPoint = Random.insideUnitCircle;
         float spreadRadians = spreadAngle * Mathf.Deg2Rad;
         return randomPoint * Mathf.Tan(spreadRadians);
-    }
-
-    private void UpdateCurrentAccuracy()
-    {
-        CurrentAccuracy = CalculateFinalAccuracy(_currentWeaponStats, CurrentRecoilState);
-        CurrentSpreadAngle = CalculateSpreadAngle(CurrentAccuracy);
     }
     #endregion
 }
