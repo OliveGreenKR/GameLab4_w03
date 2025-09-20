@@ -20,68 +20,79 @@ public class PlayerWeaponController : MonoBehaviour
 
     [TabGroup("References")]
     [Required]
+    [SerializeField] private RecoilSystem _recoilSystem;
+
+    [TabGroup("References")]
+    [Required]
     [SerializeField] private ProjectileLauncher _projectileLauncher;
 
     [TabGroup("References")]
     [Required]
     [SerializeField] private AimPointManager _aimPointManager;
 
-    [TabGroup("Effects")]
+    [TabGroup("Effects",TextColor ="cyan")]
     [Header("Active Weapon Effects")]
     [SerializeField] private List<WeaponEffectSO> _activeEffects = new List<WeaponEffectSO>();
     #endregion
 
     #region Properties
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public WeaponStatData FinalStats { get; private set; }
 
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public bool CanFire => CanFireInternal();
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public int ActiveEffectCount => _activeEffects?.Count ?? 0;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float CurrentAccuracy => _accuracySystem?.CurrentAccuracy ?? 0f;
-
-    [TabGroup("Debug")]
+    [TabGroup("Debug", "Default")]
     [ShowInInspector, ReadOnly]
     public bool IsInitialized => _isInitialized;
 
-    [TabGroup("Debug")]
+    [TabGroup("Debug", "Default")]
     [ShowInInspector, ReadOnly]
     public Vector3 CurrentAimPoint => _aimPointManager?.AimPoint ?? Vector3.zero;
 
-    [TabGroup("Weapon Stats Debug")]
+    [TabGroup("Debug","Weapon System")]
+    [ShowInInspector, ReadOnly]
+    public bool CanFire => CanFireInternal();
+
+    [TabGroup("Debug","Weapon System")]
+    [ShowInInspector, ReadOnly]
+    public int ActiveEffectCount => _activeEffects?.Count ?? 0;
+
+    [TabGroup("Debug","Weapon System")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentAccuracy => _accuracySystem?.CurrentAccuracy ?? 0f;
+
+    [TabGroup("Debug","Weapon System")]
+    [ShowInInspector, ReadOnly]
+    public float CurrentRecoilIntensity => _recoilSystem?.GetRecoilIntensity() ?? 0f;
+
+    [TabGroup("Debug","Weapon System")]
+    [ShowInInspector, ReadOnly]
+    public Vector3 CurrentRecoilVector => _recoilSystem?.GetCurrentRecoilVector() ?? Vector3.zero;
+
+    public WeaponStatData FinalStats { get; private set; }
+
+    [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     [InfoBox("최종 적용된 무기 스탯")]
     public float FinalFireRate => FinalStats.CurrentFireRate;
 
-    [TabGroup("Weapon Stats Debug")]
+    [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     public float FinalDamage => FinalStats.CurrentDamage;
 
-    [TabGroup("Weapon Stats Debug")]
+    [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     public float FinalProjectileSpeed => FinalStats.CurrentProjectileSpeed;
 
-    [TabGroup("Weapon Stats Debug")]
+    [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     public float FinalProjectileLifetime => FinalStats.CurrentProjectileLifetime;
 
-    [TabGroup("Weapon Stats Debug")]
+    [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     public float FinalAccuracy => FinalStats.CurrentAccuracy;
 
-    [TabGroup("Weapon Stats Debug")]
+    [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     public float FinalRecoil => FinalStats.CurrentRecoil;
 
-    [TabGroup("Weapon Stats Debug")]
+    [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     [InfoBox("기본 스탯 대비 배율")]
     public string StatMultipliers => _baseWeaponStats != null ?
@@ -119,6 +130,7 @@ public class PlayerWeaponController : MonoBehaviour
             CalculateFinalStats();
             UpdateLauncherSettings();
             UpdateAccuracySystem();
+            UpdateRecoilSystem();
         }
     }
 
@@ -263,6 +275,21 @@ public class PlayerWeaponController : MonoBehaviour
 
         bool success = _projectileLauncher.Fire(accurateDirection);
 
+        if (success)
+        {
+            // 정확도: 연사 페널티 적용
+            if (_accuracySystem != null)
+            {
+                _accuracySystem.AddAccuracyPenalty();
+            }
+
+            // 반동: 시각적 피드백용
+            if (_recoilSystem != null)
+            {
+                _recoilSystem.AddRecoil(1f);
+            }
+        }
+
         return success;
     }
 
@@ -338,6 +365,13 @@ public class PlayerWeaponController : MonoBehaviour
         _accuracySystem.SetWeaponStats(FinalStats);
     }
 
+    private void UpdateRecoilSystem()
+    {
+        if (_recoilSystem == null) return;
+
+        _recoilSystem.SetWeaponStats(FinalStats);
+    }
+
     private void ValidateReferences()
     {
         if (_baseWeaponStats == null)
@@ -345,6 +379,9 @@ public class PlayerWeaponController : MonoBehaviour
 
         if (_accuracySystem == null)
             Debug.LogError("[PlayerWeaponController] Accuracy system not assigned!", this);
+
+        if (_recoilSystem == null)
+            Debug.LogError("[PlayerWeaponController] Recoil system not assigned!", this);
 
         if (_projectileLauncher == null)
             Debug.LogError("[PlayerWeaponController] Projectile launcher not assigned!", this);
