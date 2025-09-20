@@ -7,12 +7,13 @@ public class PlayerEntityDamagedReaction : MonoBehaviour
     [SerializeField][Required] NewPlayerController _playerController = null;
     [SerializeField][Required] PlayerBattleEntity _playerBattleEntity = null;
 
-    [SerializeField] private float _knockbackMagnitude = 2f;
-    [SerializeField][SuffixLabel("secs")] private float _inputPreventionTime = 0.2f;
+    [SerializeField][InfoBox("Speed Slow Multiplier")] private float _slowMultiplier = 0.5f;
+    [SerializeField][SuffixLabel("secs")] private float _effeectTime = 0.2f;
 
-    #region Private Fields - Input Control
-    private bool _isMovementDisabled = false;
-    private float _inputDisableTimeRemaining = 0f;
+    #region Private Fields - effectControl
+    private bool _isDuringEffect = false;
+    private float _effectTimeRemaining = 0f;
+    private float _cachedSpeed = 0f;
     #endregion
 
     #region Unity Lifecycle
@@ -33,20 +34,22 @@ public class PlayerEntityDamagedReaction : MonoBehaviour
             Debug.LogError("[PlayerEntityDamaged] BaseBattleEntity is not assigned!", this);
             return;
         }
-        _playerBattleEntity.GetComponent<BattleStatComponent>().OnDamageTaken -= OnDamaged;
-        _playerBattleEntity.GetComponent<BattleStatComponent>().OnDamageTaken += OnDamaged;
+        _playerBattleEntity.BattleStat.OnDamageTaken -= OnDamaged;
+        _playerBattleEntity.BattleStat.OnDamageTaken += OnDamaged;
+
+        _cachedSpeed = _playerController.MoveSpeed;
     }
 
     private void Update()
     {
-        UpdateInputRecovery();
+        UpdateEffectTime();
     }
 
     private void OnDestroy()
     {
         if (_playerBattleEntity != null)
         {
-            _playerBattleEntity.GetComponent<BattleStatComponent>().OnDamageTaken -= OnDamaged;
+            _playerBattleEntity.BattleStat.OnDamageTaken -= OnDamaged;
         }
     }
     #endregion
@@ -54,10 +57,9 @@ public class PlayerEntityDamagedReaction : MonoBehaviour
     #region Private Methods - Damage Handling
     private void OnDamaged(float damage, IBattleEntity attacker)
     {
-        Vector3 direction = (_playerController.transform.position - attacker.Transform.position).normalized;
+        //Vector3 direction = (_playerController.transform.position - attacker.Transform.position).normalized;
 
         // 지면 상태에 따른 넉백 방향 계산
-        Vector3 knockbackDirection;
         //if (_playerController.IsGrounded)
         //{
         //    // 지면 위에서: Unity의 ProjectOnPlane 사용
@@ -69,37 +71,41 @@ public class PlayerEntityDamagedReaction : MonoBehaviour
         //    // 공중에서: 기존 방식 (수평 넉백)
         //    knockbackDirection = direction;
         //}
-        // 지면 위에서: Unity의 ProjectOnPlane 사용
-        Vector3 groundNormal = _playerController.LastGroudnNormal;
-        knockbackDirection = Vector3.ProjectOnPlane(direction, groundNormal).normalized;
 
-        Debug.Log($"[PlayerKnockBack]{knockbackDirection}");
-        // 넉백 적용
-        _targetCharacterController.Move(knockbackDirection * _knockbackMagnitude);
-
-        // 움직임 입력 비활성화 (시간 새로고침)
-        if (!_isMovementDisabled)
+        // 이펙트 적용 
+        if (!_isDuringEffect)
         {
-            _playerController.DisableMovementInput();
-            _isMovementDisabled = true;
+            ApplyEffect();
+
         }
 
-        // 마비 시간 새로고침 (기존 시간 리셋)
-        _inputDisableTimeRemaining = _inputPreventionTime;
+        // 새로고침 (기존 시간 리셋)
+        _effectTimeRemaining = _effeectTime;
     }
 
-    private void UpdateInputRecovery()
+    private void UpdateEffectTime()
     {
-        if (!_isMovementDisabled) return;
+        if (!_isDuringEffect) return;
 
-        _inputDisableTimeRemaining -= Time.deltaTime;
+        _effectTimeRemaining -= Time.deltaTime;
 
-        if (_inputDisableTimeRemaining <= 0f)
+        if (_effectTimeRemaining <= 0f)
         {
-            _playerController.EnableMovementInput();
-            _isMovementDisabled = false;
-            _inputDisableTimeRemaining = 0f;
+            RestoreEffect();
         }
+    }
+
+    private void ApplyEffect()
+    {
+        _playerController.SetMoveSpeed(_cachedSpeed * _slowMultiplier);
+        _isDuringEffect = true;
+    }
+
+    private void RestoreEffect()
+    {
+        _playerController.SetMoveSpeed(_cachedSpeed);
+        _isDuringEffect = false;
+        _effectTimeRemaining = 0f;
     }
     #endregion
 }

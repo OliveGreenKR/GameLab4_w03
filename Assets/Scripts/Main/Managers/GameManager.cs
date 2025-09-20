@@ -26,6 +26,9 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Serialized Fields
+    [Header("Player Integration")]
+    [SerializeField] private PlayerBattleEntity _playerBattleEntity;
+
     [Header("Initial Stats")]
     [SerializeField] private int _initialHealth = 100;
     [SerializeField] private int _initialGold = 50;
@@ -121,6 +124,8 @@ public class GameManager : MonoBehaviour
         {
             _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
         }
+
+        UnsubscribeFromPlayerEvents();
     }
     #endregion
 
@@ -337,6 +342,9 @@ public class GameManager : MonoBehaviour
             _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
             _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
         }
+
+        // 플레이어 이벤트 구독
+        SubscribeToPlayerEvents();
     }
 
     private void ReconnectEnemySpawner()
@@ -356,6 +364,53 @@ public class GameManager : MonoBehaviour
         else
         {
             Debug.LogError("[GameManager] No EnemySpawner found in the scene.");
+        }
+    }
+
+
+    #endregion
+
+    #region Private Methods - Player Integration
+    private void SubscribeToPlayerEvents()
+    {
+        if (_playerBattleEntity == null)
+        {
+            _playerBattleEntity = FindFirstObjectByType<PlayerBattleEntity>();
+        }
+
+        if (_playerBattleEntity != null && _playerBattleEntity.BattleStat != null)
+        {
+            _playerBattleEntity.BattleStat.OnStatChanged -= OnPlayerHealthChanged;
+            _playerBattleEntity.BattleStat.OnStatChanged += OnPlayerHealthChanged;
+            _playerBattleEntity.BattleStat.OnDeath -= OnPlayerDeath;
+            _playerBattleEntity.BattleStat.OnDeath += OnPlayerDeath;
+        }
+    }
+
+    private void UnsubscribeFromPlayerEvents()
+    {
+        if (_playerBattleEntity != null && _playerBattleEntity.BattleStat != null)
+        {
+            _playerBattleEntity.BattleStat.OnStatChanged -= OnPlayerHealthChanged;
+            _playerBattleEntity.BattleStat.OnDeath -= OnPlayerDeath;
+        }
+    }
+
+    private void OnPlayerHealthChanged(BattleStatType statType, float oldValue, float newValue)
+    {
+        if (statType == BattleStatType.Health)
+        {
+            int oldHealth = CurrentHealth;
+            CurrentHealth = Mathf.RoundToInt(newValue);
+            OnHealthChanged?.Invoke(oldHealth, CurrentHealth);
+        }
+    }
+
+    private void OnPlayerDeath(IBattleEntity killer)
+    {
+        if (CurrentState != GameState.GameOver)
+        {
+            ChangeGameState(GameState.GameOver);
         }
     }
     #endregion

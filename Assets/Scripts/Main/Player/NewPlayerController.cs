@@ -83,6 +83,8 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
     [ShowInInspector, ReadOnly]
     public Vector3 LastGroudnNormal => _lastGroundNormal;
 
+    public float MoveSpeed =>_moveSpeedUnitsPerSecond;
+
     #endregion
 
     #region Private Fields

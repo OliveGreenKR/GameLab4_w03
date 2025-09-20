@@ -74,24 +74,25 @@ public class PlayerBattleEntity : BaseBattleEntity
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        Debug.Log($"[PlayerBattleEntity] OnControllerColliderHit with {hit.collider.name}", this);
-        if (!IsAlive) return;
+        //Debug.Log($"[PlayerBattleEntity] OnControllerColliderHit with {hit.collider.name}", this);
+        //if (!IsAlive) return;
 
-        if (IsValidEnemy(hit))
-        {
-            HandleEnemyCollision(hit);
-        }
+        //if (IsValidEnemy(hit))
+        //{
+        //    HandleEnemyCollision(hit);
+        //}
     }
 
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (!IsAlive) return;
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log($"[PlayerBattleEntity] OnTriggerEnter with {other.name}", this);
+        if (!IsAlive) return;
 
-    //    if (IsValidEnemy(other))
-    //    {
-    //        HandleEnemyCollision(other);
-    //    }
-    //}
+        if (IsValidEnemy(other))
+        {
+            HandleEnemyCollision(other);
+        }
+    }
 
     #endregion
 

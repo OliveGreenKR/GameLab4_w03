@@ -18,6 +18,8 @@ public abstract class BaseBattleEntity : MonoBehaviour, IBattleEntity
     #region IBattleEntity Implementation
     public Transform Transform => transform;
     public GameObject GameObject => gameObject;
+    
+    public BattleStatComponent BattleStat => _battleStat;
     public bool IsAlive => _battleStat != null && _battleStat.IsAlive;
     public int TeamId => (int)_battleStat.GetCurrentStat(BattleStatType.TeamId);
 
