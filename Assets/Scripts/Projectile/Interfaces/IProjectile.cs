@@ -87,6 +87,11 @@ public interface IProjectile
     float SplitAngleRange { get; }
 
     /// <summary>
+    /// 데미지
+    /// </summary>
+    float Damage { get; }
+
+    /// <summary>
     /// 투사체 소유자 (Pool 접근용)
     /// </summary>
     ProjectileLauncher Owner { get; }
@@ -191,6 +196,17 @@ public interface IProjectile
     /// </summary>
     /// <param name="owner">소유자 ProjectileLauncher</param>
     void SetOwner(ProjectileLauncher owner);
+
+    /// <summary>
+    /// 데미지 설정
+    /// </summary>
+    /// <param name="damage"></param>
+    void SetDamage(float damage);
+    /// <summary>
+    /// 데미지 수정, 
+    /// </summary>
+    /// <param name="delta"> 변화량</param>
+    void ModifyDamage(float delta);
 
     /// <summary>
     /// 자신을 복제하여 새로운 투사체 생성

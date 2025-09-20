@@ -39,6 +39,11 @@ public class ProjectileLauncher : MonoBehaviour
     [PropertyRange(1f, 100f)]
     [SerializeField] private float _projectileSpeed = 20f;
 
+    [TabGroup("Settings")]
+    [SuffixLabel("damage")]
+    [PropertyRange(0f, 1000f)]
+    [SerializeField] private float _projectileDamage = 10f;
+
     [TabGroup("Effects")]
     [Header("Projectile Effects")]
     [SerializeField] private List<ProjectileEffectSO> _effectAssets = new List<ProjectileEffectSO>();
@@ -267,6 +272,20 @@ public class ProjectileLauncher : MonoBehaviour
         _projectileLifetime = Mathf.Clamp(lifetime, 0f, 10f);
     }
 
+    /// <summary>투사체 데미지 설정</summary>
+    /// <param name="damage">투사체 데미지</param>
+    public void SetProjectileDamage(float damage)
+    {
+        _projectileDamage = Mathf.Max(0f, damage);
+    }
+
+    /// <summary>현재 투사체 데미지 조회</summary>
+    /// <returns>투사체 데미지</returns>
+    public float GetProjectileDamage()
+    {
+        return _projectileDamage;
+    }
+
     /// <summary>현재 발사속도 조회</summary>
     /// <returns>초당 발사 횟수</returns>
     public float GetFireRate()
@@ -355,6 +374,9 @@ public class ProjectileLauncher : MonoBehaviour
 
             // Owner 자동 설정 추가
             projectile.SetOwner(this);
+
+            // 투사체 데미지 적용
+            projectile.SetDamage((int)_projectileDamage);
 
             // 투사체 소멸 이벤트 구독
             projectile.OnProjectileDestroyed -= OnProjectileDestroyed;

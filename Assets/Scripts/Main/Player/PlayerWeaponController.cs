@@ -333,6 +333,7 @@ public class PlayerWeaponController : MonoBehaviour
         _projectileLauncher.SetFireRate(FinalStats.CurrentFireRate);
         _projectileLauncher.SetProjectileSpeed(FinalStats.CurrentProjectileSpeed);
         _projectileLauncher.SetProjectileLifetime(FinalStats.CurrentProjectileLifetime);
+        _projectileLauncher.SetProjectileDamage(FinalStats.CurrentDamage);
     }
 
     private void UpdateAccuracySystem()

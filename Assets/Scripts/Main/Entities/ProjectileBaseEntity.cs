@@ -268,7 +268,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     public float SpeedMultiplier => _currentSpeedMultiplier;
     public int PierceCount => _currentPierceCount;
     public float DamageMultiplier => _currentDamageMultiplier;
-
+    public float Damage => CurrentAttackStat;
     public int SplitCount => _currentSplitCount;
     public int SplitAvailableCount => _currentSplitAvailableCount;
     public int SplitProjectileCount => _currentSplitProjectileCount;
@@ -360,6 +360,22 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         SetSplitAngleRange(_currentSplitAngleRange + delta);
     }
 
+    public void SetDamage(float damage)
+    {
+        if (_battleStat != null)
+        {
+            _battleStat.SetCurrentStat(BattleStatType.Attack, Mathf.Max(0f, damage));
+        }
+    }
+
+    public void ModifyDamage(float damage)
+    {
+        if (_battleStat != null)
+        {
+            _battleStat.ModifyStat(BattleStatType.Attack, Mathf.Max(0f, damage));
+        }
+    }
+
     public IProjectile CreateClone(Vector3 worldPosition, Quaternion worldRotation)
     {
         if (_owner == null) return null;
@@ -370,6 +386,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
             // 현재 상태 그대로 복사
             clone.Initialize(_remainingLifetime, _forwardSpeedUnitsPerSecond);
             //clone.SetLifetime(_remainingLifetime);
+            clone.SetDamage(Damage);
             clone.SetDamageMultiplier(_currentDamageMultiplier);
             clone.SetSpeedMultiplier(_currentSpeedMultiplier);
             clone.SetPierceCount(_currentPierceCount);
@@ -733,6 +750,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
 
         // Projectile Specific Stats
         logMessage += "=== Projectile Stats ===\n";
+        logMessage += $"Damage: {Damage}\n";
         logMessage += $"Pierce Count: {_currentPierceCount}\n";
         logMessage += $"Damage Multiplier: {_currentDamageMultiplier:F2}x\n";
         logMessage += $"Split Available: {_currentSplitAvailableCount}\n";
