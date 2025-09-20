@@ -3,12 +3,11 @@ using UnityEngine;
 
 public class PlayerFire : MonoBehaviour
 {
-    
-    [SerializeField][Required] NewPlayerController _player = null;
-    [SerializeField][Required] ProjectileLauncher _playerLauncher = null;
-    [SerializeField] ProjectileType _projectileType = ProjectileType.BasicProjectile;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
 
+    #region Serialized Fields
+    [SerializeField][Required] NewPlayerController _player = null;
+    [SerializeField][Required] PlayerWeaponController _playerWeaponController = null;
+    #endregion
 
     #region Unity Lifecycle
     private void OnEnable()
@@ -20,15 +19,16 @@ public class PlayerFire : MonoBehaviour
 
         if (_player == null)
         {
-            Debug.LogError("PlayerFire: PlayerEvents is null");
+            Debug.LogError("PlayerFire: _player is null");
             return;
         }
 
-        if(_playerLauncher == null)
+        if(_playerWeaponController == null)
         {
-            Debug.LogError("PlayerFire: PlayerLauncher is null");
+            Debug.LogError("PlayerFire: _playerWeaponController is null");
             return;
         }
+
 
         SubscribeFireEvents();
     }
@@ -44,17 +44,10 @@ public class PlayerFire : MonoBehaviour
     }
     #endregion
 
-    #region Public Methods
-    public void SetProjectileType(ProjectileType type)
-    {
-        _projectileType = type;
-    }
-    #endregion
-
     #region Private Methods
     private void SubscribeFireEvents()
     {
-        if (_player != null && _playerLauncher != null)
+        if (_player != null && _playerWeaponController != null)
         {
             _player.OnFire -= FireProjectile;
             _player.OnFire += FireProjectile;
@@ -63,7 +56,7 @@ public class PlayerFire : MonoBehaviour
 
     private void UnSubscribeFireEvents()
     {
-        if (_player != null && _playerLauncher != null)
+        if (_player != null && _playerWeaponController != null)
         {
             _player.OnFire -= FireProjectile;
         }
@@ -71,7 +64,7 @@ public class PlayerFire : MonoBehaviour
 
     private void FireProjectile()
     {
-        _playerLauncher.Fire(_projectileType, _playerLauncher.transform.forward);
+        _playerWeaponController.TryFire();
     }
     #endregion
 }
