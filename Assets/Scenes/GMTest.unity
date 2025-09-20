@@ -1156,6 +1156,28 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 657221844}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &761691806 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8827062219219739129, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+  m_PrefabInstance: {fileID: 816707984}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &761691818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 761691806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f77ba409874299d4eba31ef8147f6373, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _baseWeaponStats: {fileID: 0}
+  _accuracySystem: {fileID: 0}
+  _projectileLauncher: {fileID: 0}
+  _aimPointManager: {fileID: 0}
+  _activeEffects: []
 --- !u!1001 &816707984
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1168,6 +1190,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TPSPlayer
       objectReference: {fileID: 0}
+    - target: {fileID: 3958529434543869523, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: _playerWeaponController
+      value: 
+      objectReference: {fileID: 761691818}
     - target: {fileID: 4652513387228675290, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1211,7 +1237,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8827062219219739129, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 761691818}
   m_SourcePrefab: {fileID: 100100000, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
 --- !u!1 &867297365
 GameObject:
