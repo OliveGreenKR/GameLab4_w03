@@ -75,16 +75,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     [TabGroup("Projectile")]
     [SuffixLabel("secs")]
     [SerializeField] private float _maxSplitDelayedTime = 1.0f;
-
-    [TabGroup("Components")]
-    [Header("Attack Trigger")]
-    [Required]
-    [SerializeField] protected Collider _attackTrigger;
-
-    [TabGroup("Components")]
-    [Header("RigidBody")]
-    [Required]
-    [SerializeField] protected Rigidbody _rigid;
     #endregion
 
     #region Events - IProjectile
@@ -127,10 +117,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float RemainingLifeTime => _remainingLifetime;
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public Collider AttackTrigger => _attackTrigger;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
