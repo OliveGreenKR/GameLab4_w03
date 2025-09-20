@@ -151,13 +151,28 @@ public class AccuracySystem : MonoBehaviour
     private void UpdateCurrentAccuracy()
     {
         float baseAccuracy = _currentWeaponStats.CurrentAccuracy;
-        CurrentAccuracy = Mathf.Clamp(baseAccuracy - CurrentAccuracyPenalty, 0f, 100f);
+        float effectivePenalty = CalculateEffectivePenalty(baseAccuracy, CurrentAccuracyPenalty);
+        CurrentAccuracy = Mathf.Max(0f, baseAccuracy - effectivePenalty);
         CurrentSpreadAngle = CalculateSpreadAngle(CurrentAccuracy);
+    }
+
+    private float CalculateEffectivePenalty(float baseAccuracy, float rawPenalty)
+    {
+        if (baseAccuracy <= 100f)
+            return rawPenalty;
+
+        // 100 초과 부분을 페널티 버퍼로 사용
+        float excessAccuracy = baseAccuracy - 100f;
+        float bufferedPenalty = Mathf.Max(0f, rawPenalty - excessAccuracy);
+
+        return bufferedPenalty;
     }
 
     private float CalculateSpreadAngle(float accuracy)
     {
-        float normalizedAccuracy = Mathf.Clamp01(accuracy / 100f);
+        // 100 기준으로 정규화하여 100 이상은 완전 정확도
+        float clampedAccuracy = Mathf.Min(accuracy, 100f);
+        float normalizedAccuracy = Mathf.Clamp01(clampedAccuracy / 100f);
         return _maxSpreadAngle * (1f - normalizedAccuracy);
     }
 

@@ -28,12 +28,10 @@ public class WeaponStatSO : ScriptableObject
     [BoxGroup("Accuracy")]
     [Header("Accuracy Stats")]
     [SuffixLabel("%")]
-    [PropertyRange(0f, 100f)]
     [SerializeField] private float _baseAccuracy = 85f;
 
     [BoxGroup("Accuracy")]
     [SuffixLabel("degrees")]
-    [PropertyRange(0f, 45f)]
     [SerializeField] private float _baseRecoil = 2f;
     #endregion
 
