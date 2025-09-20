@@ -38,11 +38,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public bool CanFire { get; private set; }
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
-    public float CooldownRemaining { get; private set; }
+    public bool CanFire => CanFireInternal();
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -51,6 +47,47 @@ public class PlayerWeaponController : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public float CurrentAccuracy => _accuracySystem?.CurrentAccuracy ?? 0f;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public bool IsInitialized => _isInitialized;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public Vector3 CurrentAimPoint => _aimPointManager?.AimPoint ?? Vector3.zero;
+
+    [TabGroup("Weapon Stats Debug")]
+    [ShowInInspector, ReadOnly]
+    [InfoBox("최종 적용된 무기 스탯")]
+    public float FinalFireRate => FinalStats.CurrentFireRate;
+
+    [TabGroup("Weapon Stats Debug")]
+    [ShowInInspector, ReadOnly]
+    public float FinalDamage => FinalStats.CurrentDamage;
+
+    [TabGroup("Weapon Stats Debug")]
+    [ShowInInspector, ReadOnly]
+    public float FinalProjectileSpeed => FinalStats.CurrentProjectileSpeed;
+
+    [TabGroup("Weapon Stats Debug")]
+    [ShowInInspector, ReadOnly]
+    public float FinalProjectileLifetime => FinalStats.CurrentProjectileLifetime;
+
+    [TabGroup("Weapon Stats Debug")]
+    [ShowInInspector, ReadOnly]
+    public float FinalAccuracy => FinalStats.CurrentAccuracy;
+
+    [TabGroup("Weapon Stats Debug")]
+    [ShowInInspector, ReadOnly]
+    public float FinalRecoil => FinalStats.CurrentRecoil;
+
+    [TabGroup("Weapon Stats Debug")]
+    [ShowInInspector, ReadOnly]
+    [InfoBox("기본 스탯 대비 배율")]
+    public string StatMultipliers => _baseWeaponStats != null ?
+        $"Fire: {(FinalStats.CurrentFireRate / _baseWeaponStats.BaseFireRate):F2}x, " +
+        $"Dmg: {(FinalStats.CurrentDamage / _baseWeaponStats.BaseDamage):F2}x, " +
+        $"Acc: {(FinalStats.CurrentAccuracy / _baseWeaponStats.BaseAccuracy):F2}x" : "N/A";
     #endregion
 
     #region Private Fields
@@ -85,12 +122,13 @@ public class PlayerWeaponController : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
-        if (!_hasDebugDirections || _projectileLauncher == null) return;
+        //if (_projectileLauncher == null) return;
 
         Vector3 shootPosition = _projectileLauncher.transform.position;
-        float rayLength = 10f;
+
+        float rayLength = 5f;
 
         // 기본 조준 방향 (초록색)
         Gizmos.color = Color.green;
@@ -99,6 +137,32 @@ public class PlayerWeaponController : MonoBehaviour
         // 정확도 적용 방향 (파란색)
         Gizmos.color = Color.blue;
         Gizmos.DrawRay(shootPosition, _lastAccurateDirection * rayLength);
+
+        // 스탯 텍스트 표시
+        if (_isInitialized && _baseWeaponStats != null)
+        {
+            Vector3 basePosition = transform.position;
+            float offsetY = 0.5f;
+            float spacing = 0.3f;
+
+#if UNITY_EDITOR
+            UnityEditor.Handles.color = Color.white;
+            UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 0),
+                $"Fire Rate: {FinalStats.CurrentFireRate:F1} ({(FinalStats.CurrentFireRate / _baseWeaponStats.BaseFireRate):F2}x)");
+
+            UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 1),
+                $"Damage: {FinalStats.CurrentDamage:F1} ({(FinalStats.CurrentDamage / _baseWeaponStats.BaseDamage):F2}x)");
+
+            UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 2),
+                $"Accuracy: {FinalStats.CurrentAccuracy:F1}% ({(FinalStats.CurrentAccuracy / _baseWeaponStats.BaseAccuracy):F2}x)");
+
+            UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 3),
+                $"Recoil: {FinalStats.CurrentRecoil:F1} ({(FinalStats.CurrentRecoil / _baseWeaponStats.BaseRecoil):F2}x)");
+
+            UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 4),
+                $"Effects: {ActiveEffectCount}");
+#endif
+        }
     }
     #endregion
 
