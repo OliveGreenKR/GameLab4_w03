@@ -376,7 +376,7 @@ public class ProjectileLauncher : MonoBehaviour
             projectile.SetOwner(this);
 
             // 투사체 데미지 적용
-            projectile.SetDamage((int)_projectileDamage);
+            projectile.SetDamage(_projectileDamage);
 
             // 투사체 소멸 이벤트 구독
             projectile.OnProjectileDestroyed -= OnProjectileDestroyed;
