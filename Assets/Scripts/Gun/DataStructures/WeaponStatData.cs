@@ -38,7 +38,7 @@ public readonly struct WeaponStatData
         _currentDamage = Mathf.Max(0f, damage);
         _currentProjectileSpeed = Mathf.Max(1f, projectileSpeed);
         _currentProjectileLifetime = Mathf.Max(0.1f, projectileLifetime);
-        _currentAccuracy = Mathf.Clamp(accuracy, 0f, 100f);
+        _currentAccuracy = Mathf.Max(0, accuracy);
         _currentRecoil = Mathf.Max(0f, recoil);
     }
     #endregion

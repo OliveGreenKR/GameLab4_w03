@@ -1178,7 +1178,8 @@ MonoBehaviour:
   _recoilSystem: {fileID: 761691829}
   _projectileLauncher: {fileID: 962896344}
   _aimPointManager: {fileID: 831523057}
-  _activeEffects: []
+  _activeEffects:
+  - {fileID: 11400000, guid: 2a35297ec78b3e9448c406cb2f9ca1d7, type: 2}
 --- !u!114 &761691819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1192,9 +1193,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxSpreadAngle: 30
-  _accuracyPenaltyPerShot: 2
+  _accuracyPenaltyPerShot: 15
   _accuracyRecoveryRate: 30
-  _maxAccuracyPenalty: 50
+  _maxAccuracyPenalty: 45
 --- !u!114 &761691829
 MonoBehaviour:
   m_ObjectHideFlags: 0
