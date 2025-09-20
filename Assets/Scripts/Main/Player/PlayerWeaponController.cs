@@ -287,6 +287,7 @@ public class PlayerWeaponController : MonoBehaviour
             if (_recoilSystem != null)
             {
                 _recoilSystem.AddRecoil(1f);
+                Debug.Log($"[PlayerWeaponController] Recoil added. Current Intensity: {_recoilSystem.GetRecoilIntensity():F2}", this);
             }
         }
 
