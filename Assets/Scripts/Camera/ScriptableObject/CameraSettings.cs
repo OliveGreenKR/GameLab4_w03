@@ -21,9 +21,13 @@ public class CameraSettings : ScriptableObject
     [SuffixLabel("degrees")]
     [SerializeField] private float _fieldOfView = 60f;
 
-    [TabGroup("Damping")]
-    [Header("Damping Enable")]
-    [SerializeField] private bool _isEnableDamping = true;
+    [TabGroup("Damping", "Position")]
+    [Header("Position Damping")]
+    [SerializeField] private bool _isEnablePositionDamping = true;
+
+    [TabGroup("Damping", "Rotation")]
+    [Header("Rotation Damping")]
+    [SerializeField] private bool _isEnableRotationDamping = true;
 
     [TabGroup("Damping")]
     [Header("Position Damping")]
@@ -37,11 +41,18 @@ public class CameraSettings : ScriptableObject
     #endregion
 
     #region Properties
-    public bool IsEnableDamping
+    public bool IsEnablePositionDamping
     {
-        get => _isEnableDamping;
-        set => _isEnableDamping = value;
+        get => _isEnablePositionDamping;
+        set => _isEnablePositionDamping = value;
     }
+
+    public bool IsEnableRotationDamping
+    {
+        get => _isEnableRotationDamping;
+        set => _isEnableRotationDamping = value;
+    }
+
     public Vector3 OffsetDistance
     {
         get => _offsetDistance;
@@ -85,7 +96,8 @@ public class CameraSettings : ScriptableObject
         _offsetDistance = other._offsetDistance;
         _offsetRotationDegrees = other._offsetRotationDegrees;
         _fieldOfView = other._fieldOfView;
-        _isEnableDamping = other._isEnableDamping;
+        _isEnablePositionDamping = other._isEnablePositionDamping;
+        _isEnableRotationDamping = other._isEnableRotationDamping;
         _positionDampingSpeed = other._positionDampingSpeed;
         _rotationDampingSpeed = other._rotationDampingSpeed;
     }

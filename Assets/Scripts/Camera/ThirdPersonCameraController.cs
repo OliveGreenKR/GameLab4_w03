@@ -47,11 +47,15 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     [TabGroup("Damping", "Position")]
     [Header("Position Damping")]
+    [SerializeField] private bool _enablePositionDamping = true;
+    [TabGroup("Damping", "Position")]
     [SuffixLabel("units per second")]
     [SerializeField] private Vector3 _positionDampingSpeed = new Vector3(10f, 10f, 10f);
 
     [TabGroup("Damping", "Rotation")]
     [Header("Rotation Damping")]
+    [SerializeField] private bool _enableRotationDamping = true;
+    [TabGroup("Damping", "Rotation")]
     [SuffixLabel("degrees per second")]
     [SerializeField] private Vector3 _rotationDampingSpeed = new Vector3(90f, 90f, 90f);
 
@@ -60,11 +64,6 @@ public class ThirdPersonCameraController : MonoBehaviour
     [SerializeField] private DampingMode _positionDampMode = DampingMode.ExponentialDecay;
     [TabGroup("Damping", "Mode")]
     [SerializeField] private DampingMode _rotationDampMode = DampingMode.ExponentialDecay;
-
-    //[TabGroup("Damping", "Settings")]
-    //[Header("Damping Settings")]
-    //[InfoBox("Prevents overshooting when close to target")]
-    //[SerializeField] private float _dampingThresholdRatio = 0.05f;
 
     [TabGroup("Threshold")]
     [Header("Tracking Thresholds")]
@@ -76,10 +75,6 @@ public class ThirdPersonCameraController : MonoBehaviour
     [SuffixLabel("degrees")]
     [Range(0.0f, 1.0f)]
     [SerializeField] private float _rotationThreshold = 0.001f;
-
-    [TabGroup("Settings")]
-    [Header("Damping Control")]
-    [SerializeField] private bool _enableDamping = true;
 
     [TabGroup("Settings")]
     [Header("Default Camera Settings")]
@@ -104,12 +99,11 @@ public class ThirdPersonCameraController : MonoBehaviour
     [GUIColor("green")]
     [Button(ButtonSizes.Large)]
     [ButtonGroup("Apply Settings")]
-    private void ApplyAimSettings() => ApplyCameraSettings(_aimCameraSettings,true, _settingsTransitionSpeed);
+    private void ApplyAimSettings() => ApplyCameraSettings(_aimCameraSettings, true, _settingsTransitionSpeed);
 
     [GUIColor("cyan")]
     [ButtonGroup("Apply Settings")]
     private void ApplyDefaultSettings() => ApplyCameraSettings(_defaultSettings, true, _settingsTransitionSpeed);
-
 
     [Button(ButtonSizes.Large)]
     [GUIColor(1, 0.5f, 0)]
@@ -119,6 +113,8 @@ public class ThirdPersonCameraController : MonoBehaviour
         _currentSettings.RotationDampingSpeed = _rotationDampingSpeed;
         _currentSettings.OffsetDistance = _offsetDistance;
         _currentSettings.OffsetRotationDegrees = _offsetRotationDegrees;
+        _currentSettings.IsEnablePositionDamping = _enablePositionDamping;
+        _currentSettings.IsEnableRotationDamping = _enableRotationDamping;
         if (_camera != null)
         {
             _currentSettings.FieldOfView = _camera.fieldOfView;
@@ -130,7 +126,11 @@ public class ThirdPersonCameraController : MonoBehaviour
     #region Properties
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public bool IsDampingEnabled => _enableDamping;
+    public bool IsPositionDampingEnabled => _enablePositionDamping;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public bool IsRotationDampingEnabled => _enableRotationDamping;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -227,13 +227,31 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     #region Public Methods
     /// <summary>
-    /// 댐핑 활성화/비활성화 설정
+    /// 위치 댐핑 활성화/비활성화 설정
+    /// </summary>
+    /// <param name="enabled">위치 댐핑 활성화 여부</param>
+    public void SetPositionDampingEnabled(bool enabled)
+    {
+        _enablePositionDamping = enabled;
+    }
+
+    /// <summary>
+    /// 회전 댐핑 활성화/비활성화 설정
+    /// </summary>
+    /// <param name="enabled">회전 댐핑 활성화 여부</param>
+    public void SetRotationDampingEnabled(bool enabled)
+    {
+        _enableRotationDamping = enabled;
+    }
+
+    /// <summary>
+    /// 전체 댐핑 활성화/비활성화 설정
     /// </summary>
     /// <param name="enabled">댐핑 활성화 여부</param>
     public void SetDampingEnabled(bool enabled)
     {
-        _enableDamping = enabled;
-        Debug.Log($"ThirdPersonCamera : Damping : {enabled} ");
+        _enablePositionDamping = enabled;
+        _enableRotationDamping = enabled;
     }
 
     /// <summary>
@@ -357,7 +375,7 @@ public class ThirdPersonCameraController : MonoBehaviour
 
         if (positionDistance > _positionThreshold)
         {
-            if (!_enableDamping)
+            if (!_enablePositionDamping)
             {
                 transform.position = _targetWorldPosition;
                 return;
@@ -381,7 +399,7 @@ public class ThirdPersonCameraController : MonoBehaviour
 
         if (angularDistance > _rotationThreshold)
         {
-            if (!_enableDamping)
+            if (!_enableRotationDamping)
             {
                 transform.rotation = targetRotation;
                 return;
@@ -619,7 +637,6 @@ public class ThirdPersonCameraController : MonoBehaviour
     }
     #endregion
 
-        #region Private Methods - Settings Transition
     private void UpdateSettingsTransition()
     {
         if (_targetSettings == null || _currentSettings == null) return;
@@ -627,8 +644,9 @@ public class ThirdPersonCameraController : MonoBehaviour
         float deltaTime = Time.deltaTime;
         float speed = _settingsTransitionSpeed * deltaTime;
 
-        //damping 옵션은 바로 적용
-        _enableDamping = _targetSettings.IsEnableDamping;
+        // 분리된 댐핑 옵션 바로 적용
+        _enablePositionDamping = _targetSettings.IsEnablePositionDamping;
+        _enableRotationDamping = _targetSettings.IsEnableRotationDamping;
 
         // Lerp 설정값들
         _offsetDistance = Vector3.Lerp(_offsetDistance, _targetSettings.OffsetDistance, speed);
@@ -659,7 +677,8 @@ public class ThirdPersonCameraController : MonoBehaviour
         _offsetRotationDegrees = settings.OffsetRotationDegrees;
         _positionDampingSpeed = settings.PositionDampingSpeed;
         _rotationDampingSpeed = settings.RotationDampingSpeed;
-        _enableDamping = settings.IsEnableDamping;
+        _enablePositionDamping = settings.IsEnablePositionDamping;
+        _enableRotationDamping = settings.IsEnableRotationDamping;
 
         if (_camera != null)
         {
@@ -669,6 +688,5 @@ public class ThirdPersonCameraController : MonoBehaviour
         _currentSettings = settings;
         _isTransitioningSettings = false;
     }
-    #endregion
 
 }
