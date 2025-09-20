@@ -55,6 +55,9 @@ public class PlayerWeaponController : MonoBehaviour
 
     #region Private Fields
     private bool _isInitialized = false;
+    private Vector3 _lastBaseDirection = Vector3.forward;
+    private Vector3 _lastAccurateDirection = Vector3.forward;
+    private bool _hasDebugDirections = false;
     #endregion
 
     #region Unity Lifecycle
@@ -80,6 +83,22 @@ public class PlayerWeaponController : MonoBehaviour
             UpdateLauncherSettings();
             UpdateAccuracySystem();
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!_hasDebugDirections || _projectileLauncher == null) return;
+
+        Vector3 shootPosition = _projectileLauncher.transform.position;
+        float rayLength = 10f;
+
+        // 기본 조준 방향 (초록색)
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(shootPosition, _lastBaseDirection * rayLength);
+
+        // 정확도 적용 방향 (파란색)
+        Gizmos.color = Color.blue;
+        Gizmos.DrawRay(shootPosition, _lastAccurateDirection * rayLength);
     }
     #endregion
 
@@ -168,26 +187,17 @@ public class PlayerWeaponController : MonoBehaviour
         if (!CanFireInternal())
             return false;
 
-        Vector3 direction = GetAccurateDirection();
-        bool success = _projectileLauncher.Fire(direction);
+        Vector3 baseDirection = CalculateBaseDirection();
+        Vector3 accurateDirection = (_accuracySystem != null)
+            ? _accuracySystem.ApplySpreadToDirection(baseDirection, _accuracySystem.CurrentAccuracy)
+            : baseDirection;
 
-        if (success && _accuracySystem != null)
-        {
-            _accuracySystem.AddRecoil(FinalStats.CurrentRecoil);
-        }
+        // 디버그 정보 저장
+        _lastBaseDirection = baseDirection;
+        _lastAccurateDirection = accurateDirection;
+        _hasDebugDirections = true;
 
-        return success;
-    }
-
-    /// <summary>강제 발사 (쿨다운 무시)</summary>
-    /// <returns>발사 성공 여부</returns>
-    public bool ForceFire()
-    {
-        if (!_isInitialized || _projectileLauncher == null)
-            return false;
-
-        Vector3 direction = GetAccurateDirection();
-        bool success = _projectileLauncher.Fire(direction);
+        bool success = _projectileLauncher.Fire(accurateDirection);
 
         if (success && _accuracySystem != null)
         {
