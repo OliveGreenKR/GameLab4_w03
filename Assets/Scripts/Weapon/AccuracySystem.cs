@@ -3,17 +3,62 @@ using UnityEngine;
 
 public class AccuracySystem : MonoBehaviour
 {
+    #region Nested Types
+    [System.Serializable]
+    public struct RecoilState
+    {
+        #region Fields
+        private readonly float _currentRecoil;
+        private readonly float _maxRecoil;
+        private readonly float _recoveryRate;
+        #endregion
+
+        #region Properties
+        public float CurrentRecoil => _currentRecoil;
+        public float RecoilRatio => _maxRecoil > 0f ? _currentRecoil / _maxRecoil : 0f;
+        #endregion
+
+        #region Constructor
+        public RecoilState(float maxRecoil, float recoveryRate)
+        {
+            _currentRecoil = 0f;
+            _maxRecoil = Mathf.Max(0.1f, maxRecoil);
+            _recoveryRate = Mathf.Max(0f, recoveryRate);
+        }
+
+        private RecoilState(float currentRecoil, float maxRecoil, float recoveryRate)
+        {
+            _currentRecoil = currentRecoil;
+            _maxRecoil = maxRecoil;
+            _recoveryRate = recoveryRate;
+        }
+        #endregion
+
+        #region Public Methods
+        public RecoilState AddRecoil(float amount)
+        {
+            float newRecoil = Mathf.Clamp(_currentRecoil + amount, 0f, _maxRecoil);
+            return new RecoilState(newRecoil, _maxRecoil, _recoveryRate);
+        }
+
+        public RecoilState UpdateRecovery(float deltaTime)
+        {
+            float newRecoil = Mathf.Max(0f, _currentRecoil - _recoveryRate * deltaTime);
+            return new RecoilState(newRecoil, _maxRecoil, _recoveryRate);
+        }
+        #endregion
+    }
+    #endregion
+
     #region Serialized Fields
     [TabGroup("Settings")]
     [Header("Accuracy Settings")]
     [SuffixLabel("degrees")]
-    [PropertyRange(0.1f, 45f)]
     [SerializeField] private float _maxSpreadAngle = 15f;
 
     [TabGroup("Settings")]
     [Header("Recoil Recovery")]
     [SuffixLabel("units/sec")]
-    [PropertyRange(1f, 20f)]
     [SerializeField] private float _recoilRecoveryRate = 5f;
     #endregion
 
@@ -33,7 +78,6 @@ public class AccuracySystem : MonoBehaviour
 
     #region Private Fields
     private WeaponStatData _currentWeaponStats;
-    private WeaponMode _currentWeaponMode;
     #endregion
 
     #region Unity Lifecycle
@@ -45,17 +89,13 @@ public class AccuracySystem : MonoBehaviour
     #endregion
 
     #region Public Methods - Accuracy Calculation
-    public float CalculateFinalAccuracy(WeaponStatData weaponStats, WeaponMode mode, RecoilState recoilState)
+    public float CalculateFinalAccuracy(WeaponStatData weaponStats, RecoilState recoilState)
     {
         float baseAccuracy = weaponStats.CurrentAccuracy;
-        WeaponModeModifiers modifiers = mode.GetModifiers();
 
         // 반동으로 인한 정확도 감소
         float recoilPenalty = baseAccuracy * recoilState.RecoilRatio * 0.5f;
-        float accuracyWithRecoil = baseAccuracy - recoilPenalty;
-
-        // 무기 모드 배율 적용
-        float finalAccuracy = accuracyWithRecoil * modifiers.accuracyMultiplier;
+        float finalAccuracy = baseAccuracy - recoilPenalty;
 
         return Mathf.Clamp(finalAccuracy, 0f, 100f);
     }
@@ -68,14 +108,11 @@ public class AccuracySystem : MonoBehaviour
         float spreadAngle = CalculateSpreadAngle(accuracy);
         Vector2 spreadOffset = GetRandomSpreadOffset(spreadAngle);
 
-        // 기본 방향에 수직인 두 벡터 계산
         Vector3 right = Vector3.Cross(baseDirection, Vector3.up).normalized;
         if (right.sqrMagnitude < 0.1f)
             right = Vector3.Cross(baseDirection, Vector3.forward).normalized;
 
         Vector3 up = Vector3.Cross(right, baseDirection).normalized;
-
-        // 확산 적용
         Vector3 spreadDirection = baseDirection + (right * spreadOffset.x) + (up * spreadOffset.y);
         return spreadDirection.normalized;
     }
@@ -83,7 +120,7 @@ public class AccuracySystem : MonoBehaviour
     public float GetCrosshairSpread(float accuracy)
     {
         float spreadAngle = CalculateSpreadAngle(accuracy);
-        return spreadAngle / _maxSpreadAngle; // 0-1 정규화
+        return spreadAngle / _maxSpreadAngle;
     }
     #endregion
 
@@ -109,19 +146,12 @@ public class AccuracySystem : MonoBehaviour
     public void SetWeaponStats(WeaponStatData weaponStats)
     {
         _currentWeaponStats = weaponStats;
-
-        // 무기 변경시 반동 상태 리셋
         float maxRecoil = weaponStats.CurrentRecoil;
         CurrentRecoilState = new RecoilState(maxRecoil, _recoilRecoveryRate);
     }
-
-    public void SetWeaponMode(WeaponMode mode)
-    {
-        _currentWeaponMode = mode;
-    }
     #endregion
 
-    #region Private Methods - Accuracy Logic
+    #region Private Methods
     private float CalculateSpreadAngle(float accuracy)
     {
         float normalizedAccuracy = Mathf.Clamp01(accuracy / 100f);
@@ -137,7 +167,7 @@ public class AccuracySystem : MonoBehaviour
 
     private void UpdateCurrentAccuracy()
     {
-        CurrentAccuracy = CalculateFinalAccuracy(_currentWeaponStats, _currentWeaponMode, CurrentRecoilState);
+        CurrentAccuracy = CalculateFinalAccuracy(_currentWeaponStats, CurrentRecoilState);
         CurrentSpreadAngle = CalculateSpreadAngle(CurrentAccuracy);
     }
     #endregion
