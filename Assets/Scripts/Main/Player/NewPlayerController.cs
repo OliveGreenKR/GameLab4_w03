@@ -451,13 +451,13 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
             _coyoteTimeRemaining = 0f; // 코요테 타임 소모
         }
 
-        Debug.Log($"Jump Performed : {_currentVelocity.y}");
+        //Debug.Log($"Jump Performed : {_currentVelocity.y}");
     }
 
     private void OnMouseClicked(InputAction.CallbackContext context)
     {
         _isFiring = true;
-        Debug.Log("[NewPlayerController] Mouse Clicked");
+        //Debug.Log("[NewPlayerController] Mouse Clicked");
         //Fire();
     }
 
@@ -469,13 +469,13 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
     private void OnMouseRightPressed(InputAction.CallbackContext context)
     {
         OnAimModeStarted?.Invoke();
-        Debug.Log("[NewPlayerController] Mouse Right Pressed");
+        //Debug.Log("[NewPlayerController] Mouse Right Pressed");
     }
 
     private void OnMouseRightCancled(InputAction.CallbackContext context)
     {
         OnAimModeEnded?.Invoke();
-        Debug.Log("[NewPlayerController] Mouse Right Cancled");
+        //Debug.Log("[NewPlayerController] Mouse Right Cancled");
     }
     #endregion
 
