@@ -71,29 +71,6 @@ public class PlayerBattleEntity : BaseBattleEntity
         base.OnDestroy();
         UnsubscribeFromEvents();
     }
-
-    private void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        //Debug.Log($"[PlayerBattleEntity] OnControllerColliderHit with {hit.collider.name}", this);
-        //if (!IsAlive) return;
-
-        //if (IsValidEnemy(hit))
-        //{
-        //    HandleEnemyCollision(hit);
-        //}
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log($"[PlayerBattleEntity] OnTriggerEnter with {other.name}", this);
-        if (!IsAlive) return;
-
-        if (IsValidEnemy(other))
-        {
-            HandleEnemyCollision(other);
-        }
-    }
-
     #endregion
 
     #region Public Methods - Player Specific
@@ -181,7 +158,6 @@ public class PlayerBattleEntity : BaseBattleEntity
         // TODO: 사망 애니메이션, 이펙트 등 추가
     }
     #endregion
-
 
     #region Private Methods - Initialization
     private void InitializeReferences()

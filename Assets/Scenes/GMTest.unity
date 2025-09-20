@@ -487,13 +487,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4390947304085020657, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5175902631662209742, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
       propertyPath: m_Name
       value: enemy (1)
       objectReference: {fileID: 0}
     - target: {fileID: 5175902631662209742, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5289648399551077228, guid: 65dd341bb88bcc34d9365f786f7ef5f9, type: 3}
       propertyPath: _baseMoveSpeed
@@ -1309,17 +1313,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 657221844}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &761691815 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9083733794843362674, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
-  m_PrefabInstance: {fileID: 816707984}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 502e2c6ef6b42e343b68c3829015bca6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &816707984
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1353,9 +1346,21 @@ PrefabInstance:
       value: TPSPlayer
       objectReference: {fileID: 0}
     - target: {fileID: 2489569754048336098, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2489569754048336098, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: _targetRenderer
+      value: 
+      objectReference: {fileID: 1095147292}
+    - target: {fileID: 2489569754048336098, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: _inputPreventionTime
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2489569754048336098, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: _damageEffectMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 3614b2f58acda5a40a335d7f89520a47, type: 2}
     - target: {fileID: 4471660500654166704, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: _enableDamping
       value: 0
@@ -1500,6 +1505,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 867297365}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1095147292 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7802849504411400189, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+  m_PrefabInstance: {fileID: 816707984}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1218236528
 GameObject:
   m_ObjectHideFlags: 0
@@ -1769,7 +1779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbdb469506c97674f88b3753361206af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerBattleEntity: {fileID: 761691815}
+  _playerBattleEntity: {fileID: 0}
   _initialHealth: 50
   _initialGold: 50
   _normalEnemyGoldReward: 1
