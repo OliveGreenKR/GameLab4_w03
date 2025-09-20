@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d60200d9ad4dc13409779afc66bfca7d, type: 3}
+  m_Name: FocusWE
+  m_EditorClassIdentifier: 
+  _priority: 1
+  _description: "\uBC1C\uC0AC\uC18D\uB3C4 0.7x, \uC815\uD655\uB3C4 1.3x, \uB370\uBBF8\uC9C0
+    1.5x, \uBC18\uB3D9 1.3x"
+  _fireRateMultiplier: 0.67
+  _accuracyMultiplier: 1.3
+  _damageMultiplier: 1.5
+  _recoilMultiplier: 1.3
