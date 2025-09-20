@@ -23,6 +23,9 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] private RecoilSystem _recoilSystem;
 
     [TabGroup("References")]
+    [SerializeField] private RecoilConverterForCamera _recoilConverter;
+
+    [TabGroup("References")]
     [Required]
     [SerializeField] private ProjectileLauncher _projectileLauncher;
 
@@ -288,6 +291,12 @@ public class PlayerWeaponController : MonoBehaviour
             {
                 _recoilSystem.AddRecoil(1f);
                 Debug.Log($"[PlayerWeaponController] Recoil added. Current Intensity: {_recoilSystem.GetRecoilIntensity():F2}", this);
+                // 반동을 카메라에 전달
+                if (_recoilConverter != null)
+                {
+                    Vector3 recoilVector = _recoilSystem.GetCurrentRecoilVector();
+                    _recoilConverter.ApplyRecoil(new Vector2(recoilVector.x, recoilVector.y));
+                }
             }
         }
 
@@ -319,6 +328,7 @@ public class PlayerWeaponController : MonoBehaviour
         CalculateFinalStats();
         UpdateLauncherSettings();
         UpdateAccuracySystem();
+        UpdateRecoilSystem();
 
         _isInitialized = true;
         Debug.Log("[PlayerWeaponController] Weapon system initialized", this);
@@ -383,6 +393,9 @@ public class PlayerWeaponController : MonoBehaviour
 
         if (_recoilSystem == null)
             Debug.LogError("[PlayerWeaponController] Recoil system not assigned!", this);
+
+        if(_recoilConverter == null)
+            Debug.LogWarning("[PlayerWeaponController] Recoil converter not assigned! Recoil will not affect camera.", this);
 
         if (_projectileLauncher == null)
             Debug.LogError("[PlayerWeaponController] Projectile launcher not assigned!", this);

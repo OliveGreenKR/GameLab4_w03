@@ -73,7 +73,8 @@ public class RecoilConverterForCamera : MonoBehaviour
 
         _lastRecoil = recoilVector;
         // 리코일 벡터를 각도 델타로 직접 적용
-        _angleController.AdjustAngles(recoilVector.x, recoilVector.y);
+        // y축은 Pitch로 반전
+        _angleController.AdjustAngles(recoilVector.x, -recoilVector.y);
     }
     #endregion
 }

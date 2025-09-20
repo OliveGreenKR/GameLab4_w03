@@ -17,4 +17,4 @@ MonoBehaviour:
   _baseProjectileSpeed: 20
   _baseProjectileLifetime: 3
   _baseAccuracy: 90
-  _baseRecoil: 2
+  _baseRecoil: 0.3

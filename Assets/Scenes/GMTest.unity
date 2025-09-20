@@ -1176,6 +1176,7 @@ MonoBehaviour:
   _baseWeaponStats: {fileID: 11400000, guid: 4cce8f36362e86b4f854d95ba7f62999, type: 2}
   _accuracySystem: {fileID: 761691819}
   _recoilSystem: {fileID: 761691829}
+  _recoilConverter: {fileID: 1072174463}
   _projectileLauncher: {fileID: 962896344}
   _aimPointManager: {fileID: 831523057}
   _activeEffects:
@@ -1208,10 +1209,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3f2c6f1cad81aa45831710bd82690dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxRecoilIntensity: 1
-  _recoilRecoveryRate: 2
+  _maxRecoilIntensity: 1.5
+  _recoilRecoveryRate: 1
   _recoilDirection: {x: 0, y: 1}
-  _recoilRandomness: 0.2
+  _recoilRandomness: 0.5
 --- !u!1001 &816707984
 PrefabInstance:
   m_ObjectHideFlags: 0

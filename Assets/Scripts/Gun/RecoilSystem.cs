@@ -6,12 +6,12 @@ public class RecoilSystem : MonoBehaviour
     #region Serialized Fields
     [TabGroup("Settings")]
     [Header("Recoil Intensity")]
-    [SuffixLabel("units")]
+    [SuffixLabel("degrees")]
     [SerializeField] private float _maxRecoilIntensity = 1f;
 
     [TabGroup("Settings")]
     [Header("Recoil Recovery")]
-    [SuffixLabel("units/sec")]
+    [SuffixLabel("degrees/sec")]
     [SerializeField] private float _recoilRecoveryRate = 2f;
 
     [TabGroup("Settings")]
@@ -105,7 +105,6 @@ public class RecoilSystem : MonoBehaviour
     #endregion
 
     #region Private Methods - Recoil Calculation
-    #region Private Methods - Recoil Calculation
     private void UpdateRecoilRecovery()
     {
         if (CurrentRecoilIntensity > 0f)
@@ -138,6 +137,5 @@ public class RecoilSystem : MonoBehaviour
 
         return baseDirection.normalized;
     }
-    #endregion
     #endregion
 }
