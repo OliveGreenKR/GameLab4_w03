@@ -35,6 +35,16 @@ public class ThirdPersonCameraController : MonoBehaviour
     [SuffixLabel("units")]
     [SerializeField] private Vector3 _offsetDistance = new Vector3(0f, 2f, -5f);
 
+    [TabGroup("Damping", "Common")]
+    [Header("Critical Daming Options")]
+    [SerializeField] private float VIBRATION_FILTER_THRESHOLD_UNITS = 0.001f;
+    [TabGroup("Damping", "Common")]
+    [SerializeField] private float VIBRATION_FILTER_THRESHOLD_DEGREES = 0.001f;
+    [TabGroup("Damping", "Common")]
+    [SerializeField] private float CRITICAL_DAMPING_COEFFICIENT = 2.0f;
+    [TabGroup("Damping", "Common")]
+    [SerializeField] private float HIGH_FREQUENCY_CUTOFF_RATE = 20.0f;
+
     [TabGroup("Damping", "Position")]
     [Header("Position Damping")]
     [SuffixLabel("units per second")]
@@ -155,6 +165,15 @@ public class ThirdPersonCameraController : MonoBehaviour
     private Camera _camera;
     private bool _isTransitioningSettings = false;
 
+    // Velocity Tracking for Critical Damping
+    private Vector3 _currentPositionVelocity = Vector3.zero;
+    private Vector3 _currentRotationVelocity = Vector3.zero;
+
+    // Vibration Filtering
+    private Vector3 _previousTargetPosition = Vector3.zero;
+    private Quaternion _previousTargetRotation = Quaternion.identity;
+    private Vector3 _filteredTargetPosition = Vector3.zero;
+    private Quaternion _filteredTargetRotation = Quaternion.identity;
     #endregion
 
     #region Unity Lifecycle
@@ -379,7 +398,12 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     private Vector3 DampVector3(Vector3 current, Vector3 target, DampingMode mode)
     {
-        float distance = Vector3.Distance(current, target);
+        // Apply vibration filtering first
+        Vector3 filteredTarget = ApplyVibrationFilter(target, _previousTargetPosition, _filteredTargetPosition);
+        _previousTargetPosition = target;
+        _filteredTargetPosition = filteredTarget;
+
+        float distance = Vector3.Distance(current, filteredTarget);
 
         switch (mode)
         {
@@ -391,37 +415,43 @@ public class ThirdPersonCameraController : MonoBehaviour
                         _positionDampingSpeed.z * Time.deltaTime
                     );
                     return new Vector3(
-                        Mathf.Lerp(current.x, target.x, dampingSpeed.x),
-                        Mathf.Lerp(current.y, target.y, dampingSpeed.y),
-                        Mathf.Lerp(current.z, target.z, dampingSpeed.z)
+                        Mathf.Lerp(current.x, filteredTarget.x, dampingSpeed.x),
+                        Mathf.Lerp(current.y, filteredTarget.y, dampingSpeed.y),
+                        Mathf.Lerp(current.z, filteredTarget.z, dampingSpeed.z)
                     );
                 }
+
             case DampingMode.UnifiedDirectionPreserving:
                 {
-                    Vector3 direction = (target - current).normalized;
+                    Vector3 direction = (filteredTarget - current).normalized;
                     float dampingRate = _positionDampingSpeed.x;
                     float dampedDistance = distance * Mathf.Exp(-dampingRate * Time.deltaTime);
                     return current + direction * (distance - dampedDistance);
                 }
+
             case DampingMode.ExponentialDecay:
                 {
                     float dampingRate = _positionDampingSpeed.x;
-                    return target + (current - target) * Mathf.Exp(-dampingRate * Time.deltaTime);
+                    return filteredTarget + (current - filteredTarget) * Mathf.Exp(-dampingRate * Time.deltaTime);
                 }
+
             case DampingMode.CriticalDamping:
                 {
-                    float dampingRate = _positionDampingSpeed.x;
-                    float t = 1.0f - Mathf.Exp(-dampingRate * Time.deltaTime);
-                    return Vector3.Lerp(current, target, t);
+                    return CriticalDampVector3(current, filteredTarget, ref _currentPositionVelocity, _positionDampingSpeed.x);
                 }
+
             default:
                 return current;
         }
     }
-
     private Quaternion DampQuaternion(Quaternion current, Quaternion target, DampingMode mode)
     {
-        float angularDistance = Quaternion.Angle(current, target);
+        // Apply vibration filtering for rotation
+        Quaternion filteredTarget = ApplyQuaternionVibrationFilter(target, _previousTargetRotation, _filteredTargetRotation);
+        _previousTargetRotation = target;
+        _filteredTargetRotation = filteredTarget;
+
+        float angularDistance = Quaternion.Angle(current, filteredTarget);
 
         switch (mode)
         {
@@ -434,11 +464,11 @@ public class ThirdPersonCameraController : MonoBehaviour
                     );
 
                     Vector3 currentEuler = current.eulerAngles;
-                    Vector3 targetEuler = target.eulerAngles;
+                    Vector3 targetEulerFiltered = filteredTarget.eulerAngles;
 
-                    float deltaX = Mathf.DeltaAngle(currentEuler.x, targetEuler.x);
-                    float deltaY = Mathf.DeltaAngle(currentEuler.y, targetEuler.y);
-                    float deltaZ = Mathf.DeltaAngle(currentEuler.z, targetEuler.z);
+                    float deltaX = Mathf.DeltaAngle(currentEuler.x, targetEulerFiltered.x);
+                    float deltaY = Mathf.DeltaAngle(currentEuler.y, targetEulerFiltered.y);
+                    float deltaZ = Mathf.DeltaAngle(currentEuler.z, targetEulerFiltered.z);
 
                     Vector3 nextEuler = new Vector3(
                         currentEuler.x + deltaX * dampingSpeed.x,
@@ -448,32 +478,148 @@ public class ThirdPersonCameraController : MonoBehaviour
 
                     return Quaternion.Euler(nextEuler);
                 }
+
             case DampingMode.UnifiedDirectionPreserving:
                 {
                     float dampingRate = _rotationDampingSpeed.x;
                     float dampedAngle = angularDistance * Mathf.Exp(-dampingRate * Time.deltaTime);
                     float progress = (angularDistance - dampedAngle) / angularDistance;
-                    return Quaternion.Slerp(current, target, progress);
+                    return Quaternion.Slerp(current, filteredTarget, progress);
                 }
+
             case DampingMode.ExponentialDecay:
                 {
                     float dampingRate = _rotationDampingSpeed.x;
                     float t = 1.0f - Mathf.Exp(-dampingRate * Time.deltaTime);
-                    return Quaternion.Slerp(current, target, t);
+                    return Quaternion.Slerp(current, filteredTarget, t);
                 }
+
             case DampingMode.CriticalDamping:
                 {
-                    float dampingRate = _rotationDampingSpeed.x;
-                    float t = 1.0f - Mathf.Exp(-dampingRate * Time.deltaTime);
-                    return Quaternion.Slerp(current, target, t);
+                    return CriticalDampQuaternion(current, filteredTarget, ref _currentRotationVelocity, _rotationDampingSpeed.x);
                 }
+
             default:
                 return current;
         }
     }
+
+    /// <summary>
+    /// 진동 필터링을 통해 고주파 노이즈 제거
+    /// </summary>
+    /// <param name="newTarget">새로운 타겟 위치</param>
+    /// <param name="previousTarget">이전 타겟 위치</param>
+    /// <param name="filteredTarget">필터링된 타겟 위치</param>
+    /// <returns>필터링된 타겟 위치</returns>
+    private Vector3 ApplyVibrationFilter(Vector3 newTarget, Vector3 previousTarget, Vector3 filteredTarget)
+    {
+        float deltaDistance = Vector3.Distance(newTarget, previousTarget);
+
+        // 임계값 이하의 작은 변화는 필터링
+        if (deltaDistance < VIBRATION_FILTER_THRESHOLD_UNITS)
+        {
+            return filteredTarget;
+        }
+
+        // 고주파 컷오프 필터 적용
+        float filterRate = HIGH_FREQUENCY_CUTOFF_RATE * Time.deltaTime;
+        float t = 1.0f - Mathf.Exp(-filterRate);
+
+        return Vector3.Lerp(filteredTarget, newTarget, t);
+    }
+
+    /// <summary>
+    /// Spring-Mass-Damper 기반 Critical Damping 구현
+    /// </summary>
+    /// <param name="current">현재 위치</param>
+    /// <param name="target">목표 위치</param>
+    /// <param name="velocity">현재 속도 (ref)</param>
+    /// <param name="dampingSpeed">댐핑 속도</param>
+    /// <returns>댐핑된 위치</returns>
+    private Vector3 CriticalDampVector3(Vector3 current, Vector3 target, ref Vector3 velocity, float dampingSpeed)
+    {
+        float deltaTime = Time.deltaTime;
+        float omega = dampingSpeed; // Natural frequency
+        float zeta = 1.0f; // Critical damping ratio
+
+        Vector3 displacement = target - current;
+
+        // Critical damping: x(t) = (A + Bt)e^(-ωt)
+        float dampingFactor = Mathf.Exp(-omega * deltaTime);
+        float impulseFactor = omega * deltaTime * dampingFactor;
+
+        Vector3 newPosition = current + (displacement + velocity * deltaTime) * dampingFactor;
+        velocity = (velocity - displacement * omega) * dampingFactor;
+
+        return newPosition;
+    }
+
+    /// <summary>
+    /// Quaternion용 진동 필터링 (순수 Quaternion space)
+    /// </summary>
+    /// <param name="newTarget">새로운 타겟 회전</param>
+    /// <param name="previousTarget">이전 타겟 회전</param>
+    /// <param name="filteredTarget">필터링된 타겟 회전</param>
+    /// <returns>필터링된 타겟 회전</returns>
+    private Quaternion ApplyQuaternionVibrationFilter(Quaternion newTarget, Quaternion previousTarget, Quaternion filteredTarget)
+    {
+        float deltaAngle = Quaternion.Angle(newTarget, previousTarget);
+
+        if (deltaAngle < VIBRATION_FILTER_THRESHOLD_DEGREES)
+        {
+            return filteredTarget;
+        }
+
+        float filterRate = HIGH_FREQUENCY_CUTOFF_RATE * Time.deltaTime;
+        float t = 1.0f - Mathf.Exp(-filterRate);
+
+        return Quaternion.Slerp(filteredTarget, newTarget, t);
+    }
+
+    /// <summary>
+    /// Quaternion용 Critical Damping 구현 (순수 Quaternion space)
+    /// </summary>
+    /// <param name="current">현재 회전</param>
+    /// <param name="target">목표 회전</param>
+    /// <param name="angularVelocity">현재 각속도 (ref)</param>
+    /// <param name="dampingSpeed">댐핑 속도</param>
+    /// <returns>댐핑된 회전</returns>
+    private Quaternion CriticalDampQuaternion(Quaternion current, Quaternion target, ref Vector3 angularVelocity, float dampingSpeed)
+    {
+        float deltaTime = Time.deltaTime;
+        float omega = dampingSpeed;
+
+        // 최단 경로 회전 계산
+        Quaternion deltaRotation = target * Quaternion.Inverse(current);
+
+        // Quaternion을 축-각도로 변환
+        deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
+
+        // 각도를 -180~180 범위로 정규화
+        if (angle > 180f) angle -= 360f;
+        angle *= Mathf.Deg2Rad;
+
+        Vector3 displacement = axis * angle;
+
+        // Critical damping 계산
+        float dampingFactor = Mathf.Exp(-omega * deltaTime);
+        Vector3 dampedDisplacement = (displacement + angularVelocity * deltaTime) * dampingFactor;
+        angularVelocity = (angularVelocity - displacement * omega) * dampingFactor;
+
+        // 결과를 Quaternion으로 변환
+        float dampedAngle = dampedDisplacement.magnitude;
+        if (dampedAngle > Mathf.Epsilon)
+        {
+            Vector3 dampedAxis = dampedDisplacement.normalized;
+            Quaternion dampedRotation = Quaternion.AngleAxis(dampedAngle * Mathf.Rad2Deg, dampedAxis);
+            return dampedRotation * current;
+        }
+
+        return current;
+    }
     #endregion
 
-    #region Private Methods - Settings Transition
+        #region Private Methods - Settings Transition
     private void UpdateSettingsTransition()
     {
         if (_targetSettings == null || _currentSettings == null) return;
@@ -524,4 +670,5 @@ public class ThirdPersonCameraController : MonoBehaviour
         _isTransitioningSettings = false;
     }
     #endregion
+
 }
