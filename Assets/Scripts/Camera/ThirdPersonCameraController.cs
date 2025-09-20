@@ -347,6 +347,10 @@ public class ThirdPersonCameraController : MonoBehaviour
             Vector3 nextPosition = DampVector3(currentPosition, _targetWorldPosition, _positionDampMode);
             transform.position = nextPosition;
         }
+        else
+        {
+            transform.position = _targetWorldPosition;
+        }
     }
 
     private void TrackRotation()
@@ -366,6 +370,10 @@ public class ThirdPersonCameraController : MonoBehaviour
 
             Quaternion nextRotation = DampQuaternion(currentRotation, targetRotation, _rotationDampMode);
             transform.rotation = nextRotation;
+        }
+        else
+        {
+            transform.rotation = targetRotation;
         }
     }
 

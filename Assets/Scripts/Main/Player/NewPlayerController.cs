@@ -139,13 +139,13 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
         _isFiring = false;
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        if(_characterController.isGrounded)
-        {
-            _lastGroundNormal = hit.normal;
-        }
-    }
+    //private void OnControllerColliderHit(ControllerColliderHit hit)
+    //{
+    //    if(_characterController.isGrounded)
+    //    {
+    //        _lastGroundNormal = hit.normal;
+    //    }
+    //}
     #endregion
 
     #region IInputEventProvider Implementation

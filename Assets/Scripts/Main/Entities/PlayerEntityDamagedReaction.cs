@@ -5,7 +5,7 @@ public class PlayerEntityDamagedReaction : MonoBehaviour
 {
     [SerializeField][Required] CharacterController _targetCharacterController = null;
     [SerializeField][Required] NewPlayerController _playerController = null;
-    [SerializeField][Required] CharacterBattleEntity _characterBattleEntity = null;
+    [SerializeField][Required] PlayerBattleEntity _playerBattleEntity = null;
 
     [SerializeField] private float _knockbackMagnitude = 2f;
     [SerializeField][SuffixLabel("secs")] private float _inputPreventionTime = 0.2f;
@@ -28,17 +28,26 @@ public class PlayerEntityDamagedReaction : MonoBehaviour
             Debug.LogError("[PlayerEntityDamaged] PlayerController is not assigned!", this);
             return;
         }
-        if (_characterBattleEntity == null)
+        if (_playerBattleEntity == null)
         {
             Debug.LogError("[PlayerEntityDamaged] BaseBattleEntity is not assigned!", this);
             return;
         }
-        _characterBattleEntity.OnCharacterDamaged += OnDamaged;
+        _playerBattleEntity.GetComponent<BattleStatComponent>().OnDamageTaken -= OnDamaged;
+        _playerBattleEntity.GetComponent<BattleStatComponent>().OnDamageTaken += OnDamaged;
     }
 
     private void Update()
     {
         UpdateInputRecovery();
+    }
+
+    private void OnDestroy()
+    {
+        if (_playerBattleEntity != null)
+        {
+            _playerBattleEntity.GetComponent<BattleStatComponent>().OnDamageTaken -= OnDamaged;
+        }
     }
     #endregion
 
@@ -49,18 +58,22 @@ public class PlayerEntityDamagedReaction : MonoBehaviour
 
         // 지면 상태에 따른 넉백 방향 계산
         Vector3 knockbackDirection;
-        if (_playerController.IsGrounded)
-        {
-            // 지면 위에서: Unity의 ProjectOnPlane 사용
-            Vector3 groundNormal = _playerController.LastGroudnNormal;
-            knockbackDirection = Vector3.ProjectOnPlane(direction, groundNormal).normalized;
-        }
-        else
-        {
-            // 공중에서: 기존 방식 (수평 넉백)
-            knockbackDirection = direction;
-        }
+        //if (_playerController.IsGrounded)
+        //{
+        //    // 지면 위에서: Unity의 ProjectOnPlane 사용
+        //    Vector3 groundNormal = _playerController.LastGroudnNormal;
+        //    knockbackDirection = Vector3.ProjectOnPlane(direction, groundNormal).normalized;
+        //}
+        //else
+        //{
+        //    // 공중에서: 기존 방식 (수평 넉백)
+        //    knockbackDirection = direction;
+        //}
+        // 지면 위에서: Unity의 ProjectOnPlane 사용
+        Vector3 groundNormal = _playerController.LastGroudnNormal;
+        knockbackDirection = Vector3.ProjectOnPlane(direction, groundNormal).normalized;
 
+        Debug.Log($"[PlayerKnockBack]{knockbackDirection}");
         // 넉백 적용
         _targetCharacterController.Move(knockbackDirection * _knockbackMagnitude);
 

@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _enemyBattleEntity: {fileID: 7663295947113335173}
   _navMeshAgent: {fileID: 9194659079445390000}
-  _baseMoveSpeed: 5
+  _baseMoveSpeed: 1
 --- !u!114 &7456599373262166233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,7 +181,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
