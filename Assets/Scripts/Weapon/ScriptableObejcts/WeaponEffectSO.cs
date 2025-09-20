@@ -2,59 +2,109 @@
 using UnityEngine;
 
 /// <summary>
-/// 무기 효과의 기본 ScriptableObject 추상 클래스
-/// IWeaponEffect 인터페이스를 구현하여 기존 시스템과 호환
+/// 무기 효과 ScriptableObject
+/// 배율 기반으로 무기 스탯을 수정
 /// </summary>
-public abstract class WeaponEffectSO : ScriptableObject, IWeaponEffect
+[CreateAssetMenu(fileName = "New Weapon Effect", menuName = "Weapon System/Weapon Effect")]
+public class WeaponEffectSO : ScriptableObject, IWeaponEffect
 {
     #region Serialized Fields
     [Header("Effect Settings")]
     [InfoBox("낮은 우선순위가 먼저 적용됩니다")]
-    [PropertyRange(0, 100)]
     [SerializeField] protected int _priority = 50;
 
     [Header("Effect Info")]
     [SerializeField, TextArea(2, 4)]
     protected string _description = "효과 설명을 입력하세요";
+
+    [Header("Stat Multipliers")]
+    [InfoBox("발사속도 배율")]
+    [SuffixLabel("x")]
+    [SerializeField] private float _fireRateMultiplier = 1.0f;
+
+    [InfoBox("정확도 배율")]
+    [SuffixLabel("x")]
+    [SerializeField] private float _accuracyMultiplier = 1.0f;
+
+    [InfoBox("데미지 배율")]
+    [SuffixLabel("x")]
+    [SerializeField] private float _damageMultiplier = 1.0f;
+
+    [InfoBox("반동 배율")]
+    [SuffixLabel("x")]
+    [SerializeField] private float _recoilMultiplier = 1.0f;
     #endregion
 
     #region IWeaponEffect Implementation
-    /// <summary>
-    /// 효과 적용 우선순위 (낮을수록 먼저 적용)
-    /// </summary>
     public int Priority => _priority;
-
-    /// <summary>
-    /// 효과 이름
-    /// </summary>
     public string EffectName => name;
 
-    /// <summary>
-    /// 무기 스탯에 효과를 적용합니다
-    /// </summary>
-    /// <param name="baseStats">원본 무기 스탯</param>
-    /// <returns>효과가 적용된 새로운 스탯</returns>
-    public abstract WeaponStatData ApplyToWeapon(WeaponStatData baseStats);
+    public WeaponStatData ApplyToWeapon(WeaponStatData baseStats)
+    {
+        if (!ValidateWeaponStats(baseStats))
+        {
+            LogEffect("Invalid weapon stats provided");
+            return baseStats;
+        }
 
-    /// <summary>
-    /// 효과 적용 가능 여부 검증
-    /// </summary>
-    /// <param name="weaponStats">검증할 무기 스탯</param>
-    /// <returns>적용 가능하면 true</returns>
-    public virtual bool CanApplyToWeapon(WeaponStatData weaponStats) { return true; }
+        WeaponStatData modifiedStats = baseStats.ApplyMultipliers(
+            _fireRateMultiplier,
+            _damageMultiplier,
+            _accuracyMultiplier,
+            _recoilMultiplier
+        );
+
+        LogEffect($"Applied {EffectName}: FireRate {_fireRateMultiplier:F2}x, Accuracy {_accuracyMultiplier:F2}x");
+        return modifiedStats;
+    }
+
+    public bool CanApplyToWeapon(WeaponStatData weaponStats)
+    {
+        return ValidateWeaponStats(weaponStats);
+    }
     #endregion
 
     #region Properties
     [ShowInInspector, ReadOnly]
     public string EffectDescription => _description;
+
+    [ShowInInspector, ReadOnly]
+    public float FireRateMultiplier => _fireRateMultiplier;
+
+    [ShowInInspector, ReadOnly]
+    public float AccuracyMultiplier => _accuracyMultiplier;
+
+    [ShowInInspector, ReadOnly]
+    public float DamageMultiplier => _damageMultiplier;
+
+    [ShowInInspector, ReadOnly]
+    public float RecoilMultiplier => _recoilMultiplier;
     #endregion
 
     #region Unity Lifecycle
-    protected virtual void OnValidate() { }
+    protected virtual void OnValidate()
+    {
+        _priority = Mathf.Clamp(_priority, 0, 100);
+        UpdateDescription();
+    }
     #endregion
 
-    #region Protected Methods - Utility
-    protected void LogEffect(string message) { }
-    protected bool ValidateWeaponStats(WeaponStatData stats) { return true; }
+    #region Private Methods
+    private void UpdateDescription()
+    {
+        _description = $"발사속도 {_fireRateMultiplier:F1}x, 정확도 {_accuracyMultiplier:F1}x, 데미지 {_damageMultiplier:F1}x, 반동 {_recoilMultiplier:F1}x";
+    }
+
+    private void LogEffect(string message)
+    {
+#if UNITY_EDITOR
+        Debug.Log($"[{GetType().Name}] {message}", this);
+#endif
+    }
+
+    private bool ValidateWeaponStats(WeaponStatData stats)
+    {
+        return stats.CurrentFireRate > 0f && stats.CurrentAccuracy >= 0f;
+    }
     #endregion
 }
