@@ -27,6 +27,7 @@ MonoBehaviour:
     - d8b77c526a2147140be0cd0f2c656170
     - 3c7b605067b161d46b13ced696f8bab1
     - 0fa1ac4755db1ac4d9b3e749ef918252
+    - e0c84f5b4ce7e3e498eebf3f9d3ed363
     values:
     - iconNameOrGuid: 
       colorIndex: 4
@@ -80,6 +81,10 @@ MonoBehaviour:
       colorIndex: 7
       isIconRecursive: 0
       isColorRecursive: 1
+    - iconNameOrGuid: Texture Icon
+      colorIndex: 8
+      isIconRecursive: 1
+      isColorRecursive: 1
   bookmarks:
   - guid: 00000000000000001000000000000000
   - guid: 596e8db4e36d94d418d1d063961f832e
@@ -89,3 +94,4 @@ MonoBehaviour:
   - guid: f7cb4f8a1c0350b438bf0b3df032e44f
   - guid: 9c53962885c2c4f449125a979d6ad240
   - guid: 0fa1ac4755db1ac4d9b3e749ef918252
+  - guid: e0c84f5b4ce7e3e498eebf3f9d3ed363
