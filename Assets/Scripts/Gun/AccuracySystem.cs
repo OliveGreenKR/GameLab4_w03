@@ -46,7 +46,7 @@ public class AccuracySystem : MonoBehaviour
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public float BaseAccuracy => _currentWeaponStats.CurrentAccuracy;
+    public float BaseAccuracy => _currentWeaponStats.Accuracy;
     #endregion
 
     #region Private Fields
@@ -149,7 +149,7 @@ public class AccuracySystem : MonoBehaviour
 
     private void UpdateCurrentAccuracy()
     {
-        float baseAccuracy = _currentWeaponStats.CurrentAccuracy;
+        float baseAccuracy = _currentWeaponStats.Accuracy;
         float effectivePenalty = CalculateEffectivePenalty(baseAccuracy, CurrentAccuracyPenalty);
         CurrentAccuracy = Mathf.Max(0f, baseAccuracy - effectivePenalty);
         CurrentSpreadAngle = CalculateSpreadAngle(CurrentAccuracy);

@@ -104,7 +104,7 @@ public class WeaponEffectSO : ScriptableObject, IWeaponEffect
 
     private bool ValidateWeaponStats(WeaponStatData stats)
     {
-        return stats.CurrentFireRate > 0f && stats.CurrentAccuracy >= 0f;
+        return stats.FireRate > 0f && stats.Accuracy >= 0f;
     }
     #endregion
 }

@@ -36,6 +36,11 @@ public class PlayerWeaponController : MonoBehaviour
     [TabGroup("Effects",TextColor ="cyan")]
     [Header("Active Weapon Effects")]
     [SerializeField] private List<WeaponEffectSO> _activeEffects = new List<WeaponEffectSO>();
+
+    [TabGroup("Upgrades", TextColor = "green")]
+    [Header("Permanent Stat Bonuses")]
+    [InfoBox("영구 업그레이드로 누적된 보너스 스탯")]
+    [SerializeField, ReadOnly] private WeaponStatData _permanentStatBonuses;
     #endregion
 
     #region Properties
@@ -70,38 +75,53 @@ public class PlayerWeaponController : MonoBehaviour
 
     public WeaponStatData FinalStats { get; private set; }
 
+    public WeaponStatData StatBonuses 
+    {
+        get => _permanentStatBonuses;
+        set
+        {
+            _permanentStatBonuses = value;
+            if (Application.isPlaying && _isInitialized)
+            {
+                CalculateFinalStats();
+                UpdateLauncherSettings();
+                UpdateAccuracySystem();
+            }
+        }
+    }
+
     [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     [InfoBox("최종 적용된 무기 스탯")]
-    public float FinalFireRate => FinalStats.CurrentFireRate;
+    public float FinalFireRate => FinalStats.FireRate;
 
     [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
-    public float FinalDamage => FinalStats.CurrentDamage;
+    public float FinalDamage => FinalStats.Damage;
 
     [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
-    public float FinalProjectileSpeed => FinalStats.CurrentProjectileSpeed;
+    public float FinalProjectileSpeed => FinalStats.ProjectileSpeed;
 
     [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
-    public float FinalProjectileLifetime => FinalStats.CurrentProjectileLifetime;
+    public float FinalProjectileLifetime => FinalStats.ProjectileLifetime;
 
     [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
-    public float FinalAccuracy => FinalStats.CurrentAccuracy;
+    public float FinalAccuracy => FinalStats.Accuracy;
 
     [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
-    public float FinalRecoil => FinalStats.CurrentRecoil;
+    public float FinalRecoil => FinalStats.Recoil;
 
     [TabGroup("Debug","Weapon Stat")]
     [ShowInInspector, ReadOnly]
     [InfoBox("기본 스탯 대비 배율")]
     public string StatMultipliers => _baseWeaponStats != null ?
-        $"Fire: {(FinalStats.CurrentFireRate / _baseWeaponStats.BaseFireRate):F2}x, " +
-        $"Dmg: {(FinalStats.CurrentDamage / _baseWeaponStats.BaseDamage):F2}x, " +
-        $"Acc: {(FinalStats.CurrentAccuracy / _baseWeaponStats.BaseAccuracy):F2}x" : "N/A";
+        $"Fire: {(FinalStats.FireRate / _baseWeaponStats.BaseFireRate):F2}x, " +
+        $"Dmg: {(FinalStats.Damage / _baseWeaponStats.BaseDamage):F2}x, " +
+        $"Acc: {(FinalStats.Accuracy / _baseWeaponStats.BaseAccuracy):F2}x" : "N/A";
 
     public ProjectileLauncher ProjectileLauncher => _projectileLauncher;
     public AccuracySystem AccuracySystem => _accuracySystem;
@@ -167,16 +187,16 @@ public class PlayerWeaponController : MonoBehaviour
 #if UNITY_EDITOR
             UnityEditor.Handles.color = Color.white;
             UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 0),
-                $"Fire Rate: {FinalStats.CurrentFireRate:F1} ({(FinalStats.CurrentFireRate / _baseWeaponStats.BaseFireRate):F2}x)");
+                $"Fire Rate: {FinalStats.FireRate:F1} ({(FinalStats.FireRate / _baseWeaponStats.BaseFireRate):F2}x)");
 
             UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 1),
-                $"Damage: {FinalStats.CurrentDamage:F1} ({(FinalStats.CurrentDamage / _baseWeaponStats.BaseDamage):F2}x)");
+                $"Damage: {FinalStats.Damage:F1} ({(FinalStats.Damage / _baseWeaponStats.BaseDamage):F2}x)");
 
             UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 2),
-                $"Accuracy: {FinalStats.CurrentAccuracy:F1}% ({(FinalStats.CurrentAccuracy / _baseWeaponStats.BaseAccuracy):F2}x)");
+                $"Accuracy: {FinalStats.Accuracy:F1}% ({(FinalStats.Accuracy / _baseWeaponStats.BaseAccuracy):F2}x)");
 
             UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 3),
-                $"Recoil: {FinalStats.CurrentRecoil:F1} ({(FinalStats.CurrentRecoil / _baseWeaponStats.BaseRecoil):F2}x)");
+                $"Recoil: {FinalStats.Recoil:F1} ({(FinalStats.Recoil / _baseWeaponStats.BaseRecoil):F2}x)");
 
             UnityEditor.Handles.Label(basePosition + Vector3.up * (offsetY + spacing * 4),
                 $"Effects: {ActiveEffectCount}");
@@ -333,10 +353,12 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
 
+        // 영구 보너스 초기화
+        _permanentStatBonuses = new WeaponStatData(0f, 0f, 0f, 0f, 0f, 0f);
+
         CalculateFinalStats();
         UpdateLauncherSettings();
         UpdateAccuracySystem();
-        
 
         _isInitialized = true;
         Debug.Log("[PlayerWeaponController] Weapon system initialized", this);
@@ -347,7 +369,11 @@ public class PlayerWeaponController : MonoBehaviour
         if (_baseWeaponStats == null) return;
 
         WeaponStatData baseStats = _baseWeaponStats.CreateRuntimeStats();
-        WeaponStatData finalStats = baseStats;
+
+        // 베이스 스탯에 영구 보너스 적용
+        WeaponStatData statsWithBonuses = baseStats + _permanentStatBonuses;
+
+        WeaponStatData finalStats = statsWithBonuses;
 
         // 효과들을 우선순위 순으로 정렬 후 적용
         if (_activeEffects != null && _activeEffects.Count > 0)
@@ -371,10 +397,10 @@ public class PlayerWeaponController : MonoBehaviour
     {
         if (_projectileLauncher == null) return;
 
-        _projectileLauncher.SetFireRate(FinalStats.CurrentFireRate);
-        _projectileLauncher.SetProjectileSpeed(FinalStats.CurrentProjectileSpeed);
-        _projectileLauncher.SetProjectileLifetime(FinalStats.CurrentProjectileLifetime);
-        _projectileLauncher.SetProjectileDamage(FinalStats.CurrentDamage);
+        _projectileLauncher.SetFireRate(FinalStats.FireRate);
+        _projectileLauncher.SetProjectileSpeed(FinalStats.ProjectileSpeed);
+        _projectileLauncher.SetProjectileLifetime(FinalStats.ProjectileLifetime);
+        _projectileLauncher.SetProjectileDamage(FinalStats.Damage);
     }
 
     private void UpdateAccuracySystem()
@@ -411,7 +437,7 @@ public class PlayerWeaponController : MonoBehaviour
         if (!_isInitialized || _projectileLauncher == null)
             return false;
 
-        return FinalStats.CurrentFireRate > 0f && _projectileLauncher.CanFire;
+        return FinalStats.FireRate > 0f && _projectileLauncher.CanFire;
     }
 
     private Vector3 CalculateBaseDirection()

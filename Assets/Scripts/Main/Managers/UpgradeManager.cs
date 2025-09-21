@@ -83,11 +83,11 @@ public class UpgradeManager : MonoBehaviour
     {
         if (!IsInitialized || value <= 0f) return;
 
-        float currentDamage = _projectileLauncher.GetProjectileDamage();
-        float newDamage = currentDamage + value;
-        _projectileLauncher.SetProjectileDamage(newDamage);
+        WeaponStatData currentBonuses = _playerWeaponController.StatBonuses;
+        currentBonuses.Damage += value;
+        _playerWeaponController.StatBonuses = currentBonuses;
 
-        Debug.Log($"[UpgradeManager] Weapon damage upgraded: {currentDamage:F1} → {newDamage:F1} (+{value:F1})", this);
+        Debug.Log($"[UpgradeManager] Weapon damage upgraded: +{value:F1}", this);
     }
 
     /// <summary>무기 발사속도 영구 증가</summary>
@@ -96,11 +96,11 @@ public class UpgradeManager : MonoBehaviour
     {
         if (!IsInitialized || value <= 0f) return;
 
-        float currentFireRate = _projectileLauncher.GetFireRate();
-        float newFireRate = currentFireRate + value;
-        _projectileLauncher.SetFireRate(newFireRate);
+        WeaponStatData currentBonuses = _playerWeaponController.StatBonuses;
+        currentBonuses.FireRate += value;
+        _playerWeaponController.StatBonuses = currentBonuses;
 
-        Debug.Log($"[UpgradeManager] Weapon fire rate upgraded: {currentFireRate:F1} → {newFireRate:F1} (+{value:F1})", this);
+        Debug.Log($"[UpgradeManager] Weapon fire rate upgraded: +{value:F1}", this);
     }
 
     /// <summary>투사체 속도 영구 증가</summary>
@@ -109,11 +109,11 @@ public class UpgradeManager : MonoBehaviour
     {
         if (!IsInitialized || value <= 0f) return;
 
-        float currentSpeed = _projectileLauncher.GetProjectileSpeed();
-        float newSpeed = currentSpeed + value;
-        _projectileLauncher.SetProjectileSpeed(newSpeed);
+        WeaponStatData currentBonuses = _playerWeaponController.StatBonuses;
+        currentBonuses.ProjectileSpeed += value;
+        _playerWeaponController.StatBonuses = currentBonuses;
 
-        Debug.Log($"[UpgradeManager] Projectile speed upgraded: {currentSpeed:F1} → {newSpeed:F1} (+{value:F1})", this);
+        Debug.Log($"[UpgradeManager] Projectile speed upgraded: +{value:F1}", this);
     }
 
     /// <summary>투사체 생존시간 영구 증가</summary>
@@ -122,11 +122,11 @@ public class UpgradeManager : MonoBehaviour
     {
         if (!IsInitialized || value <= 0f) return;
 
-        float currentLifetime = _projectileLauncher.GetProjectileLifetime();
-        float newLifetime = currentLifetime + value;
-        _projectileLauncher.SetProjectileLifetime(newLifetime);
+        WeaponStatData currentBonuses = _playerWeaponController.StatBonuses;
+        currentBonuses.ProjectileLifetime += value;
+        _playerWeaponController.StatBonuses = currentBonuses;
 
-        Debug.Log($"[UpgradeManager] Projectile lifetime upgraded: {currentLifetime:F1}s → {newLifetime:F1}s (+{value:F1}s)", this);
+        Debug.Log($"[UpgradeManager] Projectile lifetime upgraded: +{value:F1}s", this);
     }
     #endregion
 
@@ -213,21 +213,51 @@ public class UpgradeManager : MonoBehaviour
         if (!IsInitialized || value <= 0f || durationSeconds <= 0f) return null;
 
         string buffId = GenerateBuffId();
-        float currentDamage = _projectileLauncher.GetProjectileDamage();
-        float newDamage = currentDamage + value;
 
-        _projectileLauncher.SetProjectileDamage(newDamage);
+        // StatBonuses에 직접 추가
+        WeaponStatData currentBonuses = _playerWeaponController.StatBonuses;
+        currentBonuses.Damage += value;
+        _playerWeaponController.StatBonuses = currentBonuses;
 
         System.Action<float> revertAction = (delta) =>
         {
-            float currentValue = _projectileLauncher.GetProjectileDamage();
-            _projectileLauncher.SetProjectileDamage(Mathf.Max(0f, currentValue - delta));
+            WeaponStatData bonuses = _playerWeaponController.StatBonuses;
+            bonuses.Damage -= delta;
+            _playerWeaponController.StatBonuses = bonuses;
         };
 
         TemporaryBuff buff = CreateTemporaryBuff(buffId, value, revertAction, durationSeconds);
         _activeTemporaryBuffs.Add(buff);
 
         Debug.Log($"[UpgradeManager] Temporary weapon damage buff applied: +{value:F1} for {durationSeconds:F1}s (ID: {buffId})", this);
+        return buffId;
+    }
+
+    /// <summary>임시 발사속도 버프</summary>
+    /// <param name="value">증가할 발사속도</param>
+    /// <param name="durationSeconds">지속 시간 (초)</param>
+    /// <returns>버프 ID</returns>
+    public string ApplyTemporaryFireRateBuff(float value, float durationSeconds)
+    {
+        if (!IsInitialized || value <= 0f || durationSeconds <= 0f) return null;
+
+        string buffId = GenerateBuffId();
+
+        WeaponStatData currentBonuses = _playerWeaponController.StatBonuses;
+        currentBonuses.FireRate += value;
+        _playerWeaponController.StatBonuses = currentBonuses;
+
+        System.Action<float> revertAction = (delta) =>
+        {
+            WeaponStatData bonuses = _playerWeaponController.StatBonuses;
+            bonuses.FireRate -= delta;
+            _playerWeaponController.StatBonuses = bonuses;
+        };
+
+        TemporaryBuff buff = CreateTemporaryBuff(buffId, value, revertAction, durationSeconds);
+        _activeTemporaryBuffs.Add(buff);
+
+        Debug.Log($"[UpgradeManager] Temporary fire rate buff applied: +{value:F1} for {durationSeconds:F1}s (ID: {buffId})", this);
         return buffId;
     }
 
@@ -256,30 +286,6 @@ public class UpgradeManager : MonoBehaviour
 
         Debug.Log($"[UpgradeManager] Temporary move speed buff applied: +{value:F1} for {durationSeconds:F1}s (ID: {buffId})", this);
         return buffId;
-    }
-
-    /// <summary>임시 버프 제거</summary>
-    /// <param name="buffId">제거할 버프 ID</param>
-    /// <returns>제거 성공 여부</returns>
-    public bool RemoveTemporaryBuff(string buffId)
-    {
-        if (!IsInitialized || string.IsNullOrEmpty(buffId)) return false;
-
-        for (int i = 0; i < _activeTemporaryBuffs.Count; i++)
-        {
-            if (_activeTemporaryBuffs[i].buffId == buffId)
-            {
-                TemporaryBuff buff = _activeTemporaryBuffs[i];
-                buff.revertAction?.Invoke(buff.deltaValue);
-                _activeTemporaryBuffs.RemoveAt(i);
-
-                Debug.Log($"[UpgradeManager] Temporary buff manually removed: {buffId}", this);
-                return true;
-            }
-        }
-
-        Debug.LogWarning($"[UpgradeManager] Temporary buff not found: {buffId}", this);
-        return false;
     }
     #endregion
 
