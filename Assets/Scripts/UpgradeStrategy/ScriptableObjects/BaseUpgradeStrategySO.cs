@@ -1,13 +1,11 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
-/// <summary>업그레이드 카테고리 - Strategy Factory 선택용</summary>
+/// <summary>업그레이드 카테고리</summary>
 public enum UpgradeCategory
 {
     WeaponStat,
-    PlayerStat,
-    WeaponEffect,
-    ProjectileEffect
+    PlayerStat
 }
 
 /// <summary>업그레이드 적용 전략 기본 클래스</summary>

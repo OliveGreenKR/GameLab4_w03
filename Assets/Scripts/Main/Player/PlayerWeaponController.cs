@@ -104,6 +104,8 @@ public class PlayerWeaponController : MonoBehaviour
         $"Acc: {(FinalStats.CurrentAccuracy / _baseWeaponStats.BaseAccuracy):F2}x" : "N/A";
 
     public ProjectileLauncher ProjectileLauncher => _projectileLauncher;
+    public AccuracySystem AccuracySystem => _accuracySystem;
+    public RecoilSystem RecoilSystem => _recoilSystem;
     #endregion
 
     #region Private Fields

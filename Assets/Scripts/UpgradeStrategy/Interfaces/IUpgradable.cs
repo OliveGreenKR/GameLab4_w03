@@ -16,12 +16,6 @@ public enum UpgradeType
     WeaponProjectileSpeed,
     WeaponProjectileLifetime,
 
-    // 무기 특수 효과
-    WeaponPiercing,
-    WeaponSplit,
-    WeaponConcentration,
-    WeaponBurst,
-
     // 플레이어 스탯
     PlayerHealth,
     PlayerMaxHealth,

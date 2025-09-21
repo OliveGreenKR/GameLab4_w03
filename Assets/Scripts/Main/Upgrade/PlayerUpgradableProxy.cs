@@ -38,7 +38,7 @@ public class PlayerUpgradableProxy : MonoBehaviour, IUpgradable
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public bool IsInitialized { get; private set; }7
+    public bool IsInitialized { get; private set; }
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -118,13 +118,6 @@ public class PlayerUpgradableProxy : MonoBehaviour, IUpgradable
             case UpgradeType.WeaponRecoil:
             case UpgradeType.WeaponProjectileSpeed:
             case UpgradeType.WeaponProjectileLifetime:
-                return _playerWeaponController != null;
-
-            // 무기 특수 효과
-            case UpgradeType.WeaponPiercing:
-            case UpgradeType.WeaponSplit:
-            case UpgradeType.WeaponConcentration:
-            case UpgradeType.WeaponBurst:
                 return _playerWeaponController != null;
 
             // 플레이어 스탯
@@ -304,10 +297,6 @@ public class PlayerUpgradableProxy : MonoBehaviour, IUpgradable
             case UpgradeType.WeaponRecoil:
             case UpgradeType.WeaponProjectileSpeed:
             case UpgradeType.WeaponProjectileLifetime:
-            case UpgradeType.WeaponPiercing:
-            case UpgradeType.WeaponSplit:
-            case UpgradeType.WeaponConcentration:
-            case UpgradeType.WeaponBurst:
                 return ApplyWeaponUpgrade(upgradeType, value, isRemoving);
 
             // 플레이어 스탯
@@ -358,17 +347,14 @@ public class PlayerUpgradableProxy : MonoBehaviour, IUpgradable
                 return true;
 
             case UpgradeType.WeaponAccuracy:
+                float currentAccuracy = _playerWeaponController.CurrentAccuracy;
+                float newAccuracy = Mathf.Max(0f, currentAccuracy + finalValue);
+
+                return true;
             case UpgradeType.WeaponRecoil:
+                float currentRecoil = _playerWeaponController.RecoilSystem.CurrentRecoilIntensity;
                 // 정확도와 반동은 WeaponEffectSO를 통해 처리해야 함
                 Debug.LogWarning($"[PlayerUpgradableProxy] {upgradeType} requires WeaponEffectSO implementation", this);
-                return false;
-
-            case UpgradeType.WeaponPiercing:
-            case UpgradeType.WeaponSplit:
-            case UpgradeType.WeaponConcentration:
-            case UpgradeType.WeaponBurst:
-                // 특수 효과는 WeaponEffectSO나 ProjectileEffectSO를 통해 처리해야 함
-                Debug.LogWarning($"[PlayerUpgradableProxy] {upgradeType} requires Effect SO implementation", this);
                 return false;
 
             default:
