@@ -17,7 +17,7 @@ public enum UpgradeCategory
 /// 업그레이드 정보와 효과를 연결하는 데이터
 /// </summary>
 [CreateAssetMenu(fileName = "New Upgrade", menuName = "Shop/Upgrade Data")]
-public class UpgradeData : ScriptableObject
+public class UpgradeDataSO : ScriptableObject
 {
     #region Serialized Fields
     [TabGroup("Basic Info")]
