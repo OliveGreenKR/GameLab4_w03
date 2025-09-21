@@ -35,13 +35,6 @@ public class UpgradeManager : MonoBehaviour
     [Required]
     [SerializeField] private ProjectileLauncher _projectileLauncher;
 
-    [TabGroup("Effects")]
-    [Header("Effect Assets")]
-    [SerializeField] private List<WeaponEffectSO> _availableWeaponEffects = new List<WeaponEffectSO>();
-
-    [TabGroup("Effects")]
-    [SerializeField] private List<ProjectileEffectSO> _availableProjectileEffects = new List<ProjectileEffectSO>();
-
     [TabGroup("Temporary Buffs")]
     [Header("Active Temporary Buffs")]
     [SerializeField] private List<TemporaryBuff> _activeTemporaryBuffs = new List<TemporaryBuff>();
