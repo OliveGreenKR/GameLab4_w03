@@ -20,7 +20,7 @@ public enum UpgradeApplicationMode
 }
 
 /// <summary>무기 스탯 업그레이드 전략</summary>
-[CreateAssetMenu(fileName = "New Weapon Stat Upgrade", menuName = "Shop/Upgrade Strategy/Weapon Stat")]
+[CreateAssetMenu(fileName = "New Weapon Stat Upgrade", menuName = "UpgradeStrategy/Upgrade Strategy/Weapon Stat")]
 public class WeaponStatUpgradeStrategySO : BaseUpgradeStrategySO
 {
     #region Serialized Fields

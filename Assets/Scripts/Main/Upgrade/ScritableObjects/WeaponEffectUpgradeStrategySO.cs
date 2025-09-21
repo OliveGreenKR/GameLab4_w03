@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>무기 효과 업그레이드 전략</summary>
-[CreateAssetMenu(fileName = "New Weapon Effect Upgrade", menuName = "Shop/Upgrade Strategy/Weapon Effect")]
+[CreateAssetMenu(fileName = "New Weapon Effect Upgrade", menuName = "UpgradeStrategy/Upgrade Strategy/Weapon Effect")]
 public class WeaponEffectUpgradeStrategySO : BaseUpgradeStrategySO
 {
     #region Serialized Fields

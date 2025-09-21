@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>플레이어 스탯 업그레이드 전략</summary>
-[CreateAssetMenu(fileName = "New Player Stat Upgrade", menuName = "Shop/Upgrade Strategy/Player Stat")]
+[CreateAssetMenu(fileName = "New Player Stat Upgrade", menuName = "UpgradeStrategy/Upgrade Strategy/Player Stat")]
 public class PlayerStatUpgradeStrategySO : BaseUpgradeStrategySO
 {
     #region Serialized Fields
