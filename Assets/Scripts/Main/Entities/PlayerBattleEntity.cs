@@ -117,6 +117,59 @@ public class PlayerBattleEntity : BaseBattleEntity
 
         Debug.Log($"[PlayerBattleEntity] Max health set to {maxHealth}, current: {newCurrentHealth:F1}", this);
     }
+
+    /// <summary>
+    /// 플레이어 배틀 스탯 수정 
+    /// </summary>
+    /// <param name="statType">수정할 스탯 타입</param>
+    /// <param name="value">추가할 값</param>
+    public void ModifyBattleStat(BattleStatType statType, float value)
+    {
+        if (_battleStat == null || value == 0f) return;
+
+        float currentValue = _battleStat.GetCurrentStat(statType);
+        float newValue = currentValue + value;
+
+        // 음수 방지 (체력 제외)
+        if (statType != BattleStatType.Health && newValue < 0f)
+            newValue = 0f;
+
+        _battleStat.SetCurrentStat(statType, newValue);
+
+        Debug.Log($"[PlayerBattleEntity] {statType} modified by {value:F1}, new value: {newValue:F1}", this);
+    }
+
+    /// <summary>
+    /// 플레이어 배틀 스탯 배율 적용 (상점 업그레이드용)
+    /// </summary>
+    /// <param name="statType">수정할 스탯 타입</param>
+    /// <param name="multiplier">적용할 배율</param>
+    public void ModifyBattleStatMultiplier(BattleStatType statType, float multiplier)
+    {
+        if (_battleStat == null || multiplier <= 0f) return;
+
+        float currentValue = _battleStat.GetCurrentStat(statType);
+        float newValue = currentValue * multiplier;
+
+        _battleStat.SetCurrentStat(statType, newValue);
+
+        Debug.Log($"[PlayerBattleEntity] {statType} multiplied by {multiplier:F2}, new value: {newValue:F1}", this);
+    }
+
+    /// <summary>
+    /// 정규화된 체력 비율 조회 (0.0 ~ 1.0)
+    /// </summary>
+    /// <returns>현재 체력 / 최대 체력</returns>
+    public float GetHealthPercentage()
+    {
+        if (_battleStat == null) return 0f;
+
+        float maxHealth = GetCurrentStat(BattleStatType.MaxHealth);
+        if (maxHealth <= 0f) return 0f;
+
+        float currentHealth = GetCurrentStat(BattleStatType.Health);
+        return Mathf.Clamp01(currentHealth / maxHealth);
+    }
     #endregion
 
     #region Protected Methods - Override
