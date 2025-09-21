@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9225970c6eefdd5458484c1204ca7b70, type: 3}
   m_Name: BasePistol
   m_EditorClassIdentifier: 
-  _baseFireRate: 5
+  _baseFireRate: 2
   _baseDamage: 5
-  _baseProjectileSpeed: 20
+  _baseProjectileSpeed: 25
   _baseProjectileLifetime: 3
   _baseAccuracy: 90
   _baseRecoil: 0.3

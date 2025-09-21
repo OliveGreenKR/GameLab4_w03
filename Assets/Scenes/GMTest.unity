@@ -1179,7 +1179,8 @@ MonoBehaviour:
   _recoilConverter: {fileID: 1072174463}
   _projectileLauncher: {fileID: 962896344}
   _aimPointManager: {fileID: 831523057}
-  _activeEffects: []
+  _activeEffects:
+  - {fileID: 11400000, guid: 3617afab040056e469343ca570595d86, type: 2}
 --- !u!114 &761691819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1192,7 +1193,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 033c418c5cd2dac43b36993d52c763ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSpreadAngle: 30
+  _maxSpreadAngle: 15
+  _centerWeightMultiplier: 5
   _accuracyPenaltyPerShot: 15
   _accuracyRecoveryRate: 30
   _maxAccuracyPenalty: 45
@@ -1208,9 +1210,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3f2c6f1cad81aa45831710bd82690dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxRecoilIntensity: 1.5
+  _maxRecoilIntensity: 30
   _recoilRecoveryRate: 1
-  _recoilDirection: {x: 0, y: 1}
+  _recoilDirection: {x: 0.1, y: 1}
   _recoilRandomness: 0.5
 --- !u!1001 &816707984
 PrefabInstance:

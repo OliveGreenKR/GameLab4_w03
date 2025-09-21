@@ -10,6 +10,13 @@ public class AccuracySystem : MonoBehaviour
     [SerializeField] private float _maxSpreadAngle = 15f;
 
     [TabGroup("Settings")]
+    [Header("Weighted Distribution")]
+    [InfoBox("중앙 집중도 제어 (높을수록 중앙 집중)")]
+    [SuffixLabel("weight")]
+    [PropertyRange(0.1f, 5f)]
+    [SerializeField] private float _centerWeightMultiplier = 2f;
+
+    [TabGroup("Settings")]
     [Header("Accuracy Penalty")]
     [InfoBox("연사 시 정확도 저하")]
     [SuffixLabel("penalty/shot")]
@@ -66,15 +73,7 @@ public class AccuracySystem : MonoBehaviour
             return baseDirection;
 
         float spreadAngle = CalculateSpreadAngle(CurrentAccuracy);
-        Vector2 spreadOffset = GetRandomSpreadOffset(spreadAngle);
-
-        Vector3 right = Vector3.Cross(baseDirection, Vector3.up).normalized;
-        if (right.sqrMagnitude < 0.1f)
-            right = Vector3.Cross(baseDirection, Vector3.forward).normalized;
-
-        Vector3 up = Vector3.Cross(right, baseDirection).normalized;
-        Vector3 spreadDirection = baseDirection + (right * spreadOffset.x) + (up * spreadOffset.y);
-        return spreadDirection.normalized;
+        return GetRandomDirectionInCone(baseDirection, spreadAngle);
     }
 
     /// <summary>
@@ -135,7 +134,7 @@ public class AccuracySystem : MonoBehaviour
     /// <param name="maxSpreadAngle">최대 스프레드 각도</param>
     public void SetMaxSpreadAngle(float maxSpreadAngle)
     {
-        _maxSpreadAngle = Mathf.Clamp(maxSpreadAngle, 1f, 45f);
+        _maxSpreadAngle = Mathf.Max(maxSpreadAngle, 0.01f);
     }
     #endregion
 
@@ -176,11 +175,69 @@ public class AccuracySystem : MonoBehaviour
         return _maxSpreadAngle * (1f - normalizedAccuracy);
     }
 
-    private Vector2 GetRandomSpreadOffset(float spreadAngle)
+    /// <summary>
+    /// 구면 좌표계 기반으로 원뿔 내부의 가중 분포 방향 벡터 생성
+    /// </summary>
+    /// <param name="baseDirection">기준 방향 벡터</param>
+    /// <param name="coneAngleDegrees">원뿔 각도 (도)</param>
+    /// <returns>원뿔 내부의 가중 랜덤 방향 벡터</returns>
+    private Vector3 GetRandomDirectionInCone(Vector3 baseDirection, float coneAngleDegrees)
     {
-        Vector2 randomPoint = Random.insideUnitCircle;
-        float spreadRadians = spreadAngle * Mathf.Deg2Rad;
-        return randomPoint * Mathf.Tan(spreadRadians);
+        if (coneAngleDegrees <= 0f)
+            return baseDirection;
+
+        // 정확도 기반 중앙 집중도 계산
+        float accuracyRatio = Mathf.Clamp01(CurrentAccuracy / 100f);
+        float centerWeight = Mathf.Lerp(1.0f, _centerWeightMultiplier, accuracyRatio);
+
+        // 구면 좌표계에서 가중 분포 샘플링
+        float coneAngleRadians = coneAngleDegrees * Mathf.Deg2Rad;
+        float cosTheta = Mathf.Cos(coneAngleRadians);
+
+        // Power Law Distribution으로 중앙 집중
+        float randomValue = Random.Range(0f, 1f);
+        float weightedRandom = Mathf.Pow(randomValue, centerWeight);
+        float randomCosTheta = Mathf.Lerp(1f, cosTheta, weightedRandom);
+        float theta = Mathf.Acos(randomCosTheta);
+
+        // 방위각은 균등 분포 유지
+        float phi = Random.Range(0f, 2f * Mathf.PI);
+
+        // 구면 좌표를 직교 좌표로 변환
+        float sinTheta = Mathf.Sin(theta);
+        Vector3 localDirection = new Vector3(
+            sinTheta * Mathf.Cos(phi),
+            sinTheta * Mathf.Sin(phi),
+            Mathf.Cos(theta)
+        );
+
+        return TransformDirectionToWorldSpace(localDirection, baseDirection);
+    }
+
+    /// <summary>
+    /// 로컬 방향 벡터를 월드 공간의 기준 방향 기준으로 변환
+    /// </summary>
+    /// <param name="localDirection">로컬 공간 방향 벡터 (Z축이 전방)</param>
+    /// <param name="worldForward">월드 공간의 기준 방향</param>
+    /// <returns>변환된 월드 공간 방향 벡터</returns>
+    private Vector3 TransformDirectionToWorldSpace(Vector3 localDirection, Vector3 worldForward)
+    {
+        // 월드 전방 벡터에서 직교 기저 생성
+        Vector3 forward = worldForward.normalized;
+
+        // Up 벡터 선택 (forward와 평행하지 않은 벡터)
+        Vector3 tempUp = Mathf.Abs(Vector3.Dot(forward, Vector3.up)) < 0.9f
+            ? Vector3.up
+            : Vector3.forward;
+
+        // 직교 기저 생성
+        Vector3 right = Vector3.Cross(forward, tempUp).normalized;
+        Vector3 up = Vector3.Cross(right, forward).normalized;
+
+        // 로컬 방향을 월드 공간으로 변환
+        return localDirection.x * right +
+               localDirection.y * up +
+               localDirection.z * forward;
     }
     #endregion
 }
