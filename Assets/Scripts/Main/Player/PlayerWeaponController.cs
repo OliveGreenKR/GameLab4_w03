@@ -102,6 +102,8 @@ public class PlayerWeaponController : MonoBehaviour
         $"Fire: {(FinalStats.CurrentFireRate / _baseWeaponStats.BaseFireRate):F2}x, " +
         $"Dmg: {(FinalStats.CurrentDamage / _baseWeaponStats.BaseDamage):F2}x, " +
         $"Acc: {(FinalStats.CurrentAccuracy / _baseWeaponStats.BaseAccuracy):F2}x" : "N/A";
+
+    public ProjectileLauncher ProjectileLauncher => _projectileLauncher;
     #endregion
 
     #region Private Fields
