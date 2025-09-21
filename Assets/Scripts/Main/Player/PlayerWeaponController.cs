@@ -62,7 +62,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     [TabGroup("Debug","Weapon System")]
     [ShowInInspector, ReadOnly]
-    public float CurrentRecoilIntensity => _recoilSystem?.GetRecoilIntensity() ?? 0f;
+    public float CurrentRecoilIntensity => _recoilSystem?.GetRecoilIntensityRatio() ?? 0f;
 
     [TabGroup("Debug","Weapon System")]
     [ShowInInspector, ReadOnly]
@@ -137,7 +137,7 @@ public class PlayerWeaponController : MonoBehaviour
             CalculateFinalStats();
             UpdateLauncherSettings();
             UpdateAccuracySystem();
-            UpdateRecoilSystem();
+            
         }
     }
 
@@ -211,6 +211,7 @@ public class PlayerWeaponController : MonoBehaviour
         CalculateFinalStats();
         UpdateLauncherSettings();
         UpdateAccuracySystem();
+        
 
         Debug.Log($"[PlayerWeaponController] Applied weapon effect: {effect.EffectName}", this);
     }
@@ -230,6 +231,7 @@ public class PlayerWeaponController : MonoBehaviour
             CalculateFinalStats();
             UpdateLauncherSettings();
             UpdateAccuracySystem();
+            
 
             Debug.Log($"[PlayerWeaponController] Removed weapon effect: {effect.EffectName}", this);
         }
@@ -249,6 +251,7 @@ public class PlayerWeaponController : MonoBehaviour
         CalculateFinalStats();
         UpdateLauncherSettings();
         UpdateAccuracySystem();
+        
 
         Debug.Log($"[PlayerWeaponController] Cleared {removedCount} weapon effects", this);
     }
@@ -293,8 +296,9 @@ public class PlayerWeaponController : MonoBehaviour
             // 반동: 시각적 피드백용
             if (_recoilSystem != null)
             {
-                _recoilSystem.AddRecoil(1f);
-                Debug.Log($"[PlayerWeaponController] Recoil added. Current Intensity: {_recoilSystem.GetRecoilIntensity():F2}", this);
+                float recoilAmount = FinalRecoil;
+                _recoilSystem.AddRecoil(recoilAmount);
+                Debug.Log($"[PlayerWeaponController] Recoil added {recoilAmount}. Current Intensity: {_recoilSystem.CurrentRecoilIntensity:F2}", this);
                 // 반동을 카메라에 전달
                 if (_recoilConverter != null)
                 {
@@ -332,7 +336,7 @@ public class PlayerWeaponController : MonoBehaviour
         CalculateFinalStats();
         UpdateLauncherSettings();
         UpdateAccuracySystem();
-        UpdateRecoilSystem();
+        
 
         _isInitialized = true;
         Debug.Log("[PlayerWeaponController] Weapon system initialized", this);
@@ -379,14 +383,6 @@ public class PlayerWeaponController : MonoBehaviour
 
         _accuracySystem.SetWeaponStats(FinalStats);
     }
-
-    private void UpdateRecoilSystem()
-    {
-        if (_recoilSystem == null) return;
-
-        _recoilSystem.SetWeaponStats(FinalStats);
-    }
-
     private void ValidateReferences()
     {
         if (_baseWeaponStats == null)

@@ -11,8 +11,8 @@ public class RecoilSystem : MonoBehaviour
 
     [TabGroup("Settings")]
     [Header("Recoil Recovery")]
-    [SuffixLabel("degrees/sec")]
-    [SerializeField] private float _recoilRecoveryRate = 2f;
+    [SuffixLabel("ratio per sec")]
+    [SerializeField] private float _recoilRecoveryRate = 0.8f;
 
     [TabGroup("Settings")]
     [Header("Recoil Pattern")]
@@ -38,15 +38,12 @@ public class RecoilSystem : MonoBehaviour
     public float RecoilRatio => _maxRecoilIntensity > 0f ? CurrentRecoilIntensity / _maxRecoilIntensity : 0f;
     #endregion
 
-    #region Private Fields
-    private WeaponStatData _currentWeaponStats;
-    #endregion
-
     #region Unity Lifecycle
     private void Update()
     {
-        UpdateRecoilRecovery();
         UpdateRecoilVector();
+        UpdateRecoilRecovery();
+
     }
     #endregion
 
@@ -59,10 +56,10 @@ public class RecoilSystem : MonoBehaviour
     {
         if (amount <= 0f) return;
 
-        float weaponRecoilMultiplier = _currentWeaponStats.CurrentRecoil;
-        float finalAmount = amount * weaponRecoilMultiplier;
+        float finalAmount = amount;
 
         CurrentRecoilIntensity = Mathf.Min(CurrentRecoilIntensity + finalAmount, _maxRecoilIntensity);
+        UpdateRecoilVector();
     }
 
     /// <summary>
@@ -78,7 +75,7 @@ public class RecoilSystem : MonoBehaviour
     /// 현재 반동 강도 반환 (0~1)
     /// </summary>
     /// <returns>정규화된 반동 강도</returns>
-    public float GetRecoilIntensity()
+    public float GetRecoilIntensityRatio()
     {
         return RecoilRatio;
     }
@@ -93,23 +90,12 @@ public class RecoilSystem : MonoBehaviour
     }
     #endregion
 
-    #region Public Methods - Configuration
-    /// <summary>
-    /// 무기 스탯 설정
-    /// </summary>
-    /// <param name="weaponStats">무기 스탯 데이터</param>
-    public void SetWeaponStats(WeaponStatData weaponStats)
-    {
-        _currentWeaponStats = weaponStats;
-    }
-    #endregion
-
     #region Private Methods - Recoil Calculation
     private void UpdateRecoilRecovery()
     {
         if (CurrentRecoilIntensity > 0f)
         {
-            CurrentRecoilIntensity = Mathf.Max(0f, CurrentRecoilIntensity - _recoilRecoveryRate * Time.deltaTime);
+            CurrentRecoilIntensity = Mathf.Max(0f, CurrentRecoilIntensity * _recoilRecoveryRate * Time.deltaTime);
         }
     }
 
