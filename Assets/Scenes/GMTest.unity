@@ -1679,7 +1679,7 @@ MonoBehaviour:
   _shopPanel: {fileID: 0}
   _shopItemContainer: {fileID: 0}
   _shopItemPrefab: {fileID: 0}
-  _temporaryBuffDuration: 30
+  _temporaryBuffDuration: 5
 --- !u!1 &1496758180
 GameObject:
   m_ObjectHideFlags: 0
