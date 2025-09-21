@@ -35,13 +35,11 @@ public class WeaponStatUpgradeStrategySO : BaseUpgradeStrategySO
     [BoxGroup("Weapon Stat Settings")]
     [Header("Application Mode")]
     [SerializeField] private UpgradeApplicationMode _applicationMode = UpgradeApplicationMode.Add;
-
-    readonly UpgradeCategory _category = UpgradeCategory.WeaponStat;
     #endregion
 
     #region Properties
     public override UpgradeType TargetUpgradeType => _targetUpgradeType;
-    public override UpgradeCategory Category => _category;
+    public override UpgradeCategory Category => UpgradeCategory.WeaponStat;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
