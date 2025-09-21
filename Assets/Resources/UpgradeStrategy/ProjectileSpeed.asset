@@ -9,11 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c52ee05261fca5a459c7db72a31ab1ed, type: 3}
-  m_Name: Pierce
+  m_Script: {fileID: 11500000, guid: 996d049d954b4634d8672e4dd66402db, type: 3}
+  m_Name: ProjectileSpeed
   m_EditorClassIdentifier: 
-  _priority: 0
-  _description: "+1 \uAD00\uD1B5, \uB370\uBBF8\uC9C0 0.7\uBC30"
+  _displayName: ProjectileSpeed
+  _description: ProjectileSpeed
+  _icon: {fileID: 0}
+  _applicationType: 0
+  _temporaryDurationSeconds: 30
+  _targetUpgradeType: 4
+  _upgradeValue: 1.1
   _applicationMode: 1
-  _pierceCount: 1
-  _pierceCountDamageMultiplier: 0.7
