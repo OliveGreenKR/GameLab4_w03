@@ -37,10 +37,10 @@ public class UpgradeManager : MonoBehaviour
 
     [TabGroup("Temporary Buffs")]
     [Header("Active Temporary Buffs")]
-    [SerializeField] private List<TemporaryBuff> _activeTemporaryBuffs = new List<TemporaryBuff>();
+    [SerializeField][ReadOnly] private List<TemporaryBuff> _activeTemporaryBuffs = new List<TemporaryBuff>();
 
     [TabGroup("Temporary Buffs")]
-    [SerializeField] private int _nextBuffId = 1;
+    [SerializeField][ReadOnly] private int _nextBuffId = 1;
     #endregion
 
     #region Properties
