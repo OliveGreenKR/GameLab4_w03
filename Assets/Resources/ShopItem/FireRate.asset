@@ -20,4 +20,4 @@ MonoBehaviour:
   _itemType: 1
   _basePrice: 50
   _priceInflationMultiplier: 1.25
-  _upgradeValue: 5
+  _upgradeValue: 1.2

@@ -210,16 +210,49 @@ public class PlayerWeaponController : MonoBehaviour
     }
     #endregion
 
-    #region Public Methods - Debug Description
-    /// <summary>무기 스탯 정보를 문자열로 반환</summary>
-    /// <returns>Fire Rate, Damage, Accuracy, Recoil, Effects 정보가 포함된 멀티라인 문자열</returns>
+    #region Public Methods - Stat Display
+    /// <summary>무기 관련 스탯 문자열 반환</summary>
+    /// <returns>무기 스탯 정보</returns>
     public string GetWeaponStatsString()
     {
+        if ( _baseWeaponStats == null)
+            return "무기 시스템 미초기화";
+
         return $"발사속도: {FinalStats.FireRate:F1} ({(FinalStats.FireRate / _baseWeaponStats.BaseFireRate):F2}x)\n" +
-               $"데미지: {FinalStats.Damage:F1} ({(FinalStats.Damage / _baseWeaponStats.BaseDamage):F2}x)\n" +
                $"정확도: {FinalStats.Accuracy:F1}% ({(FinalStats.Accuracy / _baseWeaponStats.BaseAccuracy):F2}x)\n" +
                $"반동: {FinalStats.Recoil:F1} ({(FinalStats.Recoil / _baseWeaponStats.BaseRecoil):F2}x)\n" +
-               $"적용된 무기 효과 개수: {ActiveEffectCount}";
+               $"적용된 무기 효과: {ActiveEffectCount}개";
+    }
+
+    /// <summary>투사체 관련 스탯 문자열 반환</summary>
+    /// <returns>투사체 스탯 정보</returns>
+    public string GetProjectileStatsString()
+    {
+        if ( _projectileLauncher == null)
+            return "투사체 시스템 미초기화";
+
+        float baseDamage = _baseWeaponStats?.BaseDamage ?? 1f;
+        float baseSpeed = _baseWeaponStats?.BaseProjectileSpeed ?? 1f;
+        float baseLifetime = _baseWeaponStats?.BaseProjectileLifetime ?? 1f;
+
+        return $"투사체 데미지: {FinalStats.Damage:F1} ({(FinalStats.Damage / baseDamage):F2}x)\n" +
+               $"투사체 속도: {FinalStats.ProjectileSpeed:F1} ({(FinalStats.ProjectileSpeed / baseSpeed):F2}x)\n" +
+               $"투사체 생명주기: {FinalStats.ProjectileLifetime:F1}초 ({(FinalStats.ProjectileLifetime / baseLifetime):F2}x)\n" +
+               $"적용된 투사체 효과: {GetActiveProjectileEffectCount()}개";
+    }
+
+    /// <summary>전체 무기 시스템 스탯 문자열 반환</summary>
+    /// <returns>무기 + 투사체 통합 스탯 정보</returns>
+    public string GetFullWeaponStatsString()
+    {
+        return $"{GetWeaponStatsString()}\n\n{GetProjectileStatsString()}";
+    }
+
+    /// <summary>현재 활성화된 투사체 효과 개수 반환</summary>
+    /// <returns>투사체 효과 개수</returns>
+    private int GetActiveProjectileEffectCount()
+    {
+        return _projectileLauncher?.ActiveEffectCount ?? 0;
     }
     #endregion
 

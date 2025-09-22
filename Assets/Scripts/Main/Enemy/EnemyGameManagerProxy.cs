@@ -37,16 +37,6 @@ public class EnemyGameManagerProxy : MonoBehaviour
             Debug.LogError("[EnemyGameManagerProxy] IBattleEntity component not found!", this);
         }
     }
-
-    private void Start()
-    {
-        SubscribeToBattleEntity();
-    }
-
-    private void OnDestroy()
-    {
-        UnsubscribeFromBattleEntity();
-    }
     #endregion
 
     #region Public Methods - Setup
@@ -61,53 +51,5 @@ public class EnemyGameManagerProxy : MonoBehaviour
     }
     #endregion
 
-    #region Private Methods - Event Handling
-    private void OnBattleEntityDeath(IBattleEntity killer)
-    {
-        NotifyGameManagerOfDeath();
-    }
 
-    private void SubscribeToBattleEntity()
-    {
-        if (_battleEntity == null) return;
-
-        // IBattleEntity는 OnDeath 이벤트가 없으므로 BaseBattleEntity의 OnDeath를 찾음
-        if (_battleEntity is BaseBattleEntity battleEntity)
-        {
-            var stat = battleEntity.GetComponent<BattleStatComponent>();
-            stat.OnDeath -= OnBattleEntityDeath;
-            stat.OnDeath += OnBattleEntityDeath;
-        }
-    }
-
-    private void UnsubscribeFromBattleEntity()
-    {
-        if (_battleEntity == null) return;
-
-        if (_battleEntity is BaseBattleEntity battleEntity)
-        {
-            var stat = battleEntity.GetComponent<BattleStatComponent>();
-            stat.OnDeath -= OnBattleEntityDeath;
-            return;
-        }
-    }
-    #endregion
-
-    #region Private Methods - GameManager Communication
-    private void NotifyGameManagerOfDeath()
-    {
-        if (GameManager.Instance == null)
-        {
-            Debug.LogWarning("[EnemyGameManagerProxy] GameManager instance not found!", this);
-            return;
-        }
-
-        // 현재 GameManager.OnEnemyKilled은 고정 보상 시스템
-        // 향후 타입별 보상을 위해 타입 정보 로깅
-        Debug.Log($"[EnemyGameManagerProxy] {_enemyType} enemy killed - notifying GameManager", this);
-
-        // 기존 GameManager 메서드 호출 (killer는 null, victim은 자신)
-        GameManager.Instance.OnEnemyKilled(null, _battleEntity);
-    }
-    #endregion
 }

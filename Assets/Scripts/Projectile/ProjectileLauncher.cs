@@ -76,6 +76,10 @@ public class ProjectileLauncher : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public Vector3 ShootTransform => _shootTransform.position;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public int ActiveEffectCount => _effectAssets?.Count ?? 0;
     #endregion
 
     #region Debug Methods

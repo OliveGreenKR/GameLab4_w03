@@ -6,6 +6,7 @@ public class WeaponStatsUI : MonoBehaviour
 {
     #region Serialized Fields
     [SerializeField] private TextMeshProUGUI _statsText;
+    [SerializeField] private TextMeshProUGUI _projStatsTxt;
     [SerializeField] private PlayerWeaponController _playerWeaponController;
     #endregion
 
@@ -36,6 +37,10 @@ public class WeaponStatsUI : MonoBehaviour
         if (_statsText != null && _playerWeaponController != null)
         {
             _statsText.text = _playerWeaponController.GetWeaponStatsString();
+        }
+        if(_projStatsTxt != null && _playerWeaponController != null)
+        {
+            _projStatsTxt.text = _playerWeaponController.GetProjectileStatsString();
         }
     }
     #endregion
