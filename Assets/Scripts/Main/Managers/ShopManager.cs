@@ -3,36 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Windows;
 
-/// <summary>상점 아이템 데이터</summary>
-[System.Serializable]
-public struct ShopItem
-{
-    public string itemName;
-    public string description;
-    public int basePrice;
-    public Sprite itemIcon;
-    public ShopItemType itemType;
-    public float upgradeValue;
-    public WeaponEffectSO weaponEffect;
-    public ProjectileEffectSO projectileEffect;
-}
-
-/// <summary>상점 아이템 타입</summary>
-public enum ShopItemType
-{
-    WeaponDamage,
-    WeaponFireRate,
-    ProjectileSpeed,
-    ProjectileLifetime,
-    PlayerHeal,
-    PlayerMaxHealth,
-    PlayerMoveSpeed,
-    WeaponEffect,
-    ProjectileEffect,
-    TemporaryWeaponDamage,
-    TemporaryMoveSpeed
-}
-
 /// <summary>
 /// 상점 시스템 관리자
 /// 업그레이드 구매 처리 및 UI 관리
@@ -51,16 +21,13 @@ public class ShopManager : MonoBehaviour
 
     [TabGroup("Shop Items")]
     [Header("Available Shop Items")]
-    [SerializeField] private List<ShopItem> _shopItems = new List<ShopItem>();
+    [SerializeField] private ShopItemSO[] _shopItems;
 
     [TabGroup("Settings")]
-    [SerializeField] private bool _isStopOnOpen = true; 
+    [SerializeField] private bool _isStopOnOpen = true;
 
     [TabGroup("Pricing")]
     [Header("Price Scaling")]
-    [SerializeField] private float _priceInflationRate = 1.1f;
-
-    [TabGroup("Pricing")]
     [SerializeField] private Dictionary<ShopItemType, int> _purchaseCount = new Dictionary<ShopItemType, int>();
 
     [TabGroup("UI")]
@@ -72,119 +39,46 @@ public class ShopManager : MonoBehaviour
 
     [TabGroup("UI")]
     [SerializeField] private GameObject _shopItemPrefab;
-
-    [TabGroup("Temporary Buffs")]
-    [Header("Temporary Buff Settings")]
-    [SerializeField] private float _temporaryBuffDuration = 30f;
     #endregion
 
     #region Serialized Methods - Debug Buttons
-    [Button("Test Weapon Damage")]
-    [GUIColor(0.4f, 0.8f, 1f)]
-    private void TestWeaponDamage()
+    [Button("Test Purchase First Item")]
+    [GUIColor(0.8f, 1f, 0.8f)]
+    private void TestPurchaseFirstItem()
     {
-        ShopItem testItem = new ShopItem
+        if (_shopItems != null && _shopItems.Length > 0)
         {
-            itemType = ShopItemType.WeaponDamage,
-            upgradeValue = 10f
-        };
-        ApplyItemEffect(testItem);
+            bool success = PurchaseItem(0);
+            Debug.Log($"[ShopManager] Test purchase result: {success}", this);
+        }
+        else
+        {
+            Debug.LogWarning("[ShopManager] No shop items available for testing", this);
+        }
     }
 
-    [Button("Test Fire Rate")]
-    [GUIColor(0.4f, 0.8f, 1f)]
-    private void TestFireRate()
+    [Button("Test Purchase First Item")]
+    [GUIColor(0.8f, 1f, 0.8f)]
+    private void TestPurchaseItem(int shopIndex)
     {
-        ShopItem testItem = new ShopItem
+        if (_shopItems != null && _shopItems.Length > 0)
         {
-            itemType = ShopItemType.WeaponFireRate,
-            upgradeValue = 1f
-        };
-        ApplyItemEffect(testItem);
+            bool success = PurchaseItem(shopIndex);
+            Debug.Log($"[ShopManager] Test purchase result: {success}", this);
+        }
+        else
+        {
+            Debug.LogWarning("[ShopManager] No shop items available for testing", this);
+        }
     }
 
-    [Button("Test Projectile Speed")]
-    [GUIColor(0.8f, 0.4f, 1f)]
-    private void TestProjectileSpeed()
+    [Button("Reset Purchase Counts")]
+    [GUIColor(1f, 0.8f, 0.8f)]
+    private void ResetPurchaseCounts()
     {
-        ShopItem testItem = new ShopItem
-        {
-            itemType = ShopItemType.ProjectileSpeed,
-            upgradeValue = 5f
-        };
-        ApplyItemEffect(testItem);
-    }
-
-    [Button("Test Projectile Lifetime")]
-    [GUIColor(0.8f, 0.4f, 1f)]
-    private void TestProjectileLifetime()
-    {
-        ShopItem testItem = new ShopItem
-        {
-            itemType = ShopItemType.ProjectileLifetime,
-            upgradeValue = 1f
-        };
-        ApplyItemEffect(testItem);
-    }
-
-    [Button("Test Heal Player")]
-    [GUIColor(1f, 0.4f, 0.4f)]
-    private void TestHealPlayer()
-    {
-        ShopItem testItem = new ShopItem
-        {
-            itemType = ShopItemType.PlayerHeal,
-            upgradeValue = 25f
-        };
-        ApplyItemEffect(testItem);
-    }
-
-    [Button("Test Max Health")]
-    [GUIColor(1f, 0.4f, 0.4f)]
-    private void TestMaxHealth()
-    {
-        ShopItem testItem = new ShopItem
-        {
-            itemType = ShopItemType.PlayerMaxHealth,
-            upgradeValue = 20f
-        };
-        ApplyItemEffect(testItem);
-    }
-
-    [Button("Test Move Speed")]
-    [GUIColor(1f, 0.4f, 0.4f)]
-    private void TestMoveSpeed()
-    {
-        ShopItem testItem = new ShopItem
-        {
-            itemType = ShopItemType.PlayerMoveSpeed,
-            upgradeValue = 1f
-        };
-        ApplyItemEffect(testItem);
-    }
-
-    [Button("Test Temp Damage")]
-    [GUIColor(1f, 0.8f, 0.4f)]
-    private void TestTempDamage()
-    {
-        ShopItem testItem = new ShopItem
-        {
-            itemType = ShopItemType.TemporaryWeaponDamage,
-            upgradeValue = 15f
-        };
-        ApplyItemEffect(testItem);
-    }
-
-    [Button("Test Temp Speed")]
-    [GUIColor(1f, 0.8f, 0.4f)]
-    private void TestTempSpeed()
-    {
-        ShopItem testItem = new ShopItem
-        {
-            itemType = ShopItemType.TemporaryMoveSpeed,
-            upgradeValue = 2f
-        };
-        ApplyItemEffect(testItem);
+        _purchaseCount.Clear();
+        InitializePurchaseCounters();
+        Debug.Log("[ShopManager] Purchase counts reset", this);
     }
     #endregion
 
@@ -195,7 +89,7 @@ public class ShopManager : MonoBehaviour
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public int AvailableItemCount => _shopItems?.Count ?? 0;
+    public int AvailableItemCount => _shopItems?.Length ?? 0;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -318,7 +212,7 @@ public class ShopManager : MonoBehaviour
         if (!CanPurchaseItem(itemIndex))
             return false;
 
-        ShopItem item = _shopItems[itemIndex];
+        ShopItemSO item = _shopItems[itemIndex];
         int currentPrice = GetCurrentPrice(itemIndex);
 
         if (!_gameManager.SpendGold(currentPrice))
@@ -327,7 +221,7 @@ public class ShopManager : MonoBehaviour
         ProcessPurchase(item, itemIndex);
         RefreshShopUI();
 
-        Debug.Log($"[ShopManager] Purchased {item.itemName} for {currentPrice} gold", this);
+        Debug.Log($"[ShopManager] Purchased {item.ItemName} for {currentPrice} gold", this);
         return true;
     }
 
@@ -336,7 +230,7 @@ public class ShopManager : MonoBehaviour
     /// <returns>구매 가능 여부</returns>
     public bool CanPurchaseItem(int itemIndex)
     {
-        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Count)
+        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Length)
             return false;
 
         int currentPrice = GetCurrentPrice(itemIndex);
@@ -350,13 +244,13 @@ public class ShopManager : MonoBehaviour
     /// <returns>현재 가격</returns>
     public int GetCurrentPrice(int itemIndex)
     {
-        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Count)
+        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Length)
             return 0;
 
-        ShopItem item = _shopItems[itemIndex];
-        int purchaseCount = GetPurchaseCount(item.itemType);
+        ShopItemSO item = _shopItems[itemIndex];
+        int purchaseCount = GetPurchaseCount(item.ItemType);
 
-        return CalculateInflatedPrice(item.basePrice, purchaseCount);
+        return CalculateInflatedPrice(item.BasePrice, item.PriceInflationMultiplier, purchaseCount);
     }
 
     /// <summary>아이템 타입별 구매 횟수 조회</summary>
@@ -424,13 +318,13 @@ public class ShopManager : MonoBehaviour
 
         ClearShopItemUI();
 
-        for (int i = 0; i < _shopItems.Count; i++)
+        for (int i = 0; i < _shopItems.Length; i++)
         {
             CreateShopItemUI(_shopItems[i], i);
         }
     }
 
-    private void CreateShopItemUI(ShopItem item, int itemIndex)
+    private void CreateShopItemUI(ShopItemSO item, int itemIndex)
     {
         if (_shopItemContainer == null || _shopItemPrefab == null)
             return;
@@ -469,64 +363,130 @@ public class ShopManager : MonoBehaviour
     #endregion
 
     #region Private Methods - Purchase Processing
-    private void ProcessPurchase(ShopItem item, int itemIndex)
+    private void ProcessPurchase(ShopItemSO item, int itemIndex)
     {
         ApplyItemEffect(item);
-        UpdatePurchaseCount(item.itemType);
+        UpdatePurchaseCount(item.ItemType);
     }
 
-    private void ApplyItemEffect(ShopItem item)
+    private void ApplyItemEffect(ShopItemSO item)
     {
-        switch (item.itemType)
+        // SO 타입별 분기 처리
+        switch (item)
         {
-            case ShopItemType.WeaponDamage:
-                _upgradeManager.UpgradeWeaponDamage(item.upgradeValue);
+            case StatUpgradeShopItemSO statItem:
+                ApplyStatUpgradeEffect(statItem);
                 break;
 
-            case ShopItemType.WeaponFireRate:
-                _upgradeManager.UpgradeWeaponFireRate(item.upgradeValue);
+            case WeaponEffectShopItemSO weaponEffectItem:
+                ApplyWeaponEffectItem(weaponEffectItem);
                 break;
 
-            case ShopItemType.ProjectileSpeed:
-                _upgradeManager.UpgradeProjectileSpeed(item.upgradeValue);
+            case ProjectileEffectShopItemSO projectileEffectItem:
+                ApplyProjectileEffectItem(projectileEffectItem);
                 break;
 
-            case ShopItemType.ProjectileLifetime:
-                _upgradeManager.UpgradeProjectileLifetime(item.upgradeValue);
-                break;
-
-            case ShopItemType.PlayerHeal:
-                _upgradeManager.HealPlayer(item.upgradeValue);
-                break;
-
-            case ShopItemType.PlayerMaxHealth:
-                _upgradeManager.UpgradePlayerMaxHealth(item.upgradeValue);
-                break;
-
-            case ShopItemType.PlayerMoveSpeed:
-                _upgradeManager.UpgradePlayerMoveSpeed(item.upgradeValue);
-                break;
-
-            case ShopItemType.WeaponEffect:
-                if (item.weaponEffect != null)
-                    _upgradeManager.AddWeaponEffect(item.weaponEffect);
-                break;
-
-            case ShopItemType.ProjectileEffect:
-                if (item.projectileEffect != null)
-                    _upgradeManager.AddProjectileEffect(item.projectileEffect);
-                break;
-
-            case ShopItemType.TemporaryWeaponDamage:
-                _upgradeManager.ApplyTemporaryWeaponDamageBuff(item.upgradeValue, _temporaryBuffDuration);
-                break;
-
-            case ShopItemType.TemporaryMoveSpeed:
-                _upgradeManager.ApplyTemporaryMoveSpeedBuff(item.upgradeValue, _temporaryBuffDuration);
+            case TemporaryBuffShopItemSO tempBuffItem:
+                ApplyTemporaryBuffEffect(tempBuffItem);
                 break;
 
             default:
-                Debug.LogWarning($"[ShopManager] Unknown item type: {item.itemType}", this);
+                Debug.LogWarning($"[ShopManager] Unknown shop item SO type: {item.GetType().Name}", this);
+                break;
+        }
+    }
+
+    private void ApplyStatUpgradeEffect(StatUpgradeShopItemSO statItem)
+    {
+        switch (statItem.ItemType)
+        {
+            case ShopItemType.WeaponDamage:
+                _upgradeManager.UpgradeWeaponDamage(statItem.UpgradeValue);
+                break;
+
+            case ShopItemType.WeaponFireRate:
+                _upgradeManager.UpgradeWeaponFireRate(statItem.UpgradeValue);
+                break;
+
+            case ShopItemType.ProjectileSpeed:
+                _upgradeManager.UpgradeProjectileSpeed(statItem.UpgradeValue);
+                break;
+
+            case ShopItemType.ProjectileLifetime:
+                _upgradeManager.UpgradeProjectileLifetime(statItem.UpgradeValue);
+                break;
+
+            case ShopItemType.PlayerHeal:
+                _upgradeManager.HealPlayer(statItem.UpgradeValue);
+                break;
+
+            case ShopItemType.PlayerMaxHealth:
+                _upgradeManager.UpgradePlayerMaxHealth(statItem.UpgradeValue);
+                break;
+
+            case ShopItemType.PlayerMoveSpeed:
+                _upgradeManager.UpgradePlayerMoveSpeed(statItem.UpgradeValue);
+                break;
+
+            default:
+                Debug.LogWarning($"[ShopManager] Unknown stat upgrade type: {statItem.ItemType}", this);
+                break;
+        }
+    }
+
+    private void ApplyWeaponEffectItem(WeaponEffectShopItemSO weaponEffectItem)
+    {
+        if (weaponEffectItem.WeaponEffect != null)
+        {
+            _upgradeManager.AddWeaponEffect(weaponEffectItem.WeaponEffect);
+        }
+        else
+        {
+            Debug.LogWarning($"[ShopManager] WeaponEffect is null for item: {weaponEffectItem.ItemName}", this);
+        }
+    }
+
+    private void ApplyProjectileEffectItem(ProjectileEffectShopItemSO projectileEffectItem)
+    {
+        if (projectileEffectItem.ProjectileEffect != null)
+        {
+            _upgradeManager.AddProjectileEffect(projectileEffectItem.ProjectileEffect);
+        }
+        else
+        {
+            Debug.LogWarning($"[ShopManager] ProjectileEffect is null for item: {projectileEffectItem.ItemName}", this);
+        }
+    }
+
+    private void ApplyTemporaryBuffEffect(TemporaryBuffShopItemSO tempBuffItem)
+    {
+        if (!tempBuffItem.HasValidBaseItem)
+        {
+            Debug.LogWarning($"[ShopManager] Base item is null for temporary buff: {tempBuffItem.ItemName}", this);
+            return;
+        }
+
+        // 임시 버프 타입별 처리
+        switch (tempBuffItem.ItemType)
+        {
+            case ShopItemType.TemporaryWeaponDamage:
+                if (tempBuffItem.BaseItem is StatUpgradeShopItemSO statItem)
+                {
+                    float buffedValue = statItem.UpgradeValue * tempBuffItem.BuffIntensityMultiplier;
+                    _upgradeManager.ApplyTemporaryWeaponDamageBuff(buffedValue, tempBuffItem.BuffDurationSeconds);
+                }
+                break;
+
+            case ShopItemType.TemporaryMoveSpeed:
+                if (tempBuffItem.BaseItem is StatUpgradeShopItemSO moveStatItem)
+                {
+                    float buffedValue = moveStatItem.UpgradeValue * tempBuffItem.BuffIntensityMultiplier;
+                    _upgradeManager.ApplyTemporaryMoveSpeedBuff(buffedValue, tempBuffItem.BuffDurationSeconds);
+                }
+                break;
+
+            default:
+                Debug.LogWarning($"[ShopManager] Unknown temporary buff type: {tempBuffItem.ItemType}", this);
                 break;
         }
     }
@@ -545,12 +505,12 @@ public class ShopManager : MonoBehaviour
     #endregion
 
     #region Private Methods - Price Calculation
-    private int CalculateInflatedPrice(int basePrice, int purchaseCount)
+    private int CalculateInflatedPrice(int basePrice, float inflationMultiplier, int purchaseCount)
     {
         if (purchaseCount <= 0)
             return basePrice;
 
-        float inflatedPrice = basePrice * Mathf.Pow(_priceInflationRate, purchaseCount);
+        float inflatedPrice = basePrice * Mathf.Pow(inflationMultiplier, purchaseCount);
         return Mathf.RoundToInt(inflatedPrice);
     }
     #endregion
