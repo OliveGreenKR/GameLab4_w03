@@ -28,11 +28,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     [SerializeField] private ProjectileType _projectileType = ProjectileType.BasicProjectile;
 
     [TabGroup("Collision")]
-    [Header("Advanced Collision Detection")]
-    [SuffixLabel("units/sec")]
-    [SerializeField] private float _highSpeedThreshold = 50f;
-
-    [TabGroup("Collision")]
     [SuffixLabel("units")]
     [SerializeField] private float _sphereCastRadius = 0.1f;
 

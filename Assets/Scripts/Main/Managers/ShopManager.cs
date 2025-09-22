@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEngine.Windows;
 
 /// <summary>
-/// 상점 시스템 관리자
-/// 업그레이드 구매 처리 및 UI 관리
+/// 순수 비즈니스 로직
+/// 구매 처리, 가격 계산, 아이템 관리
+/// UI 독립적인 이벤트 시스템으로 통신
 /// </summary>
 public class ShopManager : MonoBehaviour
 {
@@ -21,24 +22,28 @@ public class ShopManager : MonoBehaviour
 
     [TabGroup("Shop Items")]
     [Header("Available Shop Items")]
-    [SerializeField] private ShopItemSO[] _shopItems;
-
-    [TabGroup("Settings")]
-    [SerializeField] private bool _isStopOnOpen = true;
+    [SerializeField] private List<ShopItemSO> _shopItems = new List<ShopItemSO>();
 
     [TabGroup("Pricing")]
     [Header("Price Scaling")]
     [SerializeField] private Dictionary<ShopItemType, int> _purchaseCount = new Dictionary<ShopItemType, int>();
+    #endregion
 
-    [TabGroup("UI")]
-    [Header("Shop UI")]
-    [SerializeField] private GameObject _shopPanel;
+    #region Events
+    /// <summary>아이템 구매 성공 이벤트 (itemIndex, item, finalPrice)</summary>
+    public event System.Action<int, ShopItemSO, int> OnItemPurchased;
 
-    [TabGroup("UI")]
-    [SerializeField] private Transform _shopItemContainer;
+    /// <summary>아이템 구매 실패 이벤트 (itemIndex, reason)</summary>
+    public event System.Action<int, string> OnItemPurchaseFailed;
 
-    [TabGroup("UI")]
-    [SerializeField] private GameObject _shopItemPrefab;
+    /// <summary>가격 변경 이벤트 (itemIndex, newPrice)</summary>
+    public event System.Action<int, int> OnPriceChanged;
+
+    /// <summary>상점 초기화 완료 이벤트</summary>
+    public event System.Action OnShopInitialized;
+
+    /// <summary>상점 데이터 갱신 이벤트 (아이템 목록이나 가격 정책 변경시)</summary>
+    public event System.Action OnShopDataRefreshed;
     #endregion
 
     #region Serialized Methods - Debug Buttons
@@ -85,10 +90,6 @@ public class ShopManager : MonoBehaviour
     #region Properties
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public bool IsShopOpen { get; private set; }
-
-    [TabGroup("Debug")]
-    [ShowInInspector, ReadOnly]
     public int AvailableItemCount => _shopItems?.Length ?? 0;
 
     [TabGroup("Debug")]
@@ -100,18 +101,7 @@ public class ShopManager : MonoBehaviour
     public bool IsInitialized { get; private set; }
     #endregion
 
-    #region Private Fields
-    private InputSystem_Actions _inputs;
-    #endregion
-
     #region Unity Lifecycle
-    private void Awake()
-    {
-        if (_inputs == null)
-        {
-            _inputs = new InputSystem_Actions();
-        }
-    }
     private void Start()
     {
         if (!ValidateReferences())
@@ -122,84 +112,90 @@ public class ShopManager : MonoBehaviour
         }
 
         InitializeShop();
+        OnShopInitialized?.Invoke();
         Debug.Log("[ShopManager] Initialized successfully", this);
     }
 
-    private void OnEnable()
+    private void OnValidate()
     {
-        if (_inputs != null)
-        {
-            _inputs.Enable();
-            _inputs.UI.Shop.performed -= OnShopPerformed;
-            _inputs.UI.Shop.performed += OnShopPerformed;
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (_inputs != null)
-        {
-            _inputs.Disable();
-            _inputs.UI.Shop.performed -= OnShopPerformed;
-        }
+        OnShopDataRefreshed?.Invoke();
     }
     #endregion
 
-    #region Public Methods - Shop Control
-    /// <summary>상점 열기</summary>
-    public void OpenShop()
+    #region Public Methods - Item Management
+    /// <summary>상점에 새 아이템 추가</summary>
+    /// <param name="item">추가할 상점 아이템</param>
+    public void AddShopItem(ShopItemSO item)
     {
-        if (!IsInitialized || IsShopOpen) return;
-
-        IsShopOpen = true;
-
-        if (_shopPanel != null)
+        if (!IsInitialized || item == null)
         {
-            _shopPanel.SetActive(true);
+            Debug.LogWarning("[ShopManager] Cannot add item: Shop not initialized or item is null", this);
+            return;
         }
 
-        RefreshShopUI();
+        _shopItems.Add(item);
 
-        if(_isStopOnOpen)
+        // 새 아이템 타입의 구매 카운터 초기화
+        if (!_purchaseCount.ContainsKey(item.ItemType))
         {
-            // 게임 일시정지 (선택사항)
-            Time.timeScale = 0f;
+            _purchaseCount[item.ItemType] = 0;
         }
 
-        Debug.Log("[ShopManager] Shop opened", this);
+        OnShopDataRefreshed?.Invoke();
+        Debug.Log($"[ShopManager] Added shop item: {item.ItemName}", this);
     }
 
-    /// <summary>상점 닫기</summary>
-    public void CloseShop()
+    /// <summary>상점에서 아이템 제거 (인덱스)</summary>
+    /// <param name="itemIndex">제거할 아이템 인덱스</param>
+    public void RemoveShopItem(int itemIndex)
     {
-        if (!IsInitialized || !IsShopOpen) return;
-
-        IsShopOpen = false;
-
-        if (_shopPanel != null)
+        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Count)
         {
-            _shopPanel.SetActive(false);
+            Debug.LogWarning($"[ShopManager] Cannot remove item: Invalid index {itemIndex}", this);
+            return;
         }
 
-        if (_isStopOnOpen)
-        {
-            Time.timeScale = 1f;
-        }
+        string itemName = _shopItems[itemIndex].ItemName;
+        _shopItems.RemoveAt(itemIndex);
 
-        Debug.Log("[ShopManager] Shop closed", this);
+        OnShopDataRefreshed?.Invoke();
+        Debug.Log($"[ShopManager] Removed shop item: {itemName}", this);
     }
 
-    /// <summary>상점 토글</summary>
-    public void ToggleShop()
+    /// <summary>상점에서 아이템 제거 (직접 참조)</summary>
+    /// <param name="item">제거할 상점 아이템</param>
+    public void RemoveShopItem(ShopItemSO item)
     {
-        if (IsShopOpen)
+        if (!IsInitialized || item == null)
         {
-            CloseShop();
+            Debug.LogWarning("[ShopManager] Cannot remove item: Shop not initialized or item is null", this);
+            return;
+        }
+
+        bool removed = _shopItems.Remove(item);
+        if (removed)
+        {
+            OnShopDataRefreshed?.Invoke();
+            Debug.Log($"[ShopManager] Removed shop item: {item.ItemName}", this);
         }
         else
         {
-            OpenShop();
+            Debug.LogWarning($"[ShopManager] Item not found in shop: {item.ItemName}", this);
         }
+    }
+
+    /// <summary>상점의 모든 아이템 제거</summary>
+    public void ClearShopItems()
+    {
+        if (!IsInitialized)
+        {
+            Debug.LogWarning("[ShopManager] Cannot clear items: Shop not initialized", this);
+            return;
+        }
+
+        _shopItems.Clear();
+        OnShopDataRefreshed?.Invoke();
+        Debug.Log("[ShopManager] Cleared all shop items", this);
     }
     #endregion
 
@@ -210,16 +206,26 @@ public class ShopManager : MonoBehaviour
     public bool PurchaseItem(int itemIndex)
     {
         if (!CanPurchaseItem(itemIndex))
+        {
+            string reason = !IsInitialized ? "Shop not initialized" :
+                           itemIndex < 0 || itemIndex >= _shopItems.Length ? "Invalid item index" :
+                           "Insufficient gold";
+            OnItemPurchaseFailed?.Invoke(itemIndex, reason);
             return false;
+        }
 
         ShopItemSO item = _shopItems[itemIndex];
         int currentPrice = GetCurrentPrice(itemIndex);
 
         if (!_gameManager.SpendGold(currentPrice))
+        {
+            OnItemPurchaseFailed?.Invoke(itemIndex, "Failed to spend gold");
             return false;
+        }
 
         ProcessPurchase(item, itemIndex);
-        RefreshShopUI();
+        OnItemPurchased?.Invoke(itemIndex, item, currentPrice);
+        OnPriceChanged?.Invoke(itemIndex, GetCurrentPrice(itemIndex));
 
         Debug.Log($"[ShopManager] Purchased {item.ItemName} for {currentPrice} gold", this);
         return true;
@@ -277,26 +283,14 @@ public class ShopManager : MonoBehaviour
             return false;
         }
 
-        if (_shopPanel == null)
-        {
-            Debug.LogWarning("[ShopManager] Shop panel not assigned!", this);
-        }
-
         return true;
     }
 
     private void InitializeShop()
     {
         InitializePurchaseCounters();
-
-        IsShopOpen = false;
-        if (_shopPanel != null)
-        {
-            _shopPanel.SetActive(false);
-        }
-
-        RefreshShopUI();
         IsInitialized = true;
+        OnShopDataRefreshed?.Invoke();
     }
 
     private void InitializePurchaseCounters()
@@ -306,58 +300,6 @@ public class ShopManager : MonoBehaviour
         foreach (ShopItemType itemType in System.Enum.GetValues(typeof(ShopItemType)))
         {
             _purchaseCount[itemType] = 0;
-        }
-    }
-    #endregion
-
-    #region Private Methods - UI Management
-    private void RefreshShopUI()
-    {
-        if (_shopItemContainer == null || _shopItemPrefab == null)
-            return;
-
-        ClearShopItemUI();
-
-        for (int i = 0; i < _shopItems.Length; i++)
-        {
-            CreateShopItemUI(_shopItems[i], i);
-        }
-    }
-
-    private void CreateShopItemUI(ShopItemSO item, int itemIndex)
-    {
-        if (_shopItemContainer == null || _shopItemPrefab == null)
-            return;
-
-        //GameObject itemUI = Instantiate(_shopItemPrefab, _shopItemContainer);
-
-        //// UI 컴포넌트 설정 (실제 UI 구조에 따라 수정 필요)
-        //ShopItemUI shopItemUI = itemUI.GetComponent<ShopItemUI>();
-        //if (shopItemUI != null)
-        //{
-        //    int currentPrice = GetCurrentPrice(itemIndex);
-        //    bool canAfford = CanPurchaseItem(itemIndex);
-
-        //    shopItemUI.Setup(item, currentPrice, canAfford, () => PurchaseItem(itemIndex));
-        //}
-    }
-
-    private void ClearShopItemUI()
-    {
-        if (_shopItemContainer == null)
-            return;
-
-        for (int i = _shopItemContainer.childCount - 1; i >= 0; i--)
-        {
-            Transform child = _shopItemContainer.GetChild(i);
-            if (Application.isPlaying)
-            {
-                Destroy(child.gameObject);
-            }
-            else
-            {
-                DestroyImmediate(child.gameObject);
-            }
         }
     }
     #endregion
@@ -515,10 +457,4 @@ public class ShopManager : MonoBehaviour
     }
     #endregion
 
-    #region Private Methods - Input Handling
-    private void OnShopPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
-    {
-        ToggleShop();
-    }
-    #endregion
 }
