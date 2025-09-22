@@ -626,41 +626,41 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, _sphereCastRadius, direction, distance, _collisionLayerMask);
 
+        bool hasExistingTargetCollision = false;
+
         if (hits.Length > 0)
         {
-            // 충돌 발견 시 기존 처리
             foreach (var hit in hits)
             {
                 IBattleEntity target = hit.collider.GetComponent<IBattleEntity>();
                 if (target != null && IsValidCollisionTarget(target))
                 {
-                    if (_hitTargets.Contains(target)) continue;
+                    if (_hitTargets.Contains(target))
+                    {
+                        hasExistingTargetCollision = true; // 기존 타겟 충돌 확인
+                        continue;
+                    }
 
+                    // 새로운 타겟 처리
                     float damage = ProcessDamageToTarget(target);
                     if (damage > 0f)
                     {
-                        Debug.Log($"[ProjectileBase] Hit valid target: {target.GameObject.name}, Dealt Damage: {damage}");
                         RegisterHitTarget(target, hit.point);
                         OnProjectileHit?.Invoke(this, hit.collider);
                         AfterProjectileHit?.Invoke(this, hit.collider);
                         _battleStat.ApplyDamage(1.0f);
-
                         if (!IsAlive) break;
-
                         ActivateSplitDelay();
                     }
                 }
             }
         }
-        else
+
+        // 기존 타겟과 충돌하지 않으면 통과 완료
+        if (_isSplitDelayed && _hitTargetPositions.Count > 0 && !hasExistingTargetCollision)
         {
-            // 충돌 없음 + 기존 타겟 존재 = 통과 완료
-            if (_isSplitDelayed && _hitTargetPositions.Count > 0)
-            {
-                Debug.Log("[ProjectileBase] No collision detected - pass-through confirmed");
-                DrawSphereCast(transform.position, _sphereCastRadius, direction, distance);
-                ExecuteDelayedSplit();
-            }
+            Debug.Log("[ProjectileBase] No collision with existing targets - pass-through confirmed");
+            ExecuteDelayedSplit();
         }
     }
     private bool IsValidCollisionTarget(IBattleEntity target)
