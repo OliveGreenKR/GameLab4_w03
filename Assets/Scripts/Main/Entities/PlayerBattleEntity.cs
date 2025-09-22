@@ -108,14 +108,12 @@ public class PlayerBattleEntity : BaseBattleEntity
     {
         if (_battleStat == null || maxHealth <= 0f) return;
 
-        float currentHealthRatio = HealthPercentage;
+        float old = _battleStat.MaxHealth;
+        float delta = maxHealth - old;
         _battleStat.SetCurrentStat(BattleStatType.MaxHealth, maxHealth);
+        _battleStat.ModifyStat(BattleStatType.Health, delta);
 
-        // 현재 체력을 비율에 맞게 조정
-        float newCurrentHealth = maxHealth * currentHealthRatio;
-        _battleStat.SetCurrentStat(BattleStatType.Health, newCurrentHealth);
-
-        Debug.Log($"[PlayerBattleEntity] Max health set to {maxHealth}, current: {newCurrentHealth:F1}", this);
+        Debug.Log($"[PlayerBattleEntity] Max health set to {maxHealth}", this);
     }
 
     /// <summary>
