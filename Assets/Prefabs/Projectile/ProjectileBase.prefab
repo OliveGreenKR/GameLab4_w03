@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6100663332218444536}
   - component: {fileID: 435775317057005993}
   - component: {fileID: 3720800618165384622}
-  m_Layer: 0
+  m_Layer: 28
   m_Name: ProjectileBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,8 +104,7 @@ MonoBehaviour:
   _invulnerabilityDuration: 0
   _destroyMode: 0
   _projectileType: 0
-  _highSpeedThreshold: 50
-  _sphereCastRadius: 0.75
+  _sphereCastRadius: 0.5
   _hitExitTimeoutSeconds: 0.3
   _collisionLayerMask:
     serializedVersion: 2
@@ -117,10 +116,8 @@ MonoBehaviour:
   _baseSpeedMultiplier: 1
   _baseSplitAvailableCount: 0
   _baseSplitProjectileCount: 0
-  _baseSplitAngleRange: 120
+  _baseSplitAngleRange: 0
   _maxSplitDelayedTime: 1
-  _attackTrigger: {fileID: 0}
-  _rigid: {fileID: 0}
 --- !u!114 &3720800618165384622
 MonoBehaviour:
   m_ObjectHideFlags: 0

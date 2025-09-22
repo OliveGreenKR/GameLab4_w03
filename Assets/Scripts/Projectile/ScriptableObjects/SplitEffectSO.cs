@@ -103,11 +103,9 @@ public class SplitEffectSO : ProjectileEffectSO
 
         // 분열 속성 설정
         projectile.ModifySplitProjectileCount(_splitCount);
-
-        if(projectile.SplitAngleRange < _splitAngleRangeDegrees)
-        {
-            projectile.SetSplitAngleRange(_splitAngleRangeDegrees);
-        }
+        Debug.Log($"Befroe attach split effect_ range: {projectile.SplitAngleRange}");
+        projectile.ModifySplitAngleRange(_splitAngleRangeDegrees);
+        Debug.Log($"attach split effect_ range to {projectile.SplitAngleRange}");
 
         // 투사체 속성 배율 적용 (부착 시 즉시 적용)
         if (!Mathf.Approximately(_speedMultiplier, 1.0f))

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Splines;
 
 /// <summary>
 /// 투사체 소멸 모드
@@ -200,7 +201,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
 
         UpdateLifetime();
         UpdateSplitDelay();
-        CheckTargetPassThrough();
 
         // 이동 전 예측적 충돌 검사
         PredictiveCollisionCheck();
@@ -219,11 +219,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         InitializeProjectileStats();
         OnProjectileActivated?.Invoke(this);
         //Debug.Log($"[ProjectileBase] Projectile Activated. Lifetime: {_lifetimeSeconds}s, Speed: {_forwardSpeedUnitsPerSecond} units/sec", this);
-    }
-
-    private void OnDisable()
-    {
-        // OnProjectileDestroyed 이벤트 호출 제거 (HandleProjectileDeath에서 처리)
     }
 
     protected override void OnDestroy()
@@ -375,12 +370,15 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         if (_owner == null) return null;
 
+        if (_remainingLifetime < 0.001f)
+            return null;
+
         IProjectile clone = _owner.CreateProjectile(_projectileType, worldPosition, worldRotation, true);
         if (clone != null)
         {
             // 현재 상태 그대로 복사
             clone.Initialize(_remainingLifetime, _forwardSpeedUnitsPerSecond);
-            //clone.SetLifetime(_remainingLifetime);
+            clone.SetLifetime(_remainingLifetime);
             clone.SetDamage(Damage);
             clone.SetDamageMultiplier(_currentDamageMultiplier);
             clone.SetSpeedMultiplier(_currentSpeedMultiplier);
@@ -416,13 +414,13 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     public void DestroyProjectile()
     {
         Debug.Log($"[ProjectileBase] DestroyProjectile called. Splitting if possible.", this);
-        ProcessSplit();
         DestroyProjectileWithoutSplit();
     }
 
     public void ProcessSplit()
     {
-        Debug.Log($"[ProjectileBase] Attempting to split. Available Splits: {_currentSplitAvailableCount}, Projectiles per Split: {_currentSplitProjectileCount}", this);
+        //Debug.Log($"ProcessSplit called from: {System.Environment.StackTrace}");
+        //Debug.Log($"[ProjectileBase] Attempting to Processsplit. Available Splits: {_currentSplitAvailableCount}, Projectiles per Split: {_currentSplitProjectileCount}", this);
 
         if (_currentSplitAvailableCount <= 0 || _owner == null || _currentSplitProjectileCount <= 0) return;
 
@@ -434,7 +432,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         float angleStep = _currentSplitAngleRange / (_currentSplitProjectileCount - 1);
         float startAngle = -_currentSplitAngleRange * 0.5f;
 
-        int splitedcloneCount = 0;
         for (int i = 0; i < _currentSplitProjectileCount; i++)
         {
             float currentAngle = startAngle + (angleStep * i);
@@ -445,9 +442,8 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
             var clone = CreateClone(originalPosition, splitRotation);
             if (clone != null)
             {
-                clone.LogAllStats();
-                splitedcloneCount++;
-                //for debug
+                //clone.LogAllStats();
+                Debug.Log("Split!");
                 clone.GameObject.transform.SetParent(this.transform.parent);
             }
         }
@@ -497,6 +493,12 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         else
             _hitTargetPositions.Clear();
 
+        if(_isSplitDelayed)
+        {
+            _isSplitDelayed = false;
+            _splitDelayTimeRemaining = 0f;
+        }
+
         // BattleStat 완전 초기화
         if (_battleStat != null)
         {
@@ -526,15 +528,15 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     }
 
     /// <summary>
-    /// 타격 후 분열 처리 (매 타격마다 실행, Delayed 방식)
+    /// 타격 후 지연 분열 활성화
     /// </summary>
-    private void HandleSplitAfterHit()
+    private void ActivateSplitDelay()
     {
         if (_currentSplitAvailableCount <= 0 || _owner == null || _currentSplitProjectileCount <= 0)
             return;
 
         if (_isSplitDelayed) return; // 이미 분열 대기 중이면 무시
-
+        Debug.Log($"ActivateSplitDelay called from: {System.Environment.StackTrace}");
         Debug.Log($"[ProjectileBase] Split delayed after hit. Available: {_currentSplitAvailableCount}", this);
 
         _isSplitDelayed = true;
@@ -551,6 +553,7 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         {
             Debug.LogWarning("SplitDelayTimeElapsed! Executing Split now.");
             ExecuteDelayedSplit();
+            AfterProjectileHit?.Invoke(this, null); // null은 지나침을 의미
         }
     }
 
@@ -599,17 +602,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     {
         if (!gameObject.activeInHierarchy) return; // 중복 호출 방지
 
-        //// 분열 조건 체크
-        //if (SplitAvailableCount > 0 && !_isSplitDelayed)
-        //{
-        //    _isSplitDelayed = true;
-        //    _splitDelayTimeRemaining = _maxSplitDelayedTime;
-        //    Debug.Log($"[ProjectileBase] Split delayed started. Time remaining: {_splitDelayTimeRemaining:F2}s", this);
-        //    return; // 즉시 소멸하지 않음
-        //}
-
-        //ProcessSplit(); // 타격 후 분열 처리
-
         // 1. 소멸 전 이벤트 호출
         BeforeProjectileDestroyed?.Invoke(this);
 
@@ -633,42 +625,54 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     private void ProcessPredictiveSphereCast(Vector3 direction, float distance)
     {
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, _sphereCastRadius, direction, distance, _collisionLayerMask);
-        //Debug.Log($"[ProjectileBase] SphereCast detected {hits.Length} hits.", this);
-        foreach (var hit in hits)
+
+        if (hits.Length > 0)
         {
-            IBattleEntity target = hit.collider.GetComponent<IBattleEntity>();
-            if (target != null && IsValidCollisionTarget(target))
+            // 충돌 발견 시 기존 처리
+            foreach (var hit in hits)
             {
-                if (_hitTargets.Contains(target)) continue;
-
-                float damage = ProcessDamageToTarget(target);
-                if (damage > 0f)
+                IBattleEntity target = hit.collider.GetComponent<IBattleEntity>();
+                if (target != null && IsValidCollisionTarget(target))
                 {
-                    //Debug.DrawLine(transform.position, hit.point, Color.red, 1.0f);
-                    Debug.Log($"[ProjectileBase] Hit valid target: {target.GameObject.name}, Dealt Damage: {damage}");
-                    RegisterHitTarget(target);
-                    OnProjectileHit?.Invoke(this, hit.collider);
-                    AfterProjectileHit?.Invoke(this, hit.collider);
-                    _battleStat.ApplyDamage(1.0f);
+                    if (_hitTargets.Contains(target)) continue;
 
-                    if (!IsAlive) break;
+                    float damage = ProcessDamageToTarget(target);
+                    if (damage > 0f)
+                    {
+                        Debug.Log($"[ProjectileBase] Hit valid target: {target.GameObject.name}, Dealt Damage: {damage}");
+                        RegisterHitTarget(target, hit.point);
+                        OnProjectileHit?.Invoke(this, hit.collider);
+                        AfterProjectileHit?.Invoke(this, hit.collider);
+                        _battleStat.ApplyDamage(1.0f);
 
-                    HandleSplitAfterHit();
+                        if (!IsAlive) break;
+
+                        ActivateSplitDelay();
+                    }
                 }
             }
         }
+        else
+        {
+            // 충돌 없음 + 기존 타겟 존재 = 통과 완료
+            if (_isSplitDelayed && _hitTargetPositions.Count > 0)
+            {
+                Debug.Log("[ProjectileBase] No collision detected - pass-through confirmed");
+                DrawSphereCast(transform.position, _sphereCastRadius, direction, distance);
+                ExecuteDelayedSplit();
+            }
+        }
     }
-
     private bool IsValidCollisionTarget(IBattleEntity target)
     {
         return target != null && target.IsAlive && target.TeamId != TeamId;
     }
 
-    private void RegisterHitTarget(IBattleEntity target)
+    private void RegisterHitTarget(IBattleEntity target, Vector3 hitPoint)
     {
         _hitTargets.Add(target);
         _hitExitTimers[target] = _hitExitTimeoutSeconds;
-        _hitTargetPositions[target] = target.Transform.position;
+        _hitTargetPositions[target] = hitPoint; // 충돌 지점 저장
     }
 
     private void UpdateHitTargetTimers()
@@ -687,27 +691,6 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
         CleanupExpiredHitTargets(expiredTargets);
     }
 
-    private void CheckTargetPassThrough()
-    {
-        if (!_isSplitDelayed) return;
-
-        foreach (var kvp in _hitTargetPositions.ToArray())
-        {
-            IBattleEntity target = kvp.Key;
-            Vector3 hitPosition = kvp.Value;
-
-            // 투사체가 타겟을 지나쳤는지 확인
-            Vector3 toTarget = target.Transform.position - transform.position;
-
-            // 내적이 음수면 지나친 것
-            if (Vector3.Dot(toTarget.normalized, transform.forward) < 0f)
-            {
-                ExecuteDelayedSplit();
-                return;
-            }
-        }
-    }
-
     private void CleanupExpiredHitTargets(List<IBattleEntity> expiredTargets)
     {
         foreach (var target in expiredTargets)
@@ -720,6 +703,34 @@ public class ProjectileBase : BaseBattleEntity, IProjectile
     #endregion
 
     #region Debug Methods
+    /// <summary>
+    /// Raycast 시각화 (디버그용)
+    /// </summary>
+    private void DrawSphereCast(Vector3 origin, float radius, Vector3 direction, float distance)
+    {
+        // 구체 중심점들
+        Vector3 startCenter = origin;
+        Vector3 endCenter = origin + direction * distance;
+
+        // 원형 그리기 (XZ 평면)
+        int segments = 16;
+        for (int i = 0; i < segments; i++)
+        {
+            float angle1 = i * 2f * Mathf.PI / segments;
+            float angle2 = (i + 1) * 2f * Mathf.PI / segments;
+
+            Vector3 point1 = new Vector3(Mathf.Cos(angle1), 0, Mathf.Sin(angle1)) * radius;
+            Vector3 point2 = new Vector3(Mathf.Cos(angle2), 0, Mathf.Sin(angle2)) * radius;
+
+            // 시작 원
+            Debug.DrawLine(startCenter + point1, startCenter + point2, Color.red, 0.1f);
+            // 끝 원  
+            Debug.DrawLine(endCenter + point1, endCenter + point2, Color.yellow, 0.1f);
+            // 연결선
+            Debug.DrawLine(startCenter + point1, endCenter + point1, Color.green, 0.1f);
+        }
+    }
+
     /// <summary>
     /// 투사체의 모든 스탯 정보를 로그로 출력
     /// </summary>

@@ -82,7 +82,7 @@ public class PiercingEffectSO : ProjectileEffectSO
     {
         if (ValidateProjectile(projectile))
         {
-            projectile.OnProjectileHit -= AfterProjectileHit;
+            projectile.AfterProjectileHit -= AfterProjectileHit;
         }
         LogEffect("Detached from projectile (no cleanup needed)", projectile);
     }
