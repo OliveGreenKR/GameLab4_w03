@@ -1264,7 +1264,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4652513387228675290, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.75
+      value: 12.6
       objectReference: {fileID: 0}
     - target: {fileID: 4652513387228675290, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1296,6 +1296,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4652513387228675290, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5597853729675806886, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
+      propertyPath: _gravityScale
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5597853729675806886, guid: bd40782291e242f46b7c32dfe684d31e, type: 3}
@@ -1874,7 +1878,10 @@ MonoBehaviour:
   _eliteEnemyGoldReward: 25
   _enemySpawner: {fileID: 1838710321}
   _maxWaves: 10
+  _currentWave: 1
   _initialGameState: 0
+  _gameStartTime: 0
+  _totalEarnedGold: 0
 --- !u!114 &1323416450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2456,7 +2463,27 @@ MonoBehaviour:
       packSizeFixedIncrease: 5
       packSizePercentIncrease: 10
   _maxUpgradeCollection:
-    _upgrades: []
+    _upgrades:
+    - target: 0
+      upgradeAmount: 5
+      initialWeight: 2
+      weightIncrease: 3
+      maxWeight: 35
+    - target: 1
+      upgradeAmount: 10
+      initialWeight: 5
+      weightIncrease: 2
+      maxWeight: 30
+    - target: 2
+      upgradeAmount: 5
+      initialWeight: 5
+      weightIncrease: 3
+      maxWeight: 20
+    - target: 3
+      upgradeAmount: 2
+      initialWeight: 5
+      weightIncrease: 2
+      maxWeight: 10
   _difficultyUpdateInterval: 5
 --- !u!1 &1883257449
 GameObject:

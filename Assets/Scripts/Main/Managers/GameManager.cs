@@ -41,6 +41,7 @@ public class GameManager : MonoBehaviour
     [Header("Wave System")]
     [SerializeField] private EnemySpawner _enemySpawner;
     [SerializeField] private int _maxWaves = 10;
+    [SerializeField] private int _currentWave = 1;
 
     [Header("Game State")]
     [SerializeField] private GameState _initialGameState = GameState.WaveReady;
@@ -67,7 +68,7 @@ public class GameManager : MonoBehaviour
     public int CurrentGold { get; private set; }
 
     [ShowInInspector, ReadOnly]
-    public int CurrentWave => _enemySpawner != null ? _enemySpawner.CurrentCycle : 0;
+    public int CurrentWave => _currentWave;
 
     // 상태 기반 계산 프로퍼티들
     [ShowInInspector, ReadOnly]
@@ -106,7 +107,6 @@ public class GameManager : MonoBehaviour
 
     [ShowInInspector, ReadOnly]
     public string EliteEnemyProgress => $"{ActiveEliteEnemyCount}/{TotalEliteEnemyCount}";
-
 
     // 플레이 추적
     [ShowInInspector, ReadOnly]
@@ -150,9 +150,20 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        InitializeStats();
+        // 기본 골드 설정
+        CurrentGold = _initialGold;
+
+        // 게임 시작 시간 기록
+        _gameStartTime = Time.time;
+
+        // 초기 상태 설정
+        CurrentState = _initialGameState;
+
         _inputActions?.Enable();
         CursorLock();
+
+        StartGame();
+        // StartGame()은 별도 호출 필요 - 자동 시작하지 않음
     }
 
     private void OnEnable()
@@ -167,8 +178,6 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Scene 이벤트 구독 해제
-        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
 
         BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
 
@@ -180,44 +189,6 @@ public class GameManager : MonoBehaviour
         UnsubscribeFromPlayerEvents();
 
         _inputActions?.Dispose();
-    }
-    #endregion
-
-    #region Public Methods - Game Control
-    public void RestartGame()
-    {
-        // 상태 초기화
-        ResetInternalState();
-
-        // 씬 재로드
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
-    }
-
-    /// <summary>
-    /// 게임 시작 - 웨이브 및 난이도 통합 초기화
-    /// </summary>
-    public void StartGame()
-    {
-        if (_enemySpawner == null)
-        {
-            Debug.LogWarning("[GameManager] Cannot start game: EnemySpawner not found");
-            return;
-        }
-
-        // 웨이브 시스템 초기화
-        InitializeWaveSystem();
-
-        // 난이도 시스템 리셋
-        ResetDifficultySystem();
-
-        // 플레이어 상태 초기화
-        InitializePlayerState();
-
-        // 웨이브 시작
-        StartWave();
-
-        Debug.Log("[GameManager] Game started successfully");
     }
     #endregion
 
@@ -365,7 +336,132 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    #region Private Methods - Gmae State Control
+    #region Public Methods - Game Control
+    /// <summary>
+    /// 게임 재시작 - 씬 리로드 방식
+    /// </summary>
+    public void RestartGame()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    /// <summary>
+    /// 인게임 재시작 - 상태 리셋 방식
+    /// </summary>
+    public void RestartGameInPlace()
+    {
+        // 내부 상태 완전 리셋
+        ResetInternalState();
+
+        // 시스템별 초기화
+        InitializeWaveSystem();
+        ResetDifficultySystem();
+        InitializePlayerState();
+
+        // 게임 시작
+        StartWave();
+
+        Debug.Log("[GameManager] Game restarted in-place");
+    }
+
+    /// <summary>
+    /// 게임 시작 - 웨이브 및 난이도 통합 초기화
+    /// </summary>
+    public void StartGame()
+    {
+        if (_enemySpawner == null)
+        {
+            Debug.LogWarning("[GameManager] Cannot start game: EnemySpawner not found");
+            return;
+        }
+
+        // 웨이브 시스템 초기화
+        InitializeWaveSystem();
+
+        // 난이도 시스템 리셋
+        ResetDifficultySystem();
+
+        // 플레이어 상태 초기화
+        InitializePlayerState();
+
+        // 웨이브 시작
+        StartWave();
+
+        Debug.Log("[GameManager] Game started successfully");
+    }
+    #endregion
+
+    #region Private Methods - State Management
+    private void ChangeGameState(GameState newState)
+    {
+        if (CurrentState == newState)
+            return;
+
+        GameState oldState = CurrentState;
+        CurrentState = newState;
+
+        Debug.Log($"[GameManager] State changed: {oldState} → {newState}");
+
+        OnGameStateChanged?.Invoke(oldState, newState);
+        HandleStateTransition(newState);
+    }
+
+    private void HandleStateTransition(GameState newState)
+    {
+        switch (newState)
+        {
+            case GameState.WaveInProgress:
+                OnWaveStarted?.Invoke(CurrentWave);
+                break;
+
+            case GameState.WaveCompleted:
+                OnWaveCompleted?.Invoke(CurrentWave);
+
+                // 자동 웨이브 진행 처리
+                if (_currentWave >= _maxWaves)
+                {
+                    ChangeGameState(GameState.GameCleared);
+                }
+                else
+                {
+                    // NextWave를 직접 호출하지 않고 WaveReady로 전환
+                    _currentWave++;
+
+                    // 스폰너 난이도 업그레이드
+                    if (_enemySpawner != null)
+                    {
+                        _enemySpawner.UpgradeDifficulty();
+                    }
+
+                    ChangeGameState(GameState.WaveReady);
+                    Debug.Log($"[GameManager] Auto-advanced to wave {_currentWave}");
+                }
+                break;
+
+            case GameState.GameOver:
+                OnGameOver?.Invoke();
+                break;
+
+            case GameState.GameCleared:
+                OnGameCleared?.Invoke();
+                break;
+        }
+    }
+
+    private void CheckAndUpdateWaveState()
+    {
+        if (CurrentState != GameState.WaveInProgress)
+            return;
+
+        if (!IsSpawning && ActiveEnemyCount == 0)
+        {
+            ChangeGameState(GameState.WaveCompleted);
+        }
+    }
+    #endregion
+
+    #region Private Methods - Initialization
     private void InitializeWaveSystem()
     {
         if (_enemySpawner == null) return;
@@ -400,84 +496,32 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] Player state initialized");
     }
 
+    /// <summary>
+    /// 내부 상태 완전 리셋
+    /// </summary>
     private void ResetInternalState()
     {
-        // 몬스터 카운터 초기화
+        // 웨이브 리셋
+        _currentWave = 1;
+
+        // 적 카운터 리셋
         _activeNormalEnemyCount = 0;
         _activeEliteEnemyCount = 0;
         _totalNormalEnemySpawned = 0;
         _totalEliteEnemySpawned = 0;
 
-        // 게임 상태 초기화  
-        CurrentGold = _initialGold;
+        // 세션 데이터 리셋
+        _gameStartTime = Time.time;
         _totalEarnedGold = 0;
-        _gameStartTime = 0f;
 
-        // 상태 리셋
-        ChangeGameState(_initialGameState);
+        // 골드 초기화
+        int oldGold = CurrentGold;
+        CurrentGold = _initialGold;
+        OnGoldChanged?.Invoke(oldGold, CurrentGold);
 
-        Debug.Log("[GameManager] Internal state reset for restart");
-    }
-    #endregion
-
-    #region Private Methods - State Management
-    private void ChangeGameState(GameState newState)
-    {
-        if (CurrentState == newState)
-            return;
-
-        GameState oldState = CurrentState;
-        CurrentState = newState;
-
-        Debug.Log($"[GameManager] State changed: {oldState} → {newState}");
-
-        OnGameStateChanged?.Invoke(oldState, newState);
-        HandleStateTransition(newState);
+        Debug.Log("[GameManager] Internal state reset completed");
     }
 
-    private void HandleStateTransition(GameState newState)
-    {
-        switch (newState)
-        {
-            case GameState.WaveInProgress:
-                OnWaveStarted?.Invoke(CurrentWave);
-                break;
-
-            case GameState.WaveCompleted:
-                OnWaveCompleted?.Invoke(CurrentWave);
-                break;
-
-            case GameState.GameOver:
-                OnGameOver?.Invoke();
-                break;
-
-            case GameState.GameCleared:
-                OnGameCleared?.Invoke();
-                break;
-        }
-    }
-
-    private void CheckAndUpdateWaveState()
-    {
-        if (CurrentState != GameState.WaveInProgress)
-            return;
-
-        if (!IsSpawning && ActiveEnemyCount == 0)
-        {
-            if (CurrentWave >= _maxWaves)
-            {
-                ChangeGameState(GameState.GameCleared);
-            }
-            else
-            {
-                ChangeGameState(GameState.WaveCompleted);
-            }
-        }
-    }
-
-    #endregion
-
-    #region Private Methods - Initialization
     private void InitializeSingleton()
     {
         if (Instance == null)
@@ -490,61 +534,10 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[GameManager] Multiple instances detected. Destroying duplicate.", this);
+            Debug.LogWarning("[GameManager] Multiple instances detected. Destroying duplicate.");
             Destroy(gameObject);
         }
     }
-
-    private void InitializeStats()
-    {
-        // 기존 카운터 초기화
-        _activeNormalEnemyCount = 0;
-        _activeEliteEnemyCount = 0;
-        CurrentGold = _initialGold;
-
-        // 세션 추적 초기화
-        _gameStartTime = Time.time;
-        _totalEarnedGold = 0;
-
-        OnGoldChanged?.Invoke(0, CurrentGold);
-        ChangeGameState(_initialGameState);
-
-
-        _enemySpawner.ResetAllStates();
-        BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
-        BattleInteractionSystem.OnEntityKilled += OnEnemyKilled;
-
-        if (_enemySpawner != null)
-        {
-            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
-            _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
-        }
-
-        // 플레이어 이벤트 구독
-        SubscribeToPlayerEvents();
-    }
-
-    private void ReconnectEnemySpawner()
-    {
-        if (_enemySpawner != null)
-        {
-            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
-        }
-
-        _enemySpawner = FindFirstObjectByType<EnemySpawner>();
-
-        if (_enemySpawner != null)
-        {
-            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
-            _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
-        }
-        else
-        {
-            Debug.LogError("[GameManager] No EnemySpawner found in the scene.");
-        }
-    }
-
-
     #endregion
 
     #region Private Methods - Player Integration
@@ -610,12 +603,6 @@ public class GameManager : MonoBehaviour
         }
 
         CheckAndUpdateWaveState();
-    }
-
-    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
-    {
-        ReconnectEnemySpawner();
-        InitializeStats();
     }
     #endregion
 }
