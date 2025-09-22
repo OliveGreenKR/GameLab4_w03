@@ -49,6 +49,14 @@ public class ProjectileEffectShopItemSO : ShopItemSO
             description.AppendLine("효과: 투사체 효과 미할당");
         }
 
+        // 가격 정보
+        description.Append($"가격: {BasePrice}G");
+
+        if (PriceInflationMultiplier > 1.0f)
+        {
+            description.Append($" (구매시 {PriceInflationMultiplier:F1}배씩 증가)");
+        }
+
         return description.ToString().Trim();
     }
 

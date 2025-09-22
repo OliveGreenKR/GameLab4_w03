@@ -359,9 +359,9 @@ public class GameManager : MonoBehaviour
 
     private void InitializeStats()
     {
-        CurrentGold = _initialGold;
         ActiveEnemyCount = 0;
-
+        CurrentGold = _initialGold;
+        OnGoldChanged?.Invoke(0, CurrentGold);  
         ChangeGameState(_initialGameState);
 
         BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;

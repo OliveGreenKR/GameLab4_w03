@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: PlayerHeal
   m_EditorClassIdentifier: 
   _itemName: "\uCCB4\uB825 \uD68C\uBCF5"
-  _description: "[\uD50C\uB808\uC774\uC5B4 \uD68C\uBCF5]\r\n\uAE30\uBCF8 \uAC00\uACA9:
-    50G\r\n (\uAD6C\uB9E4\uC2DC 1.1\uBC30\uC529 \uC99D\uAC00)"
+  _description: "[\uD50C\uB808\uC774\uC5B4 \uD68C\uBCF5]\r\n\uC989\uC2DC \uCCB4\uB825
+    \uD68C\uBCF5 40.0HP\r\n\uAE30\uBCF8 \uAC00\uACA9: 50G\r\n(\uAD6C\uB9E4\uC2DC
+    1.1\uBC30\uC529 \uC99D\uAC00)"
   _itemIcon: {fileID: 0}
   _itemType: 4
   _basePrice: 50

@@ -37,7 +37,7 @@ public class WeaponEffectShopItemSO : ShopItemSO
         // 무기 효과 정보
         if (_weaponEffect != null)
         {
-            //description.AppendLine($"효과명: {_weaponEffect.EffectName}");
+            description.AppendLine($"효과명: {_weaponEffect.EffectName}");
 
             // 스탯 변화 정보
             var statChanges = new List<string>();
@@ -64,7 +64,6 @@ public class WeaponEffectShopItemSO : ShopItemSO
 
             if (statChanges.Count > 0)
             {
-                //description.AppendLine($"스탯: {string.Join(", ", statChanges)}");
                 foreach (string statChange in statChanges)
                 {
                     description.AppendLine(statChange);
@@ -75,6 +74,15 @@ public class WeaponEffectShopItemSO : ShopItemSO
         {
             description.AppendLine("효과: 무기 효과 미할당");
         }
+
+        // 가격 정보
+        description.Append($"가격: {BasePrice}G");
+
+        if (PriceInflationMultiplier > 1.0f)
+        {
+            description.Append($" (구매시 {PriceInflationMultiplier:F1}배씩 증가)");
+        }
+
         return description.ToString().Trim();
     }
 

@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: ProjectileLifeTime
   m_EditorClassIdentifier: 
   _itemName: "\uD22C\uC0AC\uCCB4 \uC0DD\uBA85\uC2DC\uAC04"
-  _description: "[\uD22C\uC0AC\uCCB4 \uC0DD\uC874\uC2DC\uAC04 \uAC15\uD654]\r\n\uAE30\uBCF8
-    \uAC00\uACA9: 50G\r\n (\uAD6C\uB9E4\uC2DC 1.5\uBC30\uC529 \uC99D\uAC00)"
+  _description: "[\uD22C\uC0AC\uCCB4 \uC0DD\uC874\uC2DC\uAC04 \uAC15\uD654]\r\n\uD22C\uC0AC\uCCB4
+    \uC0DD\uC874\uC2DC\uAC04 +0.5\uCD08\r\n\uAE30\uBCF8 \uAC00\uACA9: 50G\r\n(\uAD6C\uB9E4\uC2DC
+    1.5\uBC30\uC529 \uC99D\uAC00)"
   _itemIcon: {fileID: 0}
   _itemType: 3
   _basePrice: 50
