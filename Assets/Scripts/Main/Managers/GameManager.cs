@@ -159,11 +159,11 @@ public class GameManager : MonoBehaviour
         // 초기 상태 설정
         CurrentState = _initialGameState;
 
+        SubscribeToEvents();
         _inputActions?.Enable();
         CursorLock();
 
         StartGame();
-        // StartGame()은 별도 호출 필요 - 자동 시작하지 않음
     }
 
     private void OnEnable()
@@ -178,16 +178,7 @@ public class GameManager : MonoBehaviour
 
     private void OnDestroy()
     {
-
-        BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
-
-        if (_enemySpawner != null)
-        {
-            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
-        }
-
-        UnsubscribeFromPlayerEvents();
-
+        UnsubscribeFromEvents();
         _inputActions?.Dispose();
     }
     #endregion
@@ -581,6 +572,50 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Private Methods - Event CallBacks
+    /// <summary>
+    /// 이벤트 구독
+    /// </summary>
+    private void SubscribeToEvents()
+    {
+        BattleInteractionSystem.OnEntityKilled += OnEnemyKilled;
+
+        if (_enemySpawner != null)
+        {
+            _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
+            _enemySpawner.OnDifficultyUpgraded += OnDifficultyUpgraded;
+        }
+
+        SubscribeToPlayerEvents();
+    }
+
+    /// <summary>
+    /// 이벤트 구독 해제
+    /// </summary>
+    private void UnsubscribeFromEvents()
+    {
+        BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
+
+        if (_enemySpawner != null)
+        {
+            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            _enemySpawner.OnDifficultyUpgraded -= OnDifficultyUpgraded;
+        }
+
+        UnsubscribeFromPlayerEvents();
+    }
+
+    /// <summary>
+    /// 난이도 업그레이드 시 스폰 정지
+    /// </summary>
+    private void OnDifficultyUpgraded(int newCycle)
+    {
+        if (CurrentState == GameState.WaveInProgress)
+        {
+            StopWave();
+            Debug.Log($"[GameManager] Wave stopped due to difficulty upgrade (Cycle: {newCycle})");
+        }
+    }
+
     private void OnSpawnCompleted(Dictionary<PrefabType, int> spawnedByType, int currentCycle)
     {
         // 타입별 스폰 카운터 업데이트
