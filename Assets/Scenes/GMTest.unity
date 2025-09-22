@@ -1639,7 +1639,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerBattleEntity: {fileID: 761691835}
-  _initialHealth: 50
   _initialGold: 50
   _normalEnemyGoldReward: 1
   _eliteEnemyGoldReward: 25
@@ -1679,7 +1678,19 @@ MonoBehaviour:
   _upgradeManager: {fileID: 1323416450}
   _gameManager: {fileID: 1323416449}
   _shopItems:
+  - {fileID: 11400000, guid: 13d59c059e5930e4390e38e3ae77608b, type: 2}
+  - {fileID: 11400000, guid: 460724625a088c4409a3b1e98edb4e89, type: 2}
+  - {fileID: 11400000, guid: 4dfb0cd81369dd74396cb7c8396000eb, type: 2}
+  - {fileID: 11400000, guid: f0dcad317115047428d9d50670c1b877, type: 2}
+  - {fileID: 11400000, guid: 66a397a469f3ed2469e91192e9bbcfac, type: 2}
+  - {fileID: 11400000, guid: a89e1898dbc38a349aaefb5125effe46, type: 2}
+  - {fileID: 11400000, guid: 9adb5583810645a4d8feeddcc8fb7da9, type: 2}
   - {fileID: 11400000, guid: ecef11ac8f592de4987442ee0c70520a, type: 2}
+  - {fileID: 11400000, guid: 9061cb3b24cb5c1419914c236b45c53e, type: 2}
+  - {fileID: 11400000, guid: 9ee0801c0d571b249a7b1a63da0c6088, type: 2}
+  - {fileID: 11400000, guid: a3f6a698af99f1246bd130b82ea742c3, type: 2}
+  - {fileID: 11400000, guid: fdd61a9993d298146b0d661f4b38b51a, type: 2}
+  - {fileID: 11400000, guid: 72c9bba4893883d4bacabee3226a5a00, type: 2}
 --- !u!114 &1323416452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2273,10 +2284,6 @@ PrefabInstance:
     - target: {fileID: 6107341761897491531, guid: 9d9027bcecd96ff479bf1693a85700f9, type: 3}
       propertyPath: m_Name
       value: Shop
-      objectReference: {fileID: 0}
-    - target: {fileID: 6107341761897491531, guid: 9d9027bcecd96ff479bf1693a85700f9, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6157677724190515886, guid: 9d9027bcecd96ff479bf1693a85700f9, type: 3}
       propertyPath: m_Pivot.x

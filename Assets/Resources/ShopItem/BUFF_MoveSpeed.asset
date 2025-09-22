@@ -19,5 +19,5 @@ MonoBehaviour:
   _basePrice: 30
   _priceInflationMultiplier: 1.1
   _baseItem: {fileID: 11400000, guid: 9061cb3b24cb5c1419914c236b45c53e, type: 2}
-  _buffDurationSeconds: 30
+  _buffDurationSeconds: 15
   _buffIntensityMultiplier: 3
