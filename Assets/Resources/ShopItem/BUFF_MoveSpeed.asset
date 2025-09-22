@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4431df31b3f46e4e8d6a99c1b91d2ff, type: 3}
   m_Name: BUFF_MoveSpeed
   m_EditorClassIdentifier: 
-  _itemName: BUFF_MoveSpeed
-  _description: "\uC774\uB3D9\uC18D\uB3C4 \uBC84\uD504"
+  _itemName: "\uC774\uB3D9\uC18D\uB3C4 \uBC84\uD504"
+  _description: "[\uC77C\uC2DC\uC801\uC778 \uC774\uB3D9\uC18D\uB3C4 \uC99D\uAC00]\r\n\uAE30\uBCF8
+    \uAC00\uACA9: 30G\r\n (\uAD6C\uB9E4\uC2DC 1.1\uBC30\uC529 \uC99D\uAC00)"
   _itemIcon: {fileID: 0}
   _itemType: 10
   _basePrice: 30

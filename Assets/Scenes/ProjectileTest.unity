@@ -1791,7 +1791,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: _effectAssets.Array.size
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: '_effectAssets.Array.data[0]'
@@ -1800,7 +1800,7 @@ PrefabInstance:
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: '_effectAssets.Array.data[1]'
       value: 
-      objectReference: {fileID: 11400000, guid: 055ba47aea7c9304cbdb373a56b1734d, type: 2}
+      objectReference: {fileID: 11400000, guid: 0b7023912b1a8fd419c4f5fd38841d3d, type: 2}
     - target: {fileID: 4324545142038273385, guid: 05b421c1592093c41a9c4542ff80e2d3, type: 3}
       propertyPath: '_effectAssets.Array.data[2]'
       value: 

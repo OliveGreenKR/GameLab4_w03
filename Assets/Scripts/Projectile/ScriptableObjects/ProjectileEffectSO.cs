@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using System.Text;
 using UnityEngine;
 
 /// <summary>
@@ -91,6 +92,66 @@ public abstract class ProjectileEffectSO : ScriptableObject, IProjectileEffect
             Debug.Log(fullMessage, this);
         }
 #endif
+    }
+    #endregion
+
+    #region Public Methods - Description Generation
+    /// <summary>이펙트 속성을 기반으로 설명 자동 생성</summary>
+    [Button("Generate Description", ButtonSizes.Medium)]
+    [GUIColor(0.7f, 1f, 0.7f)]
+    public void GenerateDescription()
+    {
+        _description = CreateAutoDescription();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+#endif
+    }
+
+    /// <summary>이펙트 타입별 맞춤 설명 생성</summary>
+    /// <returns>생성된 설명 텍스트</returns>
+    protected virtual string CreateAutoDescription()
+    {
+        var description = new StringBuilder();
+
+        // 이펙트 타입 정보
+        string effectTypeName = GetEffectTypeName();
+        description.AppendLine($"[{effectTypeName}]");
+
+        // 우선순위 정보
+        string priorityLevel = GetPriorityLevelDescription(_priority);
+        description.Append($"적용 우선순위: {_priority} ({priorityLevel})");
+
+        return description.ToString().Trim();
+    }
+
+    /// <summary>이펙트 타입 이름 추출</summary>
+    /// <returns>이펙트 타입 표시명</returns>
+    protected virtual string GetEffectTypeName()
+    {
+        string typeName = GetType().Name;
+
+        // "SO" 접미사 제거
+        if (typeName.EndsWith("SO"))
+            typeName = typeName.Substring(0, typeName.Length - 2);
+
+        // "Effect" 접미사 제거
+        if (typeName.EndsWith("Effect"))
+            typeName = typeName.Substring(0, typeName.Length - 6);
+
+        return $"{typeName} 이펙트";
+    }
+
+    /// <summary>우선순위 레벨 설명 반환</summary>
+    /// <param name="priority">우선순위 값</param>
+    /// <returns>우선순위 설명</returns>
+    protected string GetPriorityLevelDescription(int priority)
+    {
+        if (priority <= 20) return "최우선";
+        if (priority <= 40) return "높음";
+        if (priority <= 60) return "보통";
+        if (priority <= 80) return "낮음";
+        return "최후순";
     }
     #endregion
 }

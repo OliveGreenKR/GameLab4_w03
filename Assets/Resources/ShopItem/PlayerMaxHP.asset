@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 182271832e2c6ea42a0b72748d1a3c82, type: 3}
   m_Name: PlayerMaxHP
   m_EditorClassIdentifier: 
-  _itemName: MaxHp
-  _description: MaxHp
+  _itemName: "\uCD5C\uB300 \uCCB4\uB825 \uC99D\uAC00"
+  _description: "[\uCD5C\uB300 \uCCB4\uB825 \uAC15\uD654]\r\n\uAE30\uBCF8 \uAC00\uACA9:
+    50G\r\n (\uAD6C\uB9E4\uC2DC 1.3\uBC30\uC529 \uC99D\uAC00)"
   _itemIcon: {fileID: 0}
   _itemType: 5
   _basePrice: 50

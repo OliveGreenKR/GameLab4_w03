@@ -1,4 +1,6 @@
 ﻿using Sirenix.OdinInspector;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public enum SplitApplicationMode
@@ -170,6 +172,56 @@ public class SplitEffectSO : ProjectileEffectSO
         }
 
         _description = baseText + modifierText;
+    }
+    #endregion
+
+    #region Protected Methods - Description Generation Override
+    /// <summary>분열 이펙트 특화 설명 생성</summary>
+    /// <returns>분열 이펙트 맞춤 설명</returns>
+    protected override string CreateAutoDescription()
+    {
+        var description = new StringBuilder();
+
+        // 이펙트 기본 정보
+        description.AppendLine($"[분열 이펙트]");
+
+        // 분열 설정 정보
+        string applicationModeText = _applicationMode == SplitApplicationMode.SetAbsolute ? "절대값 설정" : "기존값 추가";
+        description.AppendLine($"분열 방식: {applicationModeText}");
+        description.AppendLine($"분열 개수: {_splitCount}개");
+        description.AppendLine($"분열 각도: {_splitAngleRangeDegrees:F0}°");
+
+        // 투사체 수정 정보
+        var modifiers = new List<string>();
+
+        if (_speedMultiplier != 1.0f)
+        {
+            string speedChange = _speedMultiplier > 1.0f ? $"+{(_speedMultiplier - 1.0f) * 100:F0}%" : $"{(_speedMultiplier - 1.0f) * 100:F0}%";
+            modifiers.Add($"속도 {speedChange}");
+        }
+
+        if (_damageMultiplier != 1.0f)
+        {
+            string damageChange = _damageMultiplier > 1.0f ? $"+{(_damageMultiplier - 1.0f) * 100:F0}%" : $"{(_damageMultiplier - 1.0f) * 100:F0}%";
+            modifiers.Add($"데미지 {damageChange}");
+        }
+
+        if (_lifetimeMultiplier != 1.0f)
+        {
+            string lifetimeChange = _lifetimeMultiplier > 1.0f ? $"+{(_lifetimeMultiplier - 1.0f) * 100:F0}%" : $"{(_lifetimeMultiplier - 1.0f) * 100:F0}%";
+            modifiers.Add($"생존시간 {lifetimeChange}");
+        }
+
+        if (modifiers.Count > 0)
+        {
+            description.AppendLine($"효과: {string.Join(", ", modifiers)}");
+        }
+
+        // 우선순위 정보
+        string priorityLevel = GetPriorityLevelDescription(_priority);
+        description.Append($"우선순위: {_priority} ({priorityLevel})");
+
+        return description.ToString().Trim();
     }
     #endregion
 }

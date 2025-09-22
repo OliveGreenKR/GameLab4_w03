@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using System.Text;
 using UnityEngine;
 
 public enum PierceApplicationMode
@@ -129,6 +130,55 @@ public class PiercingEffectSO : ProjectileEffectSO
             $", 데미지 {_pierceCountDamageMultiplier:F1}배" : "";
 
         _description = $"{pierceText}{damageText}";
+    }
+    #endregion
+
+    #region Protected Methods - Description Generation Override
+    /// <summary>관통 이펙트 특화 설명 생성</summary>
+    /// <returns>관통 이펙트 맞춤 설명</returns>
+    protected override string CreateAutoDescription()
+    {
+        var description = new StringBuilder();
+
+        // 이펙트 기본 정보
+        description.AppendLine($"[관통 이펙트]");
+
+        // 관통 효과를 한 줄로 통합
+        string pierceText;
+        if (_applicationMode == PierceApplicationMode.SetAbsolute)
+        {
+            pierceText = _pierceCount > 0 ? $"{_pierceCount} 관통" : "관통 없음";
+        }
+        else
+        {
+            pierceText = _pierceCount > 0 ? $"+{_pierceCount} 관통" : "관통 추가 없음";
+        }
+
+        // 데미지 배율을 관통 텍스트에 통합
+        if (!Mathf.Approximately(_pierceCountDamageMultiplier, 1.0f))
+        {
+            string damageEffect;
+            if (_pierceCountDamageMultiplier > 1.0f)
+            {
+                damageEffect = $"관통 후 데미지 증가 {_pierceCountDamageMultiplier:F1}배";
+            }
+            else
+            {
+                damageEffect = $"관통 후 데미지 감소 {_pierceCountDamageMultiplier:F1}배";
+            }
+
+            description.AppendLine($"{pierceText}({damageEffect})");
+        }
+        else
+        {
+            description.AppendLine(pierceText);
+        }
+
+        // 우선순위 정보
+        string priorityLevel = GetPriorityLevelDescription(_priority);
+        description.Append($"우선순위: {_priority} ({priorityLevel})");
+
+        return description.ToString().Trim();
     }
     #endregion
 }

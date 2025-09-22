@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 182271832e2c6ea42a0b72748d1a3c82, type: 3}
   m_Name: ProjectileLifeTime
   m_EditorClassIdentifier: 
-  _itemName: ProjectileLifeTime
-  _description: "\uD22C\uC0AC\uCCB4 \uC9C0\uC18D \uC2DC\uAC04"
+  _itemName: "\uD22C\uC0AC\uCCB4 \uC0DD\uBA85\uC2DC\uAC04"
+  _description: "[\uD22C\uC0AC\uCCB4 \uC0DD\uC874\uC2DC\uAC04 \uAC15\uD654]\r\n\uAE30\uBCF8
+    \uAC00\uACA9: 50G\r\n (\uAD6C\uB9E4\uC2DC 1.5\uBC30\uC529 \uC99D\uAC00)"
   _itemIcon: {fileID: 0}
   _itemType: 3
   _basePrice: 50
