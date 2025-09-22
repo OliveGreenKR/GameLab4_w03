@@ -211,6 +211,8 @@ public class ShopUI : MonoBehaviour
         if (_shopItemContainer == null || _shopItemPrefab == null || item == null)
             return;
 
+        Debug.Log($"[ShopUI] Creating UI for item {item.ItemName} at index {itemIndex}", this);
+
         // 프리팹 인스턴스화
         GameObject itemUIObject = Instantiate(_shopItemPrefab, _shopItemContainer);
 
