@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -135,6 +136,10 @@ public class PlayerWeaponController : MonoBehaviour
     private bool _hasDebugDirections = false;
     #endregion
 
+    #region Events
+    public Action<WeaponStatData> OnWeaponStatChanged;
+    #endregion
+
     #region Unity Lifecycle
     private void Awake()
     {
@@ -202,6 +207,19 @@ public class PlayerWeaponController : MonoBehaviour
                 $"Effects: {ActiveEffectCount}");
 #endif
         }
+    }
+    #endregion
+
+    #region Public Methods - Debug Description
+    /// <summary>무기 스탯 정보를 문자열로 반환</summary>
+    /// <returns>Fire Rate, Damage, Accuracy, Recoil, Effects 정보가 포함된 멀티라인 문자열</returns>
+    public string GetWeaponStatsString()
+    {
+        return $"발사속도: {FinalStats.FireRate:F1} ({(FinalStats.FireRate / _baseWeaponStats.BaseFireRate):F2}x)\n" +
+               $"데미지: {FinalStats.Damage:F1} ({(FinalStats.Damage / _baseWeaponStats.BaseDamage):F2}x)\n" +
+               $"정확도: {FinalStats.Accuracy:F1}% ({(FinalStats.Accuracy / _baseWeaponStats.BaseAccuracy):F2}x)\n" +
+               $"반동: {FinalStats.Recoil:F1} ({(FinalStats.Recoil / _baseWeaponStats.BaseRecoil):F2}x)\n" +
+               $"적용된 무기 효과 개수: {ActiveEffectCount}";
     }
     #endregion
 
@@ -391,6 +409,7 @@ public class PlayerWeaponController : MonoBehaviour
         }
 
         FinalStats = finalStats;
+        OnWeaponStatChanged?.Invoke(FinalStats);
     }
 
     private void UpdateLauncherSettings()

@@ -227,6 +227,7 @@ public class GameManager : MonoBehaviour
         PrefabType enemyType = GetEnemyTypeFromVictim(victim);
         int goldReward = GetGoldRewardForEnemyType(enemyType);
 
+        Debug.Log($"[GameManager] Enemy killed: {victim.GameObject.name} (Type: {enemyType}), Reward: {goldReward} Gold", victim.GameObject);
         // 골드 지급
         int oldGold = CurrentGold;
         CurrentGold += goldReward;
