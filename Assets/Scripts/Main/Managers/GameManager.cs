@@ -44,6 +44,11 @@ public class GameManager : MonoBehaviour
 
     [Header("Game State")]
     [SerializeField] private GameState _initialGameState = GameState.WaveReady;
+
+    [Header("Play Session Tracking")]
+    [InfoBox("플레이 세션 기록 시스템")]
+    [SerializeField] private float _gameStartTime = 0f;
+    [SerializeField] private int _totalEarnedGold = 0;
     #endregion
 
     #region Private Fields
@@ -102,6 +107,15 @@ public class GameManager : MonoBehaviour
     [ShowInInspector, ReadOnly]
     public string EliteEnemyProgress => $"{ActiveEliteEnemyCount}/{TotalEliteEnemyCount}";
 
+
+    // 플레이 추적
+    [ShowInInspector, ReadOnly]
+    public float SurvivalTimeSeconds => _gameStartTime > 0f ? Time.time - _gameStartTime : 0f;
+
+    [ShowInInspector, ReadOnly]
+    public int TotalEarnedGold => _totalEarnedGold;
+
+    // 전역 인풋 시스템
     public InputSystem_Actions InputActions => _inputActions;
     #endregion
 
@@ -172,8 +186,38 @@ public class GameManager : MonoBehaviour
     #region Public Methods - Game Control
     public void RestartGame()
     {
+        // 상태 초기화
+        ResetInternalState();
+
+        // 씬 재로드
         UnityEngine.SceneManagement.SceneManager.LoadScene(
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    /// <summary>
+    /// 게임 시작 - 웨이브 및 난이도 통합 초기화
+    /// </summary>
+    public void StartGame()
+    {
+        if (_enemySpawner == null)
+        {
+            Debug.LogWarning("[GameManager] Cannot start game: EnemySpawner not found");
+            return;
+        }
+
+        // 웨이브 시스템 초기화
+        InitializeWaveSystem();
+
+        // 난이도 시스템 리셋
+        ResetDifficultySystem();
+
+        // 플레이어 상태 초기화
+        InitializePlayerState();
+
+        // 웨이브 시작
+        StartWave();
+
+        Debug.Log("[GameManager] Game started successfully");
     }
     #endregion
 
@@ -219,6 +263,7 @@ public class GameManager : MonoBehaviour
         OnGoldChanged?.Invoke(oldGold, CurrentGold);
         return true;
     }
+
     #endregion
 
     #region Public Methods - Wave Management
@@ -252,9 +297,11 @@ public class GameManager : MonoBehaviour
         int goldReward = GetGoldRewardForEnemyType(enemyType);
 
         Debug.Log($"[GameManager] Enemy killed: {victim.GameObject.name} (Type: {enemyType}), Reward: {goldReward} Gold", victim.GameObject);
-        // 골드 지급
+
+        // 골드 지급 및 누적
         int oldGold = CurrentGold;
         CurrentGold += goldReward;
+        _totalEarnedGold += goldReward;
         OnGoldChanged?.Invoke(oldGold, CurrentGold);
 
         // 적 수 감소
@@ -315,6 +362,61 @@ public class GameManager : MonoBehaviour
                 Debug.LogWarning($"[GameManager] Unknown enemy type: {enemyType}. Using normal reward.");
                 return _normalEnemyGoldReward;
         }
+    }
+    #endregion
+
+    #region Private Methods - Gmae State Control
+    private void InitializeWaveSystem()
+    {
+        if (_enemySpawner == null) return;
+
+        // 스폰너가 실행 중이면 정지
+        if (_enemySpawner.IsSpawning)
+        {
+            _enemySpawner.StopSpawning();
+        }
+
+        _enemySpawner.ResetAllStates();
+
+        ChangeGameState(GameState.WaveReady);
+        Debug.Log("[GameManager] Wave system initialized");
+    }
+
+    private void ResetDifficultySystem()
+    {
+        if (_enemySpawner == null) return;
+
+        // 난이도 시스템 리셋
+        _enemySpawner.ResetDifficulty();
+        Debug.Log("[GameManager] Difficulty system reset");
+    }
+
+    private void InitializePlayerState()
+    {
+        if (_playerBattleEntity == null) return;
+
+        // 플레이어 체력 완전 회복
+        _playerBattleEntity.InitializePlayer();
+        Debug.Log("[GameManager] Player state initialized");
+    }
+
+    private void ResetInternalState()
+    {
+        // 몬스터 카운터 초기화
+        _activeNormalEnemyCount = 0;
+        _activeEliteEnemyCount = 0;
+        _totalNormalEnemySpawned = 0;
+        _totalEliteEnemySpawned = 0;
+
+        // 게임 상태 초기화  
+        CurrentGold = _initialGold;
+        _totalEarnedGold = 0;
+        _gameStartTime = 0f;
+
+        // 상태 리셋
+        ChangeGameState(_initialGameState);
+
+        Debug.Log("[GameManager] Internal state reset for restart");
     }
     #endregion
 
@@ -395,10 +497,20 @@ public class GameManager : MonoBehaviour
 
     private void InitializeStats()
     {
+        // 기존 카운터 초기화
+        _activeNormalEnemyCount = 0;
+        _activeEliteEnemyCount = 0;
         CurrentGold = _initialGold;
-        OnGoldChanged?.Invoke(0, CurrentGold);  
+
+        // 세션 추적 초기화
+        _gameStartTime = Time.time;
+        _totalEarnedGold = 0;
+
+        OnGoldChanged?.Invoke(0, CurrentGold);
         ChangeGameState(_initialGameState);
 
+
+        _enemySpawner.ResetAllStates();
         BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
         BattleInteractionSystem.OnEntityKilled += OnEnemyKilled;
 

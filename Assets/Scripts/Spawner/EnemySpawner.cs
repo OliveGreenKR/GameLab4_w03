@@ -260,6 +260,31 @@ public class EnemySpawner : MonoBehaviour
     }
     #endregion
 
+    #region Publive Methods - Initialization
+    /// <summary>
+    /// 모든 스폰 상태를 초기값으로 리셋합니다
+    /// 게임 재시작 또는 상태 초기화가 필요한 경우 사용
+    /// </summary>
+    public void ResetAllStates()
+    {
+        // 기존 난이도 리셋 메서드 활용
+        ResetDifficulty();
+
+        // 추가 상태 초기화
+        SpawnCount = 0;
+        CurrentCycle = 1;
+        _nextSpawnTime = 0f;
+
+        // 마지막 스폰 기록 초기화
+        if (LastSpawnedEnemy != null)
+        {
+            LastSpawnedEnemy.Clear();
+        }
+
+        Debug.Log("[EnemySpawner] All states have been reset to initial values", this);
+    }
+    #endregion
+
     #region Public Methods - Spawning
     /// <summary>
     /// 스폰 시작
