@@ -4,7 +4,6 @@ public class MouseAngleController : MonoBehaviour
 {
     #region Serialized Fields
     [Header("References")]
-    [SerializeField] private InputSystem_Actions _inputs;
     [SerializeField] private GameObject _angleControllerGameObject;
 
     [Header("Mouse Settings")]
@@ -27,6 +26,7 @@ public class MouseAngleController : MonoBehaviour
     #endregion
 
     #region Private Fields
+    private InputSystem_Actions _inputs = null;
     private IAngleController _angleController;
     private Vector2 _currentLookInput = Vector2.zero;
     #endregion
@@ -34,16 +34,19 @@ public class MouseAngleController : MonoBehaviour
     #region Unity Lifecycle
     private void Awake()
     {
-        if (_inputs == null)
-        {
-            _inputs = new InputSystem_Actions();
-        }
+       
     }
 
     private void Start()
     {
+        if (_inputs == null)
+        {
+            _inputs = GameManager.Instance.InputActions;
+        }
+
         InitializeReferences();
         IsMouseInputEnabled = _enableMouseInput;
+        EnableInput();
     }
 
     private void Update()
@@ -126,27 +129,30 @@ public class MouseAngleController : MonoBehaviour
 
     private void EnableInput()
     {
-        if (_inputs == null) return;
+        if (_inputs == null)
+            _inputs = GameManager.Instance.InputActions;
 
-        _inputs.Enable();
+        _inputs.Player.Look.Enable();
+        _inputs.Player.Look.performed -= OnLookPerformed;
         _inputs.Player.Look.performed += OnLookPerformed;
+        _inputs.Player.Look.canceled -= OnLookCanceled;
         _inputs.Player.Look.canceled += OnLookCanceled;
-        _inputs.Player.ResetLook.performed += OnResetLookPerformed;
     }
 
     private void DisableInput()
     {
-        if (_inputs == null) return;
+        if (_inputs == null)
+            _inputs = GameManager.Instance.InputActions;
 
-        _inputs.Disable();
+        _inputs.Player.Look.Disable();
         _inputs.Player.Look.performed -= OnLookPerformed;
         _inputs.Player.Look.canceled -= OnLookCanceled;
-        _inputs.Player.ResetLook.performed -= OnResetLookPerformed;
     }
 
     private void OnLookPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         _currentLookInput = context.ReadValue<Vector2>();
+        Debug.Log($"Look Input: {_currentLookInput}");
     }
 
     private void OnLookCanceled(UnityEngine.InputSystem.InputAction.CallbackContext context)

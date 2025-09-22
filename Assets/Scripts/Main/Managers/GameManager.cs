@@ -46,6 +46,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameState _initialGameState = GameState.WaveReady;
     #endregion
 
+    #region Private Fields
+    private InputSystem_Actions _inputActions;
+    #endregion
+
     #region Properties
     [ShowInInspector, ReadOnly]
     public GameState CurrentState { get; private set; }
@@ -77,6 +81,8 @@ public class GameManager : MonoBehaviour
 
     [ShowInInspector, ReadOnly]
     public bool IsWaveInProgress => CurrentState == GameState.WaveInProgress;
+
+    public InputSystem_Actions InputActions => _inputActions;
     #endregion
 
     #region Events
@@ -111,6 +117,17 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         InitializeStats();
+        _inputActions?.Enable();
+    }
+
+    private void OnEnable()
+    {
+        _inputActions?.Enable();
+    }
+
+    private void OnDisable()
+    {
+        _inputActions?.Disable();
     }
 
     private void OnDestroy()
@@ -126,6 +143,8 @@ public class GameManager : MonoBehaviour
         }
 
         UnsubscribeFromPlayerEvents();
+
+        _inputActions?.Dispose();
     }
     #endregion
 
@@ -318,6 +337,9 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // InputSystem_Actions 초기화
+            _inputActions = new InputSystem_Actions();
         }
         else
         {

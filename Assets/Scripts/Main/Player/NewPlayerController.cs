@@ -7,11 +7,6 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
 {
     #region Serialized Fields
     [TabGroup("References")]
-    [Header("Core References")]
-    [Required]
-    [SerializeField] private InputSystem_Actions _inputs;
-
-    [TabGroup("References")]
     [Required]
     [SerializeField] private CharacterController _characterController;
 
@@ -88,6 +83,7 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
     #endregion
 
     #region Private Fields
+    private InputSystem_Actions _inputs;
     private Vector3 _currentVelocity = Vector3.zero;
     private Vector2 _currentMoveInput = Vector2.zero;
     private Vector3 _lastSpawnPosition = Vector3.zero;
@@ -103,14 +99,16 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
     #region Unity Lifecycle
     private void Awake()
     {
-        if (_inputs == null)
-        {
-            _inputs = new InputSystem_Actions();
-        }
+
     }
 
     private void Start()
     {
+        if (_inputs == null)
+        {
+            _inputs = GameManager.Instance.InputActions;
+        }
+
         InitializeReferences();
         _lastSpawnPosition = transform.position;
         _isFiring = false;
@@ -201,9 +199,15 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
     /// </summary>
     public void EnableInput()
     {
-        if (_inputs == null) return;
+        if (_inputs == null)
+        {
+            _inputs = GameManager.Instance.InputActions;
+        }
 
-        _inputs.Player.Enable();
+        _inputs.Player.Move.Enable();
+        _inputs.Player.Jump.Enable();
+        _inputs.Player.Zoom.Enable();
+        _inputs.Player.Fire.Enable();
         _inputs.Player.Move.performed += OnMovePerformed;
         _inputs.Player.Move.canceled += OnMoveCanceled;
         _inputs.Player.Jump.performed += OnJumpPerformed;
@@ -218,9 +222,14 @@ public class NewPlayerController : MonoBehaviour, IReSpawnable, IPlayerInputProv
     /// </summary>
     public void DisableInput()
     {
-        if (_inputs == null) return;
+        if (_inputs == null)
+            _inputs = GameManager.Instance.InputActions;
 
-        _inputs.Player.Disable();
+        //_inputs.Player.Disable();
+        _inputs.Player.Move.Disable();
+        _inputs.Player.Jump.Disable();
+        _inputs.Player.Zoom.Disable();
+        _inputs.Player.Fire.Disable();
         _inputs.Player.Move.performed -= OnMovePerformed;
         _inputs.Player.Move.canceled -= OnMoveCanceled;
         _inputs.Player.Jump.performed -= OnJumpPerformed;
