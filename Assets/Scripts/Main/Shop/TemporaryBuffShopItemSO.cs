@@ -20,7 +20,7 @@ public class TemporaryBuffShopItemSO : ShopItemSO
     [SerializeField] private float _buffDurationSeconds;
 
     [TabGroup("Buff Settings")]
-    [Range(0.1f, 5.0f)]
+    [InfoBox("기존 효과 대비 버프 효과 배율")]
     [SerializeField] private float _buffIntensityMultiplier;
     #endregion
 

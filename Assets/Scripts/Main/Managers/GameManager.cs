@@ -30,7 +30,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PlayerBattleEntity _playerBattleEntity;
 
     [Header("Initial Stats")]
-    [SerializeField] private int _initialHealth = 100;
     [SerializeField] private int _initialGold = 50;
 
     [Header("Enemy Kill Rewards")]
@@ -53,9 +52,6 @@ public class GameManager : MonoBehaviour
     #region Properties
     [ShowInInspector, ReadOnly]
     public GameState CurrentState { get; private set; }
-
-    [ShowInInspector, ReadOnly]
-    public int CurrentHealth { get; private set; }
 
     [ShowInInspector, ReadOnly]
     public int CurrentGold { get; private set; }
@@ -199,18 +195,6 @@ public class GameManager : MonoBehaviour
         OnGoldChanged?.Invoke(oldGold, CurrentGold);
         return true;
     }
-
-    public void TakeDamage(int damage)
-    {
-        if (damage <= 0 || IsGameOver)
-            return;
-
-        int oldHealth = CurrentHealth;
-        CurrentHealth = Mathf.Max(0, CurrentHealth - damage);
-        OnHealthChanged?.Invoke(oldHealth, CurrentHealth);
-
-        CheckGameOverCondition();
-    }
     #endregion
 
     #region Public Methods - Wave Management
@@ -353,13 +337,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void CheckGameOverCondition()
-    {
-        if (CurrentHealth <= 0 && CurrentState != GameState.GameOver)
-        {
-            ChangeGameState(GameState.GameOver);
-        }
-    }
     #endregion
 
     #region Private Methods - Initialization
@@ -382,7 +359,6 @@ public class GameManager : MonoBehaviour
 
     private void InitializeStats()
     {
-        CurrentHealth = _initialHealth;
         CurrentGold = _initialGold;
         ActiveEnemyCount = 0;
 
@@ -452,12 +428,7 @@ public class GameManager : MonoBehaviour
 
     private void OnPlayerHealthChanged(BattleStatType statType, float oldValue, float newValue)
     {
-        if (statType == BattleStatType.Health)
-        {
-            int oldHealth = CurrentHealth;
-            CurrentHealth = Mathf.RoundToInt(newValue);
-            OnHealthChanged?.Invoke(oldHealth, CurrentHealth);
-        }
+        //DoSomething : Player GameOVer?
     }
 
     private void OnPlayerDeath(IBattleEntity killer)
