@@ -143,8 +143,7 @@ public class ShopUI : MonoBehaviour
             //입력 비활성화
             _inputs.Player.Disable();
         }
-
-        Debug.Log("[ShopUI] Shop opened", this);
+        GameManager.Instance.CursorFree();
     }
 
     /// <summary>상점 닫기</summary>
@@ -167,6 +166,7 @@ public class ShopUI : MonoBehaviour
             
         }
         _inputs.Player.Enable();
+        GameManager.Instance.CursorLock();
         Debug.Log("[ShopUI] Shop closed", this);
     }
 

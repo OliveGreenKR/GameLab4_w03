@@ -118,6 +118,7 @@ public class GameManager : MonoBehaviour
     {
         InitializeStats();
         _inputActions?.Enable();
+        CursorLock();
     }
 
     private void OnEnable()
@@ -154,6 +155,37 @@ public class GameManager : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene(
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
+    #endregion
+
+    #region Public Methods - Cursor Control
+    public void SetCursorState(bool visible, CursorLockMode lockMode)
+    {
+        Cursor.visible = visible;
+        Cursor.lockState = lockMode;
+    }
+    /// <summary>
+    /// 중앙 고정 커서 설정
+    /// </summary>
+    /// <param name="visible"></param>
+    /// <param name="lockMode"></param>
+    public void CursorLock()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    /// <summary>
+    /// 커서 자유모드
+    /// </summary>
+    /// <param name="visible"></param>
+    /// <param name="lockMode"></param>
+    public void CursorFree()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+    }
+
+
     #endregion
 
     #region Public Methods - Stats
