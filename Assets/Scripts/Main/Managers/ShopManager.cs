@@ -51,7 +51,7 @@ public class ShopManager : MonoBehaviour
     [GUIColor(0.8f, 1f, 0.8f)]
     private void TestPurchaseFirstItem()
     {
-        if (_shopItems != null && _shopItems.Length > 0)
+        if (_shopItems != null && _shopItems.Count > 0)
         {
             bool success = PurchaseItem(0);
             Debug.Log($"[ShopManager] Test purchase result: {success}", this);
@@ -66,7 +66,7 @@ public class ShopManager : MonoBehaviour
     [GUIColor(0.8f, 1f, 0.8f)]
     private void TestPurchaseItem(int shopIndex)
     {
-        if (_shopItems != null && _shopItems.Length > 0)
+        if (_shopItems != null && _shopItems.Count > 0)
         {
             bool success = PurchaseItem(shopIndex);
             Debug.Log($"[ShopManager] Test purchase result: {success}", this);
@@ -90,7 +90,7 @@ public class ShopManager : MonoBehaviour
     #region Properties
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
-    public int AvailableItemCount => _shopItems?.Length ?? 0;
+    public int AvailableItemCount => _shopItems?.Count ?? 0;
 
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
@@ -208,7 +208,7 @@ public class ShopManager : MonoBehaviour
         if (!CanPurchaseItem(itemIndex))
         {
             string reason = !IsInitialized ? "Shop not initialized" :
-                           itemIndex < 0 || itemIndex >= _shopItems.Length ? "Invalid item index" :
+                           itemIndex < 0 || itemIndex >= _shopItems.Count ? "Invalid item index" :
                            "Insufficient gold";
             OnItemPurchaseFailed?.Invoke(itemIndex, reason);
             return false;
@@ -236,7 +236,7 @@ public class ShopManager : MonoBehaviour
     /// <returns>구매 가능 여부</returns>
     public bool CanPurchaseItem(int itemIndex)
     {
-        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Length)
+        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Count)
             return false;
 
         int currentPrice = GetCurrentPrice(itemIndex);
@@ -250,7 +250,7 @@ public class ShopManager : MonoBehaviour
     /// <returns>현재 가격</returns>
     public int GetCurrentPrice(int itemIndex)
     {
-        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Length)
+        if (!IsInitialized || itemIndex < 0 || itemIndex >= _shopItems.Count)
             return 0;
 
         ShopItemSO item = _shopItems[itemIndex];
