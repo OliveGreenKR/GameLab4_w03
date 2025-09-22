@@ -110,6 +110,8 @@ public class PlayerBattleEntity : BaseBattleEntity
 
         float old = _battleStat.MaxHealth;
         float delta = maxHealth - old;
+        delta = Mathf.Max(delta, 0f); // 최대 체력 감소시 현재 체력 유지
+
         _battleStat.SetCurrentStat(BattleStatType.MaxHealth, maxHealth);
         _battleStat.ModifyStat(BattleStatType.Health, delta);
 
