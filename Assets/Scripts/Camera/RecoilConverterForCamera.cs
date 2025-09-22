@@ -74,7 +74,7 @@ public class RecoilConverterForCamera : MonoBehaviour
         _lastRecoil = recoilVector;
         // 리코일 벡터를 각도 델타로 직접 적용
         // y축은 Pitch로 반전
-        Debug.Log($"Applying Recoil - Yaw: {recoilVector.x}, Pitch: {-recoilVector.y}", this);
+        //Debug.Log($"Applying Recoil - Yaw: {recoilVector.x}, Pitch: {-recoilVector.y}", this);
         _angleController.AdjustAngles(recoilVector.x, -recoilVector.y);
     }
     #endregion

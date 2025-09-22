@@ -1673,13 +1673,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _upgradeManager: {fileID: 1323416450}
   _gameManager: {fileID: 1323416449}
-  _shopItems: []
+  _shopItems:
+  - {fileID: 0}
   _isStopOnOpen: 1
-  _priceInflationRate: 1.1
   _shopPanel: {fileID: 0}
   _shopItemContainer: {fileID: 0}
   _shopItemPrefab: {fileID: 0}
-  _temporaryBuffDuration: 5
 --- !u!1 &1496758180
 GameObject:
   m_ObjectHideFlags: 0
@@ -2251,6 +2250,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EliteEnemy
       objectReference: {fileID: 0}
+    - target: {fileID: 7655413781182626458, guid: dc784ebed57bb4a45a3cf7cccfbec9db, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8442260816445954499, guid: dc784ebed57bb4a45a3cf7cccfbec9db, type: 3}
       propertyPath: m_LocalPosition.x
       value: -7.7630787
@@ -2301,7 +2304,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 559140464}
-  - {fileID: 1323416448}
   - {fileID: 1218236529}
   - {fileID: 1259875646}
   - {fileID: 177155405}
@@ -2314,3 +2316,4 @@ SceneRoots:
   - {fileID: 816707984}
   - {fileID: 144513046}
   - {fileID: 570581396}
+  - {fileID: 1323416448}

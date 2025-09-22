@@ -308,7 +308,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-128196123-0
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-144513042-0
         values:
-        - colorIndex: 0
+        - colorIndex: 2
           iconNameOrGuid: Settings Icon
           isIconRecursive: 0
           isColorRecursive: 0
