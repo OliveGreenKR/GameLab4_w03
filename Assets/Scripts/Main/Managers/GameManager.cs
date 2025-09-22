@@ -1,6 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 
@@ -50,6 +51,11 @@ public class GameManager : MonoBehaviour
     [InfoBox("플레이 세션 기록 시스템")]
     [SerializeField] private float _gameStartTime = 0f;
     [SerializeField] private int _totalEarnedGold = 0;
+
+    [Header("UI References")]
+    [SerializeField] Canvas _hudUI = null;
+    [SerializeField] Canvas _gameOverUI = null;
+    [SerializeField] TMP_Text _gameOverTxt = null;
     #endregion
 
     #region Private Fields
@@ -150,19 +156,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // 기본 골드 설정
-        CurrentGold = _initialGold;
-
-        // 게임 시작 시간 기록
-        _gameStartTime = Time.time;
-
-        // 초기 상태 설정
-        CurrentState = _initialGameState;
-
-        SubscribeToEvents();
-        _inputActions?.Enable();
-        CursorLock();
-
         StartGame();
     }
 
@@ -280,6 +273,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
         CheckAndUpdateWaveState();
+
     }
     #endregion
 
@@ -329,12 +323,18 @@ public class GameManager : MonoBehaviour
 
     #region Public Methods - Game Control
     /// <summary>
-    /// 게임 재시작 - 씬 리로드 방식
+    /// 게임 재시작 
     /// </summary>
     public void RestartGame()
     {
+        // 내부 상태 완전 리셋
+        ResetInternalState();
+
+
         UnityEngine.SceneManagement.SceneManager.LoadScene(
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+
+        Debug.Log("[GameManager] Game restarted via scene reload");
     }
 
     /// <summary>
@@ -344,6 +344,10 @@ public class GameManager : MonoBehaviour
     {
         // 내부 상태 완전 리셋
         ResetInternalState();
+
+        //HUD, GameOver UI 초기 상태 설정
+        if (_hudUI != null) _hudUI.enabled = true;
+        if (_gameOverUI != null) _gameOverUI.enabled = false;
 
         // 시스템별 초기화
         InitializeWaveSystem();
@@ -367,6 +371,17 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        SubscribeToEvents();
+        _inputActions?.Enable();
+        CursorLock();
+
+        // 내부 상태 완전 리셋
+        ResetInternalState();
+
+        //HUD, GameOver UI 초기 상태 설정
+        if (_hudUI != null) _hudUI.enabled = true;
+        if (_gameOverUI != null) _gameOverUI.enabled = false;
+
         // 웨이브 시스템 초기화
         InitializeWaveSystem();
 
@@ -384,6 +399,20 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Private Methods - State Management
+    private void OnGameOvered()
+    {
+        //HUD, GameOver UI 상태 설정
+        if (_hudUI != null) _hudUI.enabled = false;
+        if (_gameOverUI != null && _gameOverTxt != null)
+        {
+            _gameOverTxt.text = $"Game Over\n Gold Earned: {_totalEarnedGold}";
+            _gameOverUI.enabled = true;
+
+        }
+
+        // 커서 해제
+        CursorFree();
+    }
     private void ChangeGameState(GameState newState)
     {
         if (CurrentState == newState)
@@ -402,6 +431,11 @@ public class GameManager : MonoBehaviour
     {
         switch (newState)
         {
+            case GameState.WaveReady:
+                // 자동 웨이브 시작
+                StartWave();
+                break;
+
             case GameState.WaveInProgress:
                 OnWaveStarted?.Invoke(CurrentWave);
                 break;
@@ -431,6 +465,7 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.GameOver:
+                OnGameOvered();
                 OnGameOver?.Invoke();
                 break;
 
@@ -577,6 +612,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void SubscribeToEvents()
     {
+        BattleInteractionSystem.OnEntityKilled -= OnEnemyKilled;
         BattleInteractionSystem.OnEntityKilled += OnEnemyKilled;
 
         if (_enemySpawner != null)

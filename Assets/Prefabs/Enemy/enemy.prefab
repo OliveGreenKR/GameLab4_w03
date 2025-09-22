@@ -50,6 +50,7 @@ GameObject:
   - component: {fileID: 4390947304085020657}
   - component: {fileID: 3359800235492905524}
   - component: {fileID: 2240994674549672731}
+  - component: {fileID: 3908500797727374543}
   m_Layer: 0
   m_Name: enemy
   m_TagString: Untagged
@@ -214,6 +215,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyType: 1
+--- !u!114 &3908500797727374543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5175902631662209742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b6f1edbef0008149a740043025bf92b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetNavMeshAgent: {fileID: 9194659079445390000}
+  _enemyBattleEntity: {fileID: 7663295947113335173}
+  _slowMultiplier: 0.5
+  _effectTime: 0.2
+  _targetRenderer: {fileID: 848232088331201740}
+  _damageEffectMaterial: {fileID: 2100000, guid: 3614b2f58acda5a40a335d7f89520a47, type: 2}
 --- !u!1 &6469273310690769977
 GameObject:
   m_ObjectHideFlags: 0

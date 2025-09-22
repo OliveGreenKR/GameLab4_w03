@@ -222,6 +222,7 @@ GameObject:
   - component: {fileID: 8916186915782852267}
   - component: {fileID: 8666529698004511006}
   - component: {fileID: 1167369851163324354}
+  - component: {fileID: 4820567509844162751}
   m_Layer: 0
   m_Name: EliteEnemy
   m_TagString: Untagged
@@ -386,3 +387,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyType: 2
+--- !u!114 &4820567509844162751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7655413781182626458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b6f1edbef0008149a740043025bf92b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetNavMeshAgent: {fileID: 5240855047429907330}
+  _enemyBattleEntity: {fileID: 4234706431951078585}
+  _slowMultiplier: 0.5
+  _effectTime: 0.2
+  _targetRenderer: {fileID: 7425595937670662530}
+  _damageEffectMaterial: {fileID: 2100000, guid: 3614b2f58acda5a40a335d7f89520a47, type: 2}

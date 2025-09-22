@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _itemName: "*\uBD84\uC5F4*"
   _description: "[\uD22C\uC0AC\uCCB4 \uD6A8\uACFC]\r\n\uBD84\uC5F4: 2\uAC1C (+45\xB0)\r\n\uC18D\uB3C4:
-    -15%\r\n\uB370\uBBF8\uC9C0: -20%\r\n\uC0DD\uC874\uC2DC\uAC04: -30%\r\n\uC6B0\uC120\uC21C\uC704:
-    100 (\uCD5C\uD6C4\uC21C)\r\n\uAC00\uACA9: 75G (\uAD6C\uB9E4\uC2DC 1.3\uBC30\uC529
+    -15%\r\n\uB370\uBBF8\uC9C0: -30%\r\n\uC0DD\uC874\uC2DC\uAC04: -30%\r\n\uC6B0\uC120\uC21C\uC704:
+    100 (\uCD5C\uD6C4\uC21C)\r\n\uAC00\uACA9: 75G (\uAD6C\uB9E4\uC2DC 2\uBC30\uC529
     \uC99D\uAC00)\n*\uBD84\uC5F4\uC740 \uD0C0\uACA9 \uC885\uB8CC \uD6C4 \uBD84\uC5F4\n*\uBD84\uC5F4\uC744
     \uC704\uD574\uC11C\uB294 \uCD5C\uC18C \uAD00\uD1B5 \uD544\uC694"
   _itemIcon: {fileID: 0}
   _itemType: 8
   _basePrice: 75
-  _priceInflationMultiplier: 1.33
+  _priceInflationMultiplier: 2
   _projectileEffect: {fileID: 11400000, guid: 055ba47aea7c9304cbdb373a56b1734d, type: 2}

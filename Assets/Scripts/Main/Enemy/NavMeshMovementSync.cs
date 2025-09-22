@@ -121,7 +121,6 @@ public class NavMeshMovementSync : MonoBehaviour
         CurrentMoveSpeed = newValue;
         UpdateNavMeshSpeed(newValue);
     }
-
     private void UpdateNavMeshSpeed(float speed)
     {
         if (_navMeshAgent != null)

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _baseFireRate: 2
   _baseDamage: 5
-  _baseProjectileSpeed: 25
+  _baseProjectileSpeed: 40
   _baseProjectileLifetime: 3
   _baseAccuracy: 90
   _baseRecoil: 0.6

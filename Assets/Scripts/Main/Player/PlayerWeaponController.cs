@@ -272,12 +272,6 @@ public class PlayerWeaponController : MonoBehaviour
             _activeEffects = new List<WeaponEffectSO>();
         }
 
-        if (_activeEffects.Contains(effect))
-        {
-            Debug.LogWarning($"[PlayerWeaponController] Effect {effect.EffectName} already applied", this);
-            return;
-        }
-
         _activeEffects.Add(effect);
         CalculateFinalStats();
         UpdateLauncherSettings();

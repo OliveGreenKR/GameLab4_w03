@@ -21,6 +21,7 @@ MonoBehaviour:
     - 279568727a1ffcd49bae247c289ddf7a
     - 34b03fdac07c9324fb38f09c252499cb
     - c9712a2766445ef43bff7152a97af274
+    - eada27cd0b930ea429a5e1e795039b8f
     values:
     - goDatas_byGlobalId:
         keys: []
@@ -308,6 +309,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-128196123-0
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-144513042-0
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1529682687-0
+        - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-27268232767561959-843605818
         values:
         - colorIndex: 2
           iconNameOrGuid: Settings Icon
@@ -333,6 +335,43 @@ MonoBehaviour:
           iconNameOrGuid: Canvas Icon
           isIconRecursive: 0
           isColorRecursive: 1
+        - colorIndex: 0
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+    - goDatas_byGlobalId:
+        keys:
+        - globalObjectIdString: GlobalObjectId_V1-2-eada27cd0b930ea429a5e1e795039b8f-1323416447-0
+        - globalObjectIdString: GlobalObjectId_V1-2-eada27cd0b930ea429a5e1e795039b8f-1218236528-0
+        - globalObjectIdString: GlobalObjectId_V1-2-eada27cd0b930ea429a5e1e795039b8f-1838710319-0
+        - globalObjectIdString: GlobalObjectId_V1-2-eada27cd0b930ea429a5e1e795039b8f-128196123-0
+        - globalObjectIdString: GlobalObjectId_V1-2-eada27cd0b930ea429a5e1e795039b8f-144513042-0
+        - globalObjectIdString: GlobalObjectId_V1-2-eada27cd0b930ea429a5e1e795039b8f-1529682687-0
+        values:
+        - colorIndex: 2
+          iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Terrain Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 8
+          iconNameOrGuid: WheelCollider Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: CapsuleCollider Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 3
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
   bookmarks: []
   bookmarkedScenePaths:
   - Assets/Scenes/ProjectileTest.unity

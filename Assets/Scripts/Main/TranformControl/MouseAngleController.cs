@@ -152,7 +152,7 @@ public class MouseAngleController : MonoBehaviour
     private void OnLookPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         _currentLookInput = context.ReadValue<Vector2>();
-        Debug.Log($"Look Input: {_currentLookInput}");
+        //Debug.Log($"Look Input: {_currentLookInput}");
     }
 
     private void OnLookCanceled(UnityEngine.InputSystem.InputAction.CallbackContext context)

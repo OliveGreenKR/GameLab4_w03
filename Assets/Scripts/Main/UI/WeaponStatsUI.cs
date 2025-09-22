@@ -18,6 +18,15 @@ public class WeaponStatsUI : MonoBehaviour
             _playerWeaponController.OnWeaponStatChanged -= UpdateStatsDisplay;
             _playerWeaponController.OnWeaponStatChanged += UpdateStatsDisplay;
         }
+
+        if (_statsText != null && _playerWeaponController != null)
+        {
+            _statsText.text = _playerWeaponController.GetWeaponStatsString();
+        }
+        if (_projStatsTxt != null && _playerWeaponController != null)
+        {
+            _projStatsTxt.text = _playerWeaponController.GetProjectileStatsString();
+        }
     }
 
     private void OnDestroy()

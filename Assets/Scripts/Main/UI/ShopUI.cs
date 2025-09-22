@@ -123,7 +123,7 @@ public class ShopUI : MonoBehaviour
     /// <summary>상점 열기</summary>
     public void OpenShop()
     {
-        if (!IsInitialized || IsShopOpen) return;
+        if (!IsInitialized || IsShopOpen || GameManager.Instance.CurrentState == GameState.GameOver) return;
 
         IsShopOpen = true;
 
