@@ -1,5 +1,6 @@
 ﻿using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -47,6 +48,10 @@ public class GameManager : MonoBehaviour
 
     #region Private Fields
     private InputSystem_Actions _inputActions;
+    private int _activeNormalEnemyCount = 0;
+    private int _activeEliteEnemyCount = 0;
+    private int _totalNormalEnemySpawned = 0;
+    private int _totalEliteEnemySpawned = 0;
     #endregion
 
     #region Properties
@@ -58,9 +63,6 @@ public class GameManager : MonoBehaviour
 
     [ShowInInspector, ReadOnly]
     public int CurrentWave => _enemySpawner != null ? _enemySpawner.CurrentCycle : 0;
-
-    [ShowInInspector, ReadOnly]
-    public int ActiveEnemyCount { get; private set; }
 
     // 상태 기반 계산 프로퍼티들
     [ShowInInspector, ReadOnly]
@@ -77,6 +79,28 @@ public class GameManager : MonoBehaviour
 
     [ShowInInspector, ReadOnly]
     public bool IsWaveInProgress => CurrentState == GameState.WaveInProgress;
+
+    // 몬스터 추적
+    [ShowInInspector, ReadOnly]
+    public int ActiveEnemyCount => _activeNormalEnemyCount + _activeEliteEnemyCount;
+
+    [ShowInInspector, ReadOnly]
+    public int ActiveNormalEnemyCount => _activeNormalEnemyCount;
+
+    [ShowInInspector, ReadOnly]
+    public int ActiveEliteEnemyCount => _activeEliteEnemyCount;
+
+    [ShowInInspector, ReadOnly]
+    public int TotalNormalEnemyCount => _totalNormalEnemySpawned;
+
+    [ShowInInspector, ReadOnly]
+    public int TotalEliteEnemyCount => _totalEliteEnemySpawned;
+
+    [ShowInInspector, ReadOnly]
+    public string NormalEnemyProgress => $"{ActiveNormalEnemyCount}/{TotalNormalEnemyCount}";
+
+    [ShowInInspector, ReadOnly]
+    public string EliteEnemyProgress => $"{ActiveEliteEnemyCount}/{TotalEliteEnemyCount}";
 
     public InputSystem_Actions InputActions => _inputActions;
     #endregion
@@ -136,7 +160,7 @@ public class GameManager : MonoBehaviour
 
         if (_enemySpawner != null)
         {
-            //_enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
         }
 
         UnsubscribeFromPlayerEvents();
@@ -234,7 +258,18 @@ public class GameManager : MonoBehaviour
         OnGoldChanged?.Invoke(oldGold, CurrentGold);
 
         // 적 수 감소
-        ActiveEnemyCount = Mathf.Max(0, ActiveEnemyCount - 1);
+        switch (enemyType)
+        {
+            case PrefabType.EnemyNormal:
+                _activeNormalEnemyCount = Mathf.Max(0, _activeNormalEnemyCount - 1);
+                break;
+            case PrefabType.EnemyElite:
+                _activeEliteEnemyCount = Mathf.Max(0, _activeEliteEnemyCount - 1);
+                break;
+            default:
+                Debug.LogWarning($"[GameManager] Unknown enemy type on kill: {enemyType}. No active count decremented.", victim.GameObject);
+                break;
+        }
         CheckAndUpdateWaveState();
     }
     #endregion
@@ -360,7 +395,6 @@ public class GameManager : MonoBehaviour
 
     private void InitializeStats()
     {
-        ActiveEnemyCount = 0;
         CurrentGold = _initialGold;
         OnGoldChanged?.Invoke(0, CurrentGold);  
         ChangeGameState(_initialGameState);
@@ -370,8 +404,8 @@ public class GameManager : MonoBehaviour
 
         if (_enemySpawner != null)
         {
-            //_enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
-            //_enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
+            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
         }
 
         // 플레이어 이벤트 구독
@@ -382,15 +416,15 @@ public class GameManager : MonoBehaviour
     {
         if (_enemySpawner != null)
         {
-            //_enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
         }
 
         _enemySpawner = FindFirstObjectByType<EnemySpawner>();
 
         if (_enemySpawner != null)
         {
-            //_enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
-            //_enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
+            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
         }
         else
         {
@@ -442,9 +476,27 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Private Methods - Event CallBacks
-    private void OnSpawnCompleted(int spawnedCount, int currentCycle)
+    private void OnSpawnCompleted(Dictionary<PrefabType, int> spawnedByType, int currentCycle)
     {
-        ActiveEnemyCount += spawnedCount;
+        // 타입별 스폰 카운터 업데이트
+        foreach (var kvp in spawnedByType)
+        {
+            int spawnedCount = kvp.Value;
+
+            switch (kvp.Key)
+            {
+                case PrefabType.EnemyNormal:
+                    _activeNormalEnemyCount += spawnedCount;
+                    _totalNormalEnemySpawned += spawnedCount;
+                    break;
+
+                case PrefabType.EnemyElite:
+                    _activeEliteEnemyCount += spawnedCount;
+                    _totalEliteEnemySpawned += spawnedCount;
+                    break;
+            }
+        }
+
         CheckAndUpdateWaveState();
     }
 
