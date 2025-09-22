@@ -1,4 +1,5 @@
 ﻿using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,15 +22,15 @@ public class ShopItemUI : MonoBehaviour
     [TabGroup("UI Components")]
     [Header("Text Elements")]
     [Required]
-    [SerializeField] private Text _nameText;
+    [SerializeField] private TextMeshProUGUI _nameText;
 
     [TabGroup("UI Components")]
     [Required]
-    [SerializeField] private Text _priceText;
+    [SerializeField] private TextMeshProUGUI _priceText;
 
     [TabGroup("UI Components")]
     [Required]
-    [SerializeField] private Text _descriptionText;
+    [SerializeField] private TextMeshProUGUI _descriptionText;
 
     [TabGroup("UI Components")]
     [Header("Interaction")]

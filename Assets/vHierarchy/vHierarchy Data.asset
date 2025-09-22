@@ -307,11 +307,12 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1838710319-0
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-128196123-0
         - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-144513042-0
+        - globalObjectIdString: GlobalObjectId_V1-2-c9712a2766445ef43bff7152a97af274-1529682687-0
         values:
         - colorIndex: 2
           iconNameOrGuid: Settings Icon
           isIconRecursive: 0
-          isColorRecursive: 0
+          isColorRecursive: 1
         - colorIndex: 0
           iconNameOrGuid: Terrain Icon
           isIconRecursive: 0
@@ -328,6 +329,10 @@ MonoBehaviour:
           iconNameOrGuid: Canvas Icon
           isIconRecursive: 0
           isColorRecursive: 0
+        - colorIndex: 3
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 1
   bookmarks: []
   bookmarkedScenePaths:
   - Assets/Scenes/ProjectileTest.unity

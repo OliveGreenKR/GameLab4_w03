@@ -99,6 +99,8 @@ public class ShopManager : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public bool IsInitialized { get; private set; }
+
+    public IReadOnlyList<ShopItemSO> ShopItems => _shopItems.AsReadOnly();
     #endregion
 
     #region Unity Lifecycle
