@@ -103,19 +103,19 @@ public class EnemySpawner : MonoBehaviour
 
     #region Events
     /// <summary>
-    /// 스폰 완료 시 발생하는 이벤트
+    /// 스폰 완료 시 발생하는 이벤트 (타입별 개수, 현재 사이클)
     /// </summary>
-    public event Action<int, int> OnSpawnCompleted; // (totalSpawned, currentCycle)
+    public event Action<Dictionary<PrefabType, int>, int> OnSpawnCompleted;
 
     /// <summary>
-    /// 난이도 업그레이드 시 발생하는 이벤트
+    /// 난이도 업그레이드 시 발생하는 이벤트 (새로운 사이클 번호)
     /// </summary>
     public event Action<int> OnDifficultyUpgraded; // (newCycle)
 
     /// <summary>
-    /// 최대값 업그레이드 시 발생하는 이벤트
+    /// 최대값 업그레이드 시 발생하는 이벤트 (target, newValue)
     /// </summary>
-    public event Action<MaxUpgradeTarget, float> OnMaxValueUpgraded; // (target, newValue)
+    public event Action<MaxUpgradeTarget, float> OnMaxValueUpgraded; 
     #endregion
 
     #region Properties
@@ -154,6 +154,10 @@ public class EnemySpawner : MonoBehaviour
     [TabGroup("Debug")]
     [ShowInInspector, ReadOnly]
     public int ActiveSpawnPointCount => _spawnPoints?.Length ?? 0;
+
+    [TabGroup("Debug")]
+    [ShowInInspector, ReadOnly]
+    public Dictionary<PrefabType, int> LastSpawnedEnemy { get; private set; } = new Dictionary<PrefabType, int>();
 
     [TabGroup("Weight System Debug")]
     [ShowInInspector, ReadOnly]
@@ -477,13 +481,23 @@ public class EnemySpawner : MonoBehaviour
         // 스폰 포인트에 랜덤 분배
         int[] distribution = DistributeEnemiesRandomly(totalEnemies, _spawnPoints.Length);
 
+        // 타입별 스폰 개수 추적
+        //Dictionary<PrefabType, int> spawnedByType = new Dictionary<PrefabType, int>();
+        if(LastSpawnedEnemy == null)
+        {
+            LastSpawnedEnemy = new Dictionary<PrefabType, int>();
+        }
+        LastSpawnedEnemy.Clear();
+        Dictionary<PrefabType, int> spawnedByType = LastSpawnedEnemy;
+
         // 각 스폰 포인트에서 적 생성
         int actualSpawned = 0;
         for (int i = 0; i < _spawnPoints.Length; i++)
         {
             if (distribution[i] > 0)
             {
-                SpawnEnemiesAtPoint(_spawnPoints[i], distribution[i]);
+
+                SpawnEnemiesAtPointWithTracking(_spawnPoints[i], distribution[i], ref spawnedByType);
                 actualSpawned += distribution[i];
             }
         }
@@ -493,7 +507,7 @@ public class EnemySpawner : MonoBehaviour
 
         // 로그 및 이벤트 호출
         LogSpawnInfo(actualSpawned, distribution);
-        OnSpawnCompleted?.Invoke(actualSpawned, CurrentCycle);
+        OnSpawnCompleted?.Invoke(spawnedByType, CurrentCycle);
 
         // 난이도 업그레이드 체크
         CheckDifficultyUpgrade();
@@ -526,8 +540,8 @@ public class EnemySpawner : MonoBehaviour
 
             Vector3 spawnPosition = spawnPoint.position + offset;
             Quaternion spawnRotation = spawnPoint.rotation;
-
-            ISpawnable enemy = CreateEnemyFromPool(spawnPosition, spawnRotation);
+            var selectedType = SelectRandomEnemyType();
+            ISpawnable enemy = CreateEnemyFromPool(spawnPosition, spawnRotation, selectedType);
             if (enemy != null)
             {
                 // 스폰 완료 처리
@@ -536,12 +550,12 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    private ISpawnable CreateEnemyFromPool(Vector3 spawnPosition, Quaternion spawnRotation)
+    private ISpawnable CreateEnemyFromPool(Vector3 spawnPosition, Quaternion spawnRotation, PrefabType selectedType)
     {
-        // 확률 기반 적 타입 선택
-        PrefabType selectedEnemyType = SelectRandomEnemyType();
+        //// 확률 기반 적 타입 선택
+        //selectedType = SelectRandomEnemyType();
 
-        GameObject enemyObject = _enemyPool.SpawnObject(selectedEnemyType, spawnPosition, spawnRotation, isForcely:false);
+        GameObject enemyObject = _enemyPool.SpawnObject(selectedType, spawnPosition, spawnRotation, isForcely: false);
 
         if (enemyObject == null)
         {
@@ -559,7 +573,7 @@ public class EnemySpawner : MonoBehaviour
         }
 
         // 랜덤 스탯 생성 및 적용
-        Dictionary<SpawnStatType, float> randomStats = GenerateRandomStats(selectedEnemyType);
+        Dictionary<SpawnStatType, float> randomStats = GenerateRandomStats(selectedType);
         spawnable.ApplySpawnStats(randomStats);
 
         // 풀 반환 콜백 등록
@@ -570,6 +584,36 @@ public class EnemySpawner : MonoBehaviour
 
         return spawnable;
     }
+
+    private void SpawnEnemiesAtPointWithTracking(Transform spawnPoint, int enemyCount, ref Dictionary<PrefabType, int> spawnedTypes)
+    {
+        for (int i = 0; i < enemyCount; i++)
+        {
+            // 약간의 위치 오프셋 적용 (겹침 방지)
+            Vector3 offset = new Vector3(
+                UnityEngine.Random.Range(-1f, 1f),
+                0f,
+                UnityEngine.Random.Range(-1f, 1f)
+            );
+
+            Vector3 spawnPosition = spawnPoint.position + offset;
+            Quaternion spawnRotation = spawnPoint.rotation;
+            var selectedType = SelectRandomEnemyType();
+            ISpawnable enemy = CreateEnemyFromPool(spawnPosition, spawnRotation, selectedType);
+            if (enemy != null)
+            {
+                // 스폰 완료 처리
+                enemy.OnSpawned(this);
+
+                // 타입별 카운팅
+                if (spawnedTypes.ContainsKey(selectedType))
+                    spawnedTypes[selectedType]++;
+                else
+                    spawnedTypes[selectedType] = 1;
+            }
+        }
+    }
+
     #endregion
 
     #region Private Methods - Difficulty Logic

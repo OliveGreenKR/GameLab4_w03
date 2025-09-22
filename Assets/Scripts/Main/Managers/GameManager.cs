@@ -136,7 +136,7 @@ public class GameManager : MonoBehaviour
 
         if (_enemySpawner != null)
         {
-            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            //_enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
         }
 
         UnsubscribeFromPlayerEvents();
@@ -370,8 +370,8 @@ public class GameManager : MonoBehaviour
 
         if (_enemySpawner != null)
         {
-            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
-            _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
+            //_enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            //_enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
         }
 
         // 플레이어 이벤트 구독
@@ -382,15 +382,15 @@ public class GameManager : MonoBehaviour
     {
         if (_enemySpawner != null)
         {
-            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            //_enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
         }
 
         _enemySpawner = FindFirstObjectByType<EnemySpawner>();
 
         if (_enemySpawner != null)
         {
-            _enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
-            _enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
+            //_enemySpawner.OnSpawnCompleted -= OnSpawnCompleted;
+            //_enemySpawner.OnSpawnCompleted += OnSpawnCompleted;
         }
         else
         {
